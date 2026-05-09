@@ -1,50 +1,50 @@
-card_id,card_name,bank,network,eligible_mccs,earn_rate_mpd,base_rate_mpd,cap_sgd,cap_period,min_spend,requires_amaze,amaze_fee_pct,notes
-hsbc_revolution,HSBC Revolution,HSBC,Visa,"5812,5813,5814,5411,5912,5311,5331,5262,4121,4722,7011,7512,5732,4511,5734,5944,5945,7832",4.0,0.4,1000,calendar_month,0,false,0.0,4mpd on 38 eligible MCCs
-uob_ppv,UOB Preferred Platinum Visa,UOB,Visa,"5812,5814,5411,5912,5311,5262,5331,4121,4722,7011,4511",4.0,0.4,600,calendar_month,0,false,0.0,4mpd mobile contactless only
-citi_rewards_mc,Citi Rewards Mastercard,Citibank,Mastercard,"5812,5814,5411,5912,5311,5262,5331,4121,4722,7011,5732",4.0,0.4,1000,statement_month,0,false,0.0,4mpd general online non-travel
-uob_ladys,UOB Lady's Card,UOB,Visa,"5812,5814,5411,5912,5311,5262,5541,4121,4722,7011,4511",4.0,0.4,1000,calendar_month,0,false,0.0,4mpd on chosen category
-uob_ladys_solitaire,UOB Lady's Solitaire,UOB,Visa,"5812,5814,5411,5912,5311,5262,5541,4121,4722,7011,4511",4.0,0.4,750,calendar_month,0,false,0.0,4mpd on chosen category
-dbs_wwmc,DBS Woman's World Card,DBS,Mastercard,"4511,5499",4.0,1.5,1000,calendar_month,0,false,0.0,4mpd air tickets and Atome only
-dbs_altitude_visa,DBS Altitude Visa,DBS,Visa,,1.3,1.3,,calendar_month,0,false,0.0,Base earn all spend; 2.2mpd FCY
-dbs_altitude_amex,DBS Altitude Amex,DBS,Amex,,1.3,1.3,,calendar_month,0,false,0.0,Base earn all spend
-dbs_yuu_visa,DBS yuu Visa,DBS,Visa,"5411,5912,5814,4121,4111,4814",10.0,0.4,822,calendar_month,800,false,0.0,10mpd Cold Storage/Guardian/Foodpanda/Gojek/SimplyGo/Singtel only
-maybank_xl,Maybank XL Card,Maybank,Visa,"5812,5814,5411,5912,5311,4722,7011,4511",4.0,0.4,1000,calendar_month,500,false,0.0,4mpd min $500/mo
-ocbc_90n_mc,OCBC 90N Mastercard,OCBC,Mastercard,,1.3,1.3,,calendar_month,0,false,0.0,Base earn; 2.1mpd FCY
-ocbc_90n_visa,OCBC 90N Visa,OCBC,Visa,,1.3,1.3,,calendar_month,0,false,0.0,Base earn; 2.1mpd FCY
-ocbc_rewards,OCBC Rewards Card,OCBC,Visa,"5812,5814,5411,5912,5311,5262,5331",4.0,0.4,1100,calendar_month,0,false,0.0,6mpd Shopee/Lazada/Watsons till Jun 2026
-uob_signature,UOB Visa Signature,UOB,Visa,,4.0,0.4,1200,statement_month,1000,false,0.0,4mpd on ALL contactless (Apple Pay/PayWave/Google Pay) and FCY; min $1K/month spend
-uob_prvi_miles_visa,UOB PRVI Miles Visa,UOB,Visa,,1.4,1.4,,calendar_month,0,false,0.0,1.4mpd local; 2.4mpd FCY
-uob_prvi_miles_amex,UOB PRVI Miles Amex,UOB,Amex,,1.4,1.4,,calendar_month,0,false,0.0,1.4mpd local; 2.4mpd FCY
-hsbc_advance,HSBC Advance,HSBC,Visa,,1.2,1.2,,calendar_month,0,false,0.0,Base earn
-hsbc_travelone,HSBC TravelOne,HSBC,Visa,,1.2,1.2,,calendar_month,0,false,0.0,1.2mpd local; 2.4mpd FCY
-hsbc_premier_mc,HSBC Premier Mastercard,HSBC,Mastercard,,1.68,1.68,,calendar_month,0,false,0.0,1.68mpd local; 2.76mpd FCY
-krisflyer_uob,KrisFlyer UOB Credit Card,UOB,Visa,"5812,5814,5411,5912,5311,5262,4121,4722,7011,4511",2.4,1.2,,calendar_month,1000,false,0.0,2.4mpd SQ categories min $1K SIA Group/year
-citi_premiermiles,Citi PremierMiles,Citibank,Visa,,1.2,1.2,,calendar_month,0,false,0.0,1.2mpd local; 2.2mpd FCY
-citi_prestige,Citi Prestige,Citibank,Visa,,1.3,1.3,,calendar_month,0,false,0.0,1.3mpd local; 2mpd FCY
-dbs_vantage,DBS Vantage,DBS,Visa,,1.5,1.5,,calendar_month,0,false,0.0,1.5mpd local; 2.2mpd FCY
-stanChart_journey,Standard Chartered Journey,Standard Chartered,Visa,"5812,5814,5411,4121",3.0,1.2,1000,statement_month,0,false,0.0,3mpd dining/groceries/transport online SGD
-stanChart_smart,Standard Chartered Smart,Standard Chartered,Visa,"5812,5814,4111",9.28,1.0,,statement_month,1500,false,0.0,9.28mpd selected fast food + transport min $1.5K
-stanChart_vi,Standard Chartered Visa Infinite,Standard Chartered,Visa,,1.4,1.4,,statement_month,2000,false,0.0,1.4mpd min $2K; 3mpd FCY
-uob_one,UOB One,UOB,Visa,,0.4,0.4,,calendar_month,0,false,0.0,Cashback card; minimal miles earn
-chocolate_visa,Chocolate Visa,Chocolate,Visa,,1.0,1.0,1000,calendar_month,0,false,0.0,1mpd up to $1K; 0.4mpd after
-amaze_citi,Amaze + Citi Rewards,Instarem/Citibank,Mastercard,"5812,5814,5411,5912,5311,5262,5331,4121",4.0,0.4,1000,statement_month,0,true,1.0,4mpd via Amaze; 1% SGD fee
-maybank_horizon,Maybank Horizon Visa Signature,Maybank,Visa,,2.8,2.8,,calendar_month,800,false,0.0,2.8mpd FCY; 3.2mpd selected Asian countries till Jun 2026
-boc_elite,BOC Elite Miles,Bank of China,Visa,,1.4,1.4,,calendar_month,0,false,0.0,1.4mpd local; 2.8mpd FCY
-uob_reserve,UOB Reserve,UOB,Visa,,1.6,1.6,,calendar_month,0,false,0.0,1.6mpd local; 2.4mpd FCY
-uob_vim,UOB Visa Infinite Metal,UOB,Visa,,1.4,1.4,,calendar_month,0,false,0.0,1.4mpd local; 2.4mpd FCY
-ocbc_voyage,OCBC VOYAGE,OCBC,Visa,,1.3,1.3,,calendar_month,0,false,0.0,1.3mpd local; 2.2mpd FCY
-ocbc_voyage_premier,OCBC VOYAGE Premier,OCBC,Visa,,1.6,1.6,,calendar_month,0,false,0.0,1.6mpd; 2.3mpd FCY
-citi_ultima,Citi ULTIMA,Citibank,Visa,,1.6,1.6,,calendar_month,0,false,0.0,1.6mpd local; 2mpd FCY
-dbs_insignia,DBS Insignia,DBS,Visa,,1.6,1.6,,calendar_month,0,false,0.0,1.6mpd local; 2mpd FCY
-amex_krisflyer,Amex KrisFlyer Credit Card,American Express,Amex,"4511",2.0,1.1,,calendar_month,0,false,0.0,2mpd SIA/Scoot; 1.1mpd other
-amex_krisflyer_ascend,Amex KrisFlyer Ascend,American Express,Amex,"4511",2.0,1.2,,calendar_month,0,false,0.0,2mpd SIA/Scoot; 1.2mpd other
-amex_highflyer,Amex HighFlyer,American Express,Amex,"4511",2.0,1.2,,calendar_month,0,false,0.0,2mpd SIA/Scoot; 1.2mpd other
-amex_plat_charge,Amex Platinum Charge,American Express,Amex,,0.63,0.63,,calendar_month,0,false,0.0,Premium card low base earn
-amex_plat_credit,Amex Platinum Credit,American Express,Amex,,0.57,0.57,,calendar_month,0,false,0.0,
-amex_centurion,Amex Centurion,American Express,Amex,,0.78,0.78,,calendar_month,0,false,0.0,Black card
-stanChart_beyond,Standard Chartered Beyond,Standard Chartered,Visa,,1.5,1.5,,calendar_month,0,false,0.0,2mpd PB/PP
-maybank_vi,Maybank Visa Infinite,Maybank,Visa,,1.2,1.2,,calendar_month,0,false,0.0,1.2mpd local; 3.2mpd FCY min $4K
-maybank_world_mc,Maybank World Mastercard,Maybank,Mastercard,"5541",4.0,0.4,,calendar_month,0,false,0.0,4mpd petrol offline uncapped
-maybank_perks,Maybank Perks,Maybank,Visa,,1.2,1.2,,calendar_month,500,false,0.0,2mpd FCY min $500
-dcs_imperium,DCS Imperium,DCS Card,Visa,,1.0,1.0,,calendar_month,4000,false,0.0,4mpd FCY min $4K
-amaze,Amaze (Instarem),Instarem,Mastercard,,0.0,0.0,,calendar_month,0,false,0.0,Amaze pass-through — add to wallet to enable Amaze combos
+card_id,card_name,bank,network,eligible_mccs,earn_rate_mpd,base_rate_mpd,cap_sgd,cap_period,min_spend,requires_amaze,amaze_fee_pct
+hsbc_revolution,HSBC Revolution,HSBC,Visa,"5812,5813,5814,5411,5912,5311,5331,5262,4121,4722,7011,7512,5732,4511,5734,5944,5945,7832",4.0,0.4,1000,calendar_month,0,false,0.0
+uob_ppv,UOB Preferred Platinum Visa,UOB,Visa,"5812,5814,5411,5912,5311,5262,5331,4121,4722,7011,4511",4.0,0.4,600,calendar_month,0,false,0.0
+citi_rewards_mc,Citi Rewards Mastercard,Citibank,Mastercard,"5812,5814,5411,5912,5311,5262,5331,4121,4722,7011,5732",4.0,0.4,1000,statement_month,0,false,0.0
+uob_ladys,UOB Lady's Card,UOB,Visa,"5812,5814,5411,5912,5311,5262,5541,4121,4722,7011,4511",4.0,0.4,1000,calendar_month,0,false,0.0
+uob_ladys_solitaire,UOB Lady's Solitaire,UOB,Visa,"5812,5814,5411,5912,5311,5262,5541,4121,4722,7011,4511",4.0,0.4,750,calendar_month,0,false,0.0
+dbs_wwmc,DBS Woman's World Card,DBS,Mastercard,"4511,5499",4.0,1.5,1000,calendar_month,0,false,0.0
+dbs_altitude_visa,DBS Altitude Visa,DBS,Visa,,1.3,1.3,,calendar_month,0,false,0.0
+dbs_altitude_amex,DBS Altitude Amex,DBS,Amex,,1.3,1.3,,calendar_month,0,false,0.0
+dbs_yuu_visa,DBS yuu Visa,DBS,Visa,"5411,5912,5814,4121,4111,4814",10.0,0.4,822,calendar_month,800,false,0.0
+maybank_xl,Maybank XL Card,Maybank,Visa,"5812,5814,5411,5912,5311,4722,7011,4511",4.0,0.4,1000,calendar_month,500,false,0.0
+ocbc_90n_mc,OCBC 90N Mastercard,OCBC,Mastercard,,1.3,1.3,,calendar_month,0,false,0.0
+ocbc_90n_visa,OCBC 90N Visa,OCBC,Visa,,1.3,1.3,,calendar_month,0,false,0.0
+ocbc_rewards,OCBC Rewards Card,OCBC,Visa,"5812,5814,5411,5912,5311,5262,5331",4.0,0.4,1100,calendar_month,0,false,0.0
+uob_signature,UOB Visa Signature,UOB,Visa,,4.0,0.4,1200,statement_month,1000,false,0.0
+uob_prvi_miles_visa,UOB PRVI Miles Visa,UOB,Visa,,1.4,1.4,,calendar_month,0,false,0.0
+uob_prvi_miles_amex,UOB PRVI Miles Amex,UOB,Amex,,1.4,1.4,,calendar_month,0,false,0.0
+hsbc_advance,HSBC Advance,HSBC,Visa,,1.2,1.2,,calendar_month,0,false,0.0
+hsbc_travelone,HSBC TravelOne,HSBC,Visa,,1.2,1.2,,calendar_month,0,false,0.0
+hsbc_premier_mc,HSBC Premier Mastercard,HSBC,Mastercard,,1.68,1.68,,calendar_month,0,false,0.0
+krisflyer_uob,KrisFlyer UOB Credit Card,UOB,Visa,"5812,5814,5411,5912,5311,5262,4121,4722,7011,4511",2.4,1.2,,calendar_month,1000,false,0.0
+citi_premiermiles,Citi PremierMiles,Citibank,Visa,,1.2,1.2,,calendar_month,0,false,0.0
+citi_prestige,Citi Prestige,Citibank,Visa,,1.3,1.3,,calendar_month,0,false,0.0
+dbs_vantage,DBS Vantage,DBS,Visa,,1.5,1.5,,calendar_month,0,false,0.0
+stanChart_journey,Standard Chartered Journey,Standard Chartered,Visa,"5812,5814,5411,4121",3.0,1.2,1000,statement_month,0,false,0.0
+stanChart_smart,Standard Chartered Smart,Standard Chartered,Visa,"5812,5814,4111",9.28,1.0,,statement_month,1500,false,0.0
+stanChart_vi,Standard Chartered Visa Infinite,Standard Chartered,Visa,,1.4,1.4,,statement_month,2000,false,0.0
+uob_one,UOB One,UOB,Visa,,0.4,0.4,,calendar_month,0,false,0.0
+chocolate_visa,Chocolate Visa,Chocolate,Visa,,1.0,1.0,1000,calendar_month,0,false,0.0
+amaze_citi,Amaze + Citi Rewards,Instarem/Citibank,Mastercard,"5812,5814,5411,5912,5311,5262,5331,4121",4.0,0.4,1000,statement_month,0,true,1.0
+maybank_horizon,Maybank Horizon Visa Signature,Maybank,Visa,,2.8,2.8,,calendar_month,800,false,0.0
+boc_elite,BOC Elite Miles,Bank of China,Visa,,1.4,1.4,,calendar_month,0,false,0.0
+uob_reserve,UOB Reserve,UOB,Visa,,1.6,1.6,,calendar_month,0,false,0.0
+uob_vim,UOB Visa Infinite Metal,UOB,Visa,,1.4,1.4,,calendar_month,0,false,0.0
+ocbc_voyage,OCBC VOYAGE,OCBC,Visa,,1.3,1.3,,calendar_month,0,false,0.0
+ocbc_voyage_premier,OCBC VOYAGE Premier,OCBC,Visa,,1.6,1.6,,calendar_month,0,false,0.0
+citi_ultima,Citi ULTIMA,Citibank,Visa,,1.6,1.6,,calendar_month,0,false,0.0
+dbs_insignia,DBS Insignia,DBS,Visa,,1.6,1.6,,calendar_month,0,false,0.0
+amex_krisflyer,Amex KrisFlyer Credit Card,American Express,Amex,4511,2.0,1.1,,calendar_month,0,false,0.0
+amex_krisflyer_ascend,Amex KrisFlyer Ascend,American Express,Amex,4511,2.0,1.2,,calendar_month,0,false,0.0
+amex_highflyer,Amex HighFlyer,American Express,Amex,4511,2.0,1.2,,calendar_month,0,false,0.0
+amex_plat_charge,Amex Platinum Charge,American Express,Amex,,0.63,0.63,,calendar_month,0,false,0.0
+amex_plat_credit,Amex Platinum Credit,American Express,Amex,,0.57,0.57,,calendar_month,0,false,0.0
+amex_centurion,Amex Centurion,American Express,Amex,,0.78,0.78,,calendar_month,0,false,0.0
+stanChart_beyond,Standard Chartered Beyond,Standard Chartered,Visa,,1.5,1.5,,calendar_month,0,false,0.0
+maybank_vi,Maybank Visa Infinite,Maybank,Visa,,1.2,1.2,,calendar_month,0,false,0.0
+maybank_world_mc,Maybank World Mastercard,Maybank,Mastercard,5541,4.0,0.4,,calendar_month,0,false,0.0
+maybank_perks,Maybank Perks,Maybank,Visa,,1.2,1.2,,calendar_month,500,false,0.0
+dcs_imperium,DCS Imperium,DCS Card,Visa,,1.0,1.0,,calendar_month,4000,false,0.0
+amaze,Amaze (Instarem),Instarem,Mastercard,,0.0,0.0,,calendar_month,0,false,0.0
