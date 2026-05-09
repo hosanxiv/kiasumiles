@@ -1,12 +1,27 @@
 from __future__ import annotations
 import json
+import platform
 import shutil
 import subprocess
 import sys
 from pathlib import Path
 
 
-_CLAUDE_DESKTOP = Path.home() / "Library" / "Application Support" / "Claude" / "claude_desktop_config.json"
+def _get_claude_desktop_config_path() -> Path:
+    """Get Claude Desktop config path for current platform."""
+    system = platform.system()
+    if system == "Darwin":  # macOS
+        return Path.home() / "Library" / "Application Support" / "Claude" / "claude_desktop_config.json"
+    elif system == "Linux":
+        return Path.home() / ".config" / "Claude" / "claude_desktop_config.json"
+    elif system == "Windows":
+        return Path.home() / "AppData" / "Roaming" / "Claude" / "claude_desktop_config.json"
+    else:
+        # Fallback to Linux convention
+        return Path.home() / ".config" / "Claude" / "claude_desktop_config.json"
+
+
+_CLAUDE_DESKTOP = _get_claude_desktop_config_path()
 
 
 def find_binary() -> Path | None:

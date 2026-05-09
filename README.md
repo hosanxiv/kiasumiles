@@ -26,8 +26,14 @@ Pick your agent below. **You only do this once.**
 
 Open this file in a text editor:
 
+**On Mac:**
 ```
 ~/Library/Application Support/Claude/claude_desktop_config.json
+```
+
+**On Linux:**
+```
+~/.config/Claude/claude_desktop_config.json
 ```
 
 *(Create it if it doesn't exist yet)*
