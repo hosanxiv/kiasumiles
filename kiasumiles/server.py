@@ -1,5 +1,4 @@
 from __future__ import annotations
-import threading
 from mcp.server.fastmcp import FastMCP
 from .data.loader import DataLoader
 from .engine.wallet import load_wallet, save_wallet, WALLET_PATH
@@ -35,13 +34,38 @@ def kiasumiles_configure(cards: list[str]) -> dict:
     ask about any merchant to get the best card. Never show card_ids or technical terms to the user.
     """
     valid_ids = {c.card_id for c in _loader.cards()}
-    saved = [cid for cid in cards if cid in valid_ids]
-    not_found = [cid for cid in cards if cid not in valid_ids]
-    save_wallet(saved)
+    invalid = [cid for cid in cards if cid not in valid_ids]
+
+    if invalid:
+        return {
+            "error": f"Invalid cards: {invalid}. Wallet not changed.",
+            "wallet_configured": bool(load_wallet()),
+        }
+
+    save_wallet(cards)
     return {
-        "saved": saved,
-        "not_found": not_found,
+        "saved": cards,
         "wallet_path": str(WALLET_PATH),
+    }
+
+
+@mcp.tool()
+def kiasumiles_get_wallet() -> dict:
+    """Get the user's currently saved credit cards. Returns card names in plain English."""
+    wallet_ids = load_wallet()
+    if not wallet_ids:
+        return {
+            "cards": [],
+            "message": "No wallet configured yet. Tell your agent which cards you carry.",
+        }
+
+    card_names = [
+        c.card_name
+        for c in _loader.cards()
+        if c.card_id in wallet_ids
+    ]
+    return {
+        "cards": card_names,
     }
 
 
@@ -119,27 +143,5 @@ def kiasumiles_lookup(
     }
 
 
-@mcp.tool()
-def kiasumiles_refresh() -> dict:
-    """Pull the latest merchant MCC data and card rules from GitHub. Run monthly or when you suspect data is stale."""
-    from .data.updater import refresh
-    result = refresh(force=False)
-    if result["source"] == "github":
-        _loader.reload()
-    return result
-
-
-def _background_refresh() -> None:
-    try:
-        from .data.updater import refresh
-        result = refresh(force=False)
-        if result["source"] == "github":
-            _loader.reload()
-    except Exception:
-        pass
-
-
 def main() -> None:
-    t = threading.Thread(target=_background_refresh, daemon=True)
-    t.start()
     mcp.run()

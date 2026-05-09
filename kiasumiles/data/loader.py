@@ -32,17 +32,7 @@ class CardRule:
     amaze_fee_pct: float
 
 
-_CACHE_DIR = Path.home() / ".kiasumiles" / "data"
 _BUNDLED = Path(__file__).parent
-
-
-def _csv_path(filename: str) -> Path:
-    """Return user cache path if it exists (written by updater); else bundled."""
-    cached = _CACHE_DIR / filename
-    bundled = _BUNDLED / filename
-    if cached.exists():
-        return cached
-    return bundled
 
 
 def _parse_bool(val: str) -> bool:
@@ -75,12 +65,8 @@ class DataLoader:
             self._cards = self._load_cards()
         return self._cards
 
-    def reload(self) -> None:
-        self._merchants = None
-        self._cards = None
-
     def _load_merchants(self) -> list[MerchantRecord]:
-        path = _csv_path("merchant_mcc.csv")
+        path = _BUNDLED / "merchant_mcc.csv"
         records = []
         with open(path, newline="", encoding="utf-8") as f:
             for row in csv.DictReader(f):
@@ -97,7 +83,7 @@ class DataLoader:
         return records
 
     def _load_cards(self) -> list[CardRule]:
-        path = _csv_path("card_rules.csv")
+        path = _BUNDLED / "card_rules.csv"
         rules = []
         seen: set[str] = set()
         with open(path, newline="", encoding="utf-8") as f:
