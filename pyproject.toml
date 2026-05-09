@@ -1,0 +1,40 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "kiasumiles-mcp"
+version = "0.1.0"
+description = "KiasuMiles — SG credit card miles optimizer, MCP server"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+keywords = ["singapore", "credit-card", "miles", "mcp", "kiasumiles"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: End Users/Desktop",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3.11",
+    "Topic :: Office/Business :: Financial",
+]
+dependencies = [
+    "mcp[cli]>=1.0.0",
+    "rapidfuzz>=3.0.0",
+    "pyyaml>=6.0",
+    "httpx>=0.27.0",
+]
+
+[project.scripts]
+kiasumiles-mcp = "kiasumiles.server:main"
+kiasumiles-setup = "kiasumiles.setup:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["kiasumiles"]
+include = ["kiasumiles/data/*.csv"]
+
+[project.urls]
+Homepage = "https://github.com/hosanxiv/kiasumiles"
+"Bug Tracker" = "https://github.com/hosanxiv/kiasumiles/issues"
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0", "pytest-asyncio>=0.23"]

@@ -1,0 +1,18 @@
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+dist/
+*.egg-info/
+.DS_Store
+.pytest_cache/
+
+# Internal docs
+docs/
+
+# Maintenance scripts
+scripts/
+
+# One-off tools
+install_mcp.py
+install_mcp.command
