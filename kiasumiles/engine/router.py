@@ -80,6 +80,7 @@ def rank_cards(
             "cap_period": rule.cap_period,
             "caveat": rule.caveat or None,
             "last_verified": rule.last_verified or None,
+            "earn_block_sgd": rule.earn_block_sgd,
         })
 
     scored.sort(key=lambda x: x["earn_rate_mpd"], reverse=True)

@@ -35,6 +35,7 @@ class CardRule:
     caveat: str
     last_verified: str
     source_url: str
+    earn_block_sgd: float  # spend rounds down to nearest block before earn rate applies (UOB/DBS = $5, others = $1)
 
 
 _BUNDLED = Path(__file__).parent
@@ -115,5 +116,6 @@ class DataLoader:
                     caveat=row.get("caveat", "").strip(),
                     last_verified=row.get("last_verified", "").strip(),
                     source_url=row.get("source_url", "").strip(),
+                    earn_block_sgd=float(row.get("earn_block_sgd") or 1),
                 ))
         return rules

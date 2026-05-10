@@ -8,9 +8,23 @@ _loader = DataLoader()
 
 
 @mcp.tool()
-def kiasumiles_list_cards() -> dict:
-    """Call this first when the user wants to set up or update their KiasuMiles wallet. Lists all supported Singapore credit cards so you can match them to what the user carries. Present grouped by bank in plain language — never show card_id values to the user."""
+def kiasumiles_list_cards(bank: str | None = None) -> dict:
+    """List supported Singapore credit cards for KiasuMiles wallet setup.
+
+    DO NOT call this with no arguments first — that returns 49 cards and overwhelms the user.
+    Instead, ask the user "Which banks do you have cards with?" first. Common banks: UOB, DBS,
+    OCBC, Citibank, HSBC, American Express, Standard Chartered, Maybank. Then call this
+    once per bank they mention with the bank parameter set, and present a short list per bank.
+
+    Only call without bank if the user explicitly asks "show me ALL cards" or "what's the
+    full list".
+
+    Never show card_id values to the user — only card_name and bank in plain language.
+    """
     cards = _loader.cards()
+    if bank:
+        bank_lower = bank.lower().strip()
+        cards = [c for c in cards if bank_lower in c.bank.lower()]
     return {
         "cards": [
             {
@@ -22,6 +36,7 @@ def kiasumiles_list_cards() -> dict:
             for c in cards
         ],
         "total": len(cards),
+        "filtered_by_bank": bank,
     }
 
 
