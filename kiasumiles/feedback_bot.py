@@ -4,6 +4,10 @@ Listens for messages on @kiasumilesbot. Logs each message with sender,
 timestamp, and content to ~/.kiasumiles/feedback.log. Acknowledges the
 sender with a thank-you reply.
 
+Per-user rate limit: 10 messages per hour. Beyond the limit, messages are
+logged silently with a flag but not acked or forwarded — protects against
+spam without affecting genuine reports.
+
 Run continuously on a server (or locally for testing):
 
     export KIASUMILES_BOT_TOKEN="<token from @BotFather>"
@@ -12,13 +16,15 @@ Run continuously on a server (or locally for testing):
 The token is read from the env var. NEVER commit the token to git.
 
 Optional: set KIASUMILES_OWNER_CHAT_ID to forward feedback to a specific
-chat (e.g. your own Telegram). The bot prints the owner chat ID on /start.
+chat (e.g. your own Telegram). The owner can send /testforward to verify
+the pipeline (sends a self-forward as if a user sent it).
 """
 from __future__ import annotations
 import json
 import os
 import sys
 import time
+from collections import defaultdict, deque
 from datetime import datetime, timezone
 from pathlib import Path
 from urllib import request as urlrequest, parse as urlparse, error as urlerror
@@ -28,11 +34,23 @@ API_BASE = "https://api.telegram.org/bot"
 LOG_DIR = Path.home() / ".kiasumiles"
 LOG_FILE = LOG_DIR / "feedback.log"
 
+RATE_LIMIT_MESSAGES = 10
+RATE_LIMIT_WINDOW_SECONDS = 3600  # 1 hour
+
 ACK_REPLY = (
     "Thanks for the feedback on KiasuMiles. Logged it — "
     "we look at every report. If your card recommendation was wrong, "
     "include the merchant name and which card was suggested."
 )
+
+RATE_LIMIT_REPLY = (
+    "You've sent a lot of messages recently — slowing you down to keep things "
+    "manageable. Try again in an hour. Genuine reports always get reviewed."
+)
+
+# In-memory sliding window per user_id. Resets when the bot restarts (acceptable
+# for our scale — persistent storage would be over-engineering at single-digit users).
+_message_history: dict[int, deque[float]] = defaultdict(deque)
 
 
 def _api(token: str, method: str, payload: dict | None = None) -> dict:
@@ -48,7 +66,7 @@ def _api(token: str, method: str, payload: dict | None = None) -> dict:
         return {"ok": False, "error": str(e)}
 
 
-def _log_feedback(msg: dict) -> None:
+def _log_feedback(msg: dict, rate_limited: bool = False) -> None:
     LOG_DIR.mkdir(parents=True, exist_ok=True)
     sender = msg.get("from", {})
     entry = {
@@ -58,16 +76,41 @@ def _log_feedback(msg: dict) -> None:
         "username": sender.get("username") or "",
         "name": (sender.get("first_name", "") + " " + sender.get("last_name", "")).strip(),
         "text": msg.get("text", ""),
+        "rate_limited": rate_limited,
     }
     with LOG_FILE.open("a", encoding="utf-8") as f:
         f.write(json.dumps(entry, ensure_ascii=False) + "\n")
-    print(f"[{entry['ts']}] {entry['username'] or entry['name']}: {entry['text'][:100]}")
+    flag = " [RATE-LIMITED]" if rate_limited else ""
+    print(f"[{entry['ts']}]{flag} {entry['username'] or entry['name']}: {entry['text'][:100]}")
+
+
+def _is_rate_limited(user_id: int) -> bool:
+    """Sliding window: True if user has sent >= RATE_LIMIT_MESSAGES in the last window."""
+    now = time.time()
+    history = _message_history[user_id]
+    cutoff = now - RATE_LIMIT_WINDOW_SECONDS
+    while history and history[0] < cutoff:
+        history.popleft()
+    if len(history) >= RATE_LIMIT_MESSAGES:
+        return True
+    history.append(now)
+    return False
+
+
+def _forward_to_owner(token: str, msg: dict, owner_chat_id: str) -> None:
+    sender = msg.get("from", {})
+    forward = (
+        f"Feedback from @{sender.get('username', '?')} ({sender.get('id', '?')}):\n\n"
+        f"{msg.get('text', '')}"
+    )
+    _api(token, "sendMessage", {"chat_id": owner_chat_id, "text": forward})
 
 
 def _handle_message(token: str, msg: dict, owner_chat_id: str | None) -> None:
     chat_id = msg.get("chat", {}).get("id")
     text = msg.get("text", "")
-    if not chat_id:
+    user_id = msg.get("from", {}).get("id")
+    if not chat_id or not user_id:
         return
 
     if text.startswith("/start"):
@@ -83,16 +126,26 @@ def _handle_message(token: str, msg: dict, owner_chat_id: str | None) -> None:
         print(f"[/start] chat_id={chat_id} username=@{msg.get('from', {}).get('username', '')}")
         return
 
+    # Owner-only command: trigger a self-forward so the owner can verify the
+    # forwarding pipeline works end-to-end.
+    if text.startswith("/testforward") and owner_chat_id and str(chat_id) == str(owner_chat_id):
+        _forward_to_owner(token, msg, owner_chat_id)
+        _api(token, "sendMessage", {"chat_id": chat_id, "text": "Test forward sent."})
+        return
+
+    if _is_rate_limited(user_id):
+        _log_feedback(msg, rate_limited=True)
+        # Send the rate-limit reply at most once per window: the user is already
+        # over the limit, but they should know why their messages aren't being acked.
+        # Telegram itself dedupes identical replies, so safe to call.
+        _api(token, "sendMessage", {"chat_id": chat_id, "text": RATE_LIMIT_REPLY})
+        return
+
     _log_feedback(msg)
     _api(token, "sendMessage", {"chat_id": chat_id, "text": ACK_REPLY})
 
     if owner_chat_id and str(chat_id) != str(owner_chat_id):
-        sender = msg.get("from", {})
-        forward = (
-            f"Feedback from @{sender.get('username', '?')} ({sender.get('id', '?')}):\n\n"
-            f"{text}"
-        )
-        _api(token, "sendMessage", {"chat_id": owner_chat_id, "text": forward})
+        _forward_to_owner(token, msg, owner_chat_id)
 
 
 def main() -> None:
