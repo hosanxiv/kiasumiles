@@ -20,6 +20,9 @@ scripts/
 install_mcp.py
 install_mcp.command
 
+# Claude Code local settings (may contain tokens/permissions)
+.claude/
+
 # Secrets — bot tokens, API keys, etc. NEVER commit these.
 .env
 .env.*

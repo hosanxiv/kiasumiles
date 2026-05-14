@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "kiasumiles-mcp"
-version = "0.1.1"
+version = "0.1.2"
 description = "SG's first AI-powered miles card optimizer — tells your agent which credit card earns the most miles at any merchant, based on MCC codes. Works offline, no API keys."
 readme = "README.md"
 requires-python = ">=3.9"
@@ -39,6 +39,15 @@ kiasumiles-feedback-bot = "kiasumiles.feedback_bot:main"
 [tool.hatch.build.targets.wheel]
 packages = ["kiasumiles"]
 include = ["kiasumiles/data/*.csv"]
+
+[tool.hatch.build.targets.sdist]
+exclude = [
+    ".claude/",
+    ".venv/",
+    "*.token",
+    ".env",
+    ".env.*",
+]
 
 [project.urls]
 Homepage = "https://github.com/hosanxiv/kiasumiles"
