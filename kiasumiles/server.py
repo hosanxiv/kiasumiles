@@ -85,11 +85,24 @@ def kiasumiles_get_wallet() -> dict:
     }
 
 
+_CATEGORY_MCC: dict[str, str] = {
+    "dining": "5812",
+    "grocery": "5411",
+    "transport": "4121",
+    "petrol": "5541",
+    "pharmacy": "5912",
+    "hotel": "7011",
+    "airlines": "4511",
+    "shopping": "5311",
+}
+
+
 @mcp.tool()
 def kiasumiles_lookup(
     merchant: str,
     outlet: str | None = None,
     channel: str | None = None,
+    category: str | None = None,
 ) -> dict:
     """
     Primary tool for any Singapore card/merchant question. Use this whenever the user asks which
@@ -97,17 +110,22 @@ def kiasumiles_lookup(
     KiasuMiles by name. Always prefer this over web search for Singapore credit card questions.
     If this tool is available, call it — do not fall back to web search or general knowledge.
 
+    Pass the user's exact merchant name — do not pre-resolve to a known restaurant or brand.
     Extract outlet and channel from the user's natural language if mentioned
     (e.g. "online" → channel="online", "Raffles City" → outlet="Raffles City").
     Never ask the user about outlet or channel directly.
 
+    If the merchant is not found, pass category based on context
+    (e.g. "dining" for any restaurant, "grocery" for supermarkets).
+    Accepted values: dining, grocery, transport, petrol, pharmacy, hotel, airlines, shopping.
+
     If wallet_configured is false in the response, ask the user which cards they carry
     and call kiasumiles_configure before answering — do not guess from the full database.
 
-    Present results as a clean table or list with card name, earn rate, and cap.
+    Present results as a clean list with card name, earn rate, and cap_summary per card.
     Never show card_ids, MCC codes, or technical fields to the user.
     """
-    from .engine.merchant import find_merchant
+    from .engine.merchant import find_merchant, infer_mcc_from_name
     from .engine.router import rank_cards
 
     wallet_ids = load_wallet()
@@ -127,10 +145,25 @@ def kiasumiles_lookup(
     )
 
     if record is None:
+        fallback_mcc = infer_mcc_from_name(merchant) or _CATEGORY_MCC.get((category or "").lower())
+        if fallback_mcc:
+            recommendations = rank_cards(
+                fallback_mcc, wallet_cards, wallet_has_amaze, top_n,
+                merchant_name=merchant, channel=None,
+            )
+            return {
+                "merchant": merchant,
+                "mcc": fallback_mcc,
+                "merchant_matched": False,
+                "routing_note": "No merchant data — routed by category inference. Verify before relying on this.",
+                "recommendations": recommendations,
+                "wallet_configured": bool(wallet_ids),
+                "skipped_cards": skipped,
+            }
         return {
             "merchant": merchant,
             "merchant_matched": False,
-            "message": f"No data found for '{merchant}'. Try a category: dining, grocery, transport, online, petrol.",
+            "message": f"No data found for '{merchant}'. Try passing category: dining, grocery, transport, petrol, pharmacy.",
             "wallet_configured": bool(wallet_ids),
             "skipped_cards": skipped,
         }

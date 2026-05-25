@@ -2,6 +2,27 @@ from __future__ import annotations
 from rapidfuzz import fuzz, process
 from ..data.loader import MerchantRecord
 
+
+_KEYWORD_MCC: list[tuple[list[str], str]] = [
+    (["ramen", "sushi", "noodle", "restaurant", "cafe", "kopitiam", "hawker", "bistro", "eatery", "dining", "coffee", "bak kut", "zi char", "cze char"], "5812"),
+    (["supermarket", "fairprice", "cold storage", "sheng siong", "market", "grocery", "giant", "jasons", "little farms"], "5411"),
+    (["grab", "gojek", "taxi", "mrt", "bus", "transit", "simplygo", "ez-link", "comfort", "premier cab"], "4121"),
+    (["petrol", "shell", "esso", "caltex", "sinopec", "spc", "fuel", "chevron"], "5541"),
+    (["pharmacy", "guardian", "watsons", "unity", "ntuc health", "caring"], "5912"),
+    (["hotel", "airbnb", "resort", "inn", "lodge", "serviced apartment"], "7011"),
+    (["airline", "airways", "scoot", "silkair", "jetstar", "airasia", "flight"], "4511"),
+    (["shopping", "department store", "takashimaya", "robinsons", "isetan"], "5311"),
+]
+
+
+def infer_mcc_from_name(merchant: str) -> str | None:
+    """Infer MCC from merchant name keywords. Returns None if no match."""
+    lower = merchant.lower()
+    for keywords, mcc in _KEYWORD_MCC:
+        if any(kw in lower for kw in keywords):
+            return mcc
+    return None
+
 _FUZZY_THRESHOLD = 80
 
 
