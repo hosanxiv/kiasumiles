@@ -2,7 +2,7 @@
 
 <p align="center">
   <a href="https://haohao.zo.space/kiasumiles">
-    <img src="assets/kiasumiles-hero.png" alt="KiasuMiles landing page hero" width="100%">
+    <img src="https://raw.githubusercontent.com/hosanxiv/kiasumiles/main/assets/kiasumiles-hero.png" alt="KiasuMiles landing page hero" width="100%">
   </a>
 </p>
 
