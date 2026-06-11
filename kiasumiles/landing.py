@@ -622,7 +622,7 @@ def render_landing(version: dict) -> str:
         <article class="story-card">
           <span class="phase">The tap</span>
           <h3>The answer moved to the moment that matters.</h3>
-          <p class="body-md" style="margin-top: 18px;">Your wallet, your partner's wallet, your parents' cards, ranked for the merchant in front of you.</p>
+          <p class="body-md" style="margin-top: 18px;">Different card sets can produce different answers for the same merchant, so the recommendation is always based on the cards passed in with that request.</p>
           <p class="muted-small">The whole product lives in the few seconds before the tap. That is the only window that matters.</p>
         </article>
       </div>
@@ -631,13 +631,13 @@ def render_landing(version: dict) -> str:
           <p class="micro-label">From the build</p>
           <h3 style="margin-top: 16px;">The data can be right and the recommendation can still be wrong.</h3>
           <p class="body-md" style="margin-top: 18px;">
-            Category-level advice breaks when the merchant has specific rules. KiasuMiles combines merchant matching, card-rule caveats, and the user's current stack before ranking.
+            Category-level advice breaks when the merchant has specific rules. KiasuMiles combines merchant matching, card-rule caveats, and the cards supplied in the request before ranking.
           </p>
         </div>
         <div class="lesson-card">
           <p class="micro-label">What changed</p>
           <div class="lesson-list">
-            <div class="lesson-item"><span class="check">&check;</span><span>Wallet setup moved to the client as a list of card IDs.</span></div>
+            <div class="lesson-item"><span class="check">&check;</span><span>Card IDs are passed in with each MCP request, then ranked against the merchant.</span></div>
             <div class="lesson-item"><span class="check">&check;</span><span>Merchant logic handles exceptions instead of trusting category alone.</span></div>
             <div class="lesson-item"><span class="check">&check;</span><span>When card rules are time-sensitive, KiasuMiles shows the caveat instead of bluffing certainty.</span></div>
           </div>
