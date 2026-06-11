@@ -1,5 +1,15 @@
 # KiasuMiles
 
+<p align="center">
+  <a href="https://haohao.zo.space/kiasumiles">
+    <img src="https://raw.githubusercontent.com/hosanxiv/kiasumiles/main/assets/kiasumiles-hero.png" alt="KiasuMiles landing page hero" width="100%">
+  </a>
+</p>
+
+<p align="center">
+  <a href="https://haohao.zo.space/kiasumiles"><strong>View the live landing page and 60s demo</strong></a>
+</p>
+
 > "Which card do I use again?"
 
 If you're in the miles game, you've asked this at least once - standing at the cashier,
@@ -83,42 +93,14 @@ curl -i -X POST https://kiasumiles.space/mcp \
 
 ---
 
-## Local MCP
-
-The package also runs as a local stdio MCP server, fully offline:
-
-```bash
-pip3 install kiasumiles-mcp && kiasumiles-setup
-```
-
-The local server can save a wallet on your machine and answer lookups without any web
-calls. The setup script auto-configures Claude Desktop and Claude Code if it finds them.
-
-Run the server directly:
-
-```bash
-kiasumiles-mcp
-```
-
-The package ships demo data only. If you keep a fuller card and merchant database in
-private CSVs, point `KIASUMILES_DATA_DIR` at the folder that holds `card_rules.csv` and
-`merchant_mcc.csv`.
-
-Local-only tools on top of the hosted set:
-
-| Tool | What it does |
-|------|--------------|
-| `kiasumiles_configure` | Save a local card wallet |
-| `kiasumiles_get_wallet` | Show locally saved cards |
-
 ### Supported agents
 
-- Claude Desktop
-- Claude Code (CLI)
-- Codex - local MCP config can point at `kiasumiles-mcp`; the repo includes `AGENTS.md` for Codex workers
+- Codex
+- ChatGPT with MCP support
+- Claude Code
 - OpenClaw
-- Hermes - after install, run `hermes mcp list` and `hermes mcp test kiasumiles` to verify. If tools still don't appear after `/new`, restart with `hermes gateway restart` and start a fresh chat
-- Anything else with MCP support, via pip or the hosted endpoint
+- Hermes
+- Anything else with Streamable HTTP MCP support
 
 ### Codex plugin
 
@@ -129,7 +111,7 @@ codes, or wallet paths at the user.
 
 In Codex, add the repo marketplace, install KiasuMiles, then ask:
 
-> "Use KiasuMiles to set up my wallet."
+> "What card should I use at NTUC FairPrice?"
 
 ---
 
@@ -140,14 +122,6 @@ Hosted:
 - The server stores no wallet data
 - The client keeps the user's card stack and sends card IDs with each request
 - No wallet configure or wallet read tools exist on the hosted side
-
-Local:
-
-- The wallet lives on your machine at `~/.kiasumiles/wallet.yaml`
-- `kiasumiles_configure` and `kiasumiles_get_wallet` manage it
-- The query path stays offline
-
----
 
 ## Data backends
 
@@ -160,20 +134,18 @@ Environment variables (set in Vercel for hosted deployments):
 - `KIASUMILES_SUPABASE_SERVICE_ROLE_KEY`
 - `KIASUMILES_SUPABASE_CARDS_TABLE` (optional, default `card_rules`)
 - `KIASUMILES_SUPABASE_MERCHANTS_TABLE` (optional, default `merchant_mcc`)
-- `KIASUMILES_DATA_BACKEND` (optional: `auto`, `supabase`, or `csv`)
-- `KIASUMILES_DATA_DIR` (optional, folder with private local CSVs)
+- `KIASUMILES_DATA_BACKEND` (optional: `auto` or `supabase`)
 - `KIASUMILES_RATE_LIMIT_REQUESTS` (optional, default 30; 0 disables)
 - `KIASUMILES_RATE_LIMIT_WINDOW_SECONDS` (optional, default 60)
 
 Backend selection:
 
-- `auto`: Supabase when credentials are present, else `KIASUMILES_DATA_DIR` if set, else bundled demo CSVs
+- `auto`: Supabase when credentials are present, else bundled demo CSVs
 - `supabase`: require Supabase, fail loudly if unreachable
-- `csv`: force local CSVs, from `KIASUMILES_DATA_DIR` or the bundled demo data
 
 The table schema lives at [supabase/schema.sql](supabase/schema.sql). Both
 `kiasumiles_data_version` and `/health` report `data_backend`, so you can confirm
-whether production is reading from `supabase`, `private_csv`, or `demo_csv`.
+whether production is reading from `supabase` or `demo_csv`.
 
 ---
 
@@ -195,7 +167,7 @@ in the stack, the combo math is already done.
 ## Supported cards
 
 50+ Singapore credit cards in the database. Recommendations only ever draw from the
-cards you supply or save locally.
+cards you supply in the request.
 
 HSBC Revolution · UOB PPV · UOB Visa Signature · UOB PRVI Miles · UOB Lady's · KrisFlyer UOB · DBS Altitude · DBS yuu · DBS Woman's World · DBS Vantage · Citi Rewards · Citi PremierMiles · Citi Prestige · OCBC 90N · OCBC Rewards · OCBC VOYAGE · Maybank Horizon · Maybank World · Standard Chartered Journey · Standard Chartered Visa Infinite · BOC Elite Miles · Amex KrisFlyer · Amex KrisFlyer Ascend · Amex HighFlyer · Amaze combos · and more
 

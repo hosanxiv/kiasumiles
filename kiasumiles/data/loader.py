@@ -83,8 +83,6 @@ class DataLoader:
     def backend_name(self) -> str:
         if self._should_use_supabase():
             return "supabase"
-        if self._private_data_dir():
-            return "private_csv"
         return "demo_csv"
 
     def _should_use_supabase(self) -> bool:
@@ -103,18 +101,7 @@ class DataLoader:
     def _supabase_table(self, default: str, env_var: str) -> str:
         return os.environ.get(env_var, default).strip() or default
 
-    def _private_data_dir(self) -> Path | None:
-        raw = os.environ.get("KIASUMILES_DATA_DIR", "").strip()
-        if not raw:
-            return None
-        return Path(raw).expanduser()
-
     def _csv_path(self, filename: str) -> Path:
-        private_dir = self._private_data_dir()
-        if private_dir is not None:
-            candidate = private_dir / filename
-            if candidate.exists():
-                return candidate
         return _DEMO_DATA_DIR / filename
 
     def _fetch_supabase_rows(self, table_name: str) -> list[dict]:

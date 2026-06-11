@@ -38,7 +38,7 @@ def test_data_version_has_counts():
     assert result["data_version"] != "unknown"
     assert result["cards"] >= 1
     assert result["merchants"] >= 1
-    assert result["data_backend"] in {"demo_csv", "private_csv", "supabase"}
+    assert result["data_backend"] in {"demo_csv", "supabase"}
 
 
 def test_hosted_exports_asgi_app():

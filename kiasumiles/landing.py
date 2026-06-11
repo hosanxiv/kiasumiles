@@ -616,7 +616,7 @@ def render_landing(version: dict) -> str:
         <article class="story-card">
           <span class="phase">The build</span>
           <h3>The product became an MCP server.</h3>
-          <p class="body-md" style="margin-top: 18px;">The early build had local wallet setup and config paths. Useful, but too much ceremony for the checkout line.</p>
+          <p class="body-md" style="margin-top: 18px;">The early build leaned on extra setup steps. Useful for experiments, but too much ceremony for the checkout line.</p>
           <p class="muted-small">Now the hosted endpoint keeps the rules current while clients pass the user's card IDs for each request.</p>
         </article>
         <article class="story-card">
