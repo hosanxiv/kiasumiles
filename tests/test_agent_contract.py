@@ -20,6 +20,14 @@ def test_tool_descriptions_cover_category_values():
         assert category in lookup_description
 
 
+def test_lookup_description_requires_card_stack_first():
+    lookup_description = HOSTED_TOOL_DESCRIPTIONS["kiasumiles_lookup"]
+    guide = hosted_agent_guide()
+
+    assert "Do not call this tool until you have a card stack" in lookup_description
+    assert any("Before the first lookup" in rule for rule in guide["display_rules"])
+
+
 def test_tool_handlers_are_callable_without_fastmcp():
     result = tools.lookup_hosted("NTUC FairPrice", cards=["uob_ppv"])
 
