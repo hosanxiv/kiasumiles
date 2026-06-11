@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "kiasumiles-mcp"
-version = "0.1.3"
+version = "1.0.0"
 description = "SG's first AI-powered miles card optimizer — tells your agent which credit card earns the most miles at any merchant, based on MCC codes. Works offline, no API keys."
 readme = "README.md"
 requires-python = ">=3.10"
@@ -38,7 +38,10 @@ kiasumiles-feedback-bot = "kiasumiles.feedback_bot:main"
 
 [tool.hatch.build.targets.wheel]
 packages = ["kiasumiles"]
-include = ["kiasumiles/data/demo/*.csv", "kiasumiles/static/**/*"]
+# Landing-page media (kiasumiles/static/) is deliberately NOT shipped in the
+# wheel — Vercel serves it from the repo; pip users don't need 3.7MB of video.
+include = ["kiasumiles/data/demo/*.csv"]
+exclude = ["kiasumiles/static/"]
 
 [tool.hatch.build.targets.sdist]
 exclude = [
@@ -47,6 +50,7 @@ exclude = [
     "*.token",
     ".env",
     ".env.*",
+    "kiasumiles/static/",
 ]
 
 [project.urls]

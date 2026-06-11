@@ -32,3 +32,8 @@ create table if not exists public.merchant_mcc (
 
 create index if not exists merchant_mcc_name_idx on public.merchant_mcc (merchant_name);
 create index if not exists merchant_mcc_mcc_idx on public.merchant_mcc (mcc);
+
+-- RLS with no policies: anon/authenticated keys get zero access; only the
+-- service role key (used by the hosted loader) can read or write.
+alter table public.card_rules enable row level security;
+alter table public.merchant_mcc enable row level security;

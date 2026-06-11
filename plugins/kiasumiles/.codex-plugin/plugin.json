@@ -1,6 +1,6 @@
 {
   "name": "kiasumiles",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Local-first Singapore credit-card miles optimizer for Codex via MCP.",
   "author": {
     "name": "Hosan"
