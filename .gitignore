@@ -10,9 +10,6 @@ dist/
 # Internal docs
 docs/
 
-# Tests (dev only)
-tests/
-
 # Maintenance scripts
 scripts/
 
@@ -22,8 +19,14 @@ install_mcp.command
 
 # Claude Code local settings (may contain tokens/permissions)
 .claude/
+.codex/
 
 # Secrets — bot tokens, API keys, etc. NEVER commit these.
 .env
 .env.*
 *.token
+.vercel
+
+# Private data sources kept off GitHub
+kiasumiles/data/private/
+private-data/
