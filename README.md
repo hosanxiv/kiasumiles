@@ -1,6 +1,16 @@
 # KiasuMiles
 
-> "Which card do I use again?"
+<p align="center">
+  <a href="https://haohao.zo.space/kiasumiles">
+    <img src="https://raw.githubusercontent.com/hosanxiv/kiasumiles/main/assets/kiasumiles-hero.png" alt="KiasuMiles landing page hero" width="100%">
+  </a>
+</p>
+
+<p align="center">
+  <a href="https://haohao.zo.space/kiasumiles"><strong>View the live landing page and 60s demo</strong></a>
+</p>
+
+> *"Which card do I use again?"*
 
 If you're in the miles game, you've asked this at least once - standing at the cashier,
 not quite sure if this is the 4 mpd card or the 1.2 mpd one.
