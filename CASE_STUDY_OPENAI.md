@@ -22,7 +22,7 @@ The agent should not be the source of truth for card rules. The agent should orc
 
 ## Architecture
 
-KiasuMiles is a Python MCP server with a local stdio transport. Query-time recommendations use bundled CSV data and a local wallet file, so no hosting or API key is needed for the core workflow.
+KiasuMiles is a Python MCP server with a local stdio transport. Query-time recommendations can run against a private local CSV database or a hosted private backend, while the public repo only carries demo data for development and tests.
 
 The current architecture separates:
 

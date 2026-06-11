@@ -44,8 +44,8 @@ only.
 
 ## Private data backend
 
-The hosted app can read card rules and merchant mappings from a private Supabase project
-instead of bundled CSV files.
+The hosted app reads card rules and merchant mappings from a private Supabase project.
+The public repo ships only small demo CSVs for local development and tests.
 
 Set these environment variables in Vercel:
 
@@ -55,16 +55,20 @@ Set these environment variables in Vercel:
 - `KIASUMILES_SUPABASE_MERCHANTS_TABLE` (optional, default: `merchant_mcc`)
 - `KIASUMILES_DATA_BACKEND` (optional: `auto`, `supabase`, or `csv`)
 
+For private local CSV use outside GitHub:
+
+- `KIASUMILES_DATA_DIR` pointing to a folder that contains `card_rules.csv` and `merchant_mcc.csv`
+
 Behavior:
 
-- `auto`: use Supabase when credentials are present, otherwise fall back to bundled CSV data
+- `auto`: use Supabase when credentials are present, otherwise use `KIASUMILES_DATA_DIR` if configured, otherwise fall back to bundled demo CSV data
 - `supabase`: require Supabase and fail loudly if it is unavailable
-- `csv`: force bundled CSV data even if Supabase credentials exist
+- `csv`: force local CSV mode, using `KIASUMILES_DATA_DIR` when provided or the bundled demo CSV data otherwise
 
 The starter table schema lives at [supabase/schema.sql](/Users/hs/Documents/Projects/KiasuMiles/supabase/schema.sql).
 
 `kiasumiles_data_version` and `/health` include `data_backend` so you can confirm whether
-production is reading from `supabase` or `bundled_csv`.
+production is reading from `supabase`, `private_csv`, or `demo_csv`.
 
 ---
 
@@ -115,6 +119,9 @@ pip3 install kiasumiles-mcp && kiasumiles-setup
 
 The local MCP server can save a wallet on the user's machine and run lookup without web
 calls. This is separate from the hosted MCP endpoint.
+
+The public repo includes demo data only. For a full private local database, keep your real
+CSV files outside the repo and point `KIASUMILES_DATA_DIR` at them.
 
 Run a local MCP server directly:
 
