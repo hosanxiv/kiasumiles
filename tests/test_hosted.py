@@ -45,6 +45,28 @@ def test_hosted_exports_asgi_app():
     assert hosted.app is not None
 
 
+def test_mcp_endpoint_is_rate_limited_per_ip():
+    async def ok_app(scope, receive, send):
+        await send({"type": "http.response.start", "status": 200, "headers": []})
+        await send({"type": "http.response.body", "body": b"ok"})
+
+    limited = hosted.RateLimitMiddleware(ok_app, max_requests=3, window_seconds=60)
+    # No `with` block: the dummy app has no lifespan handler, and the
+    # middleware needs no startup.
+    client = TestClient(limited)
+    statuses = [client.get("/mcp").status_code for _ in range(5)]
+    landing_status = client.get("/").status_code
+
+    assert statuses[:3] == [200, 200, 200]
+    assert statuses[3:] == [429, 429]
+    # Only /mcp is throttled — landing page and media stay open.
+    assert landing_status == 200
+
+
+def test_hosted_app_is_wrapped_in_rate_limiter():
+    assert isinstance(hosted.app, hosted.RateLimitMiddleware)
+
+
 def test_landing_page_and_media_routes_are_served():
     with TestClient(hosted.app) as client:
         landing = client.get("/")
