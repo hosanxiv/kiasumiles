@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "kiasumiles-mcp"
 version = "1.0.0"
-description = "SG's first AI-powered miles card optimizer — tells your agent which credit card earns the most miles at any merchant, based on MCC codes. Works offline, no API keys."
+description = "Hosted Singapore miles card optimizer for MCP clients — tells your agent which credit card earns the most miles at any merchant, based on MCC codes."
 readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "MIT" }
@@ -31,9 +31,7 @@ dependencies = [
 ]
 
 [project.scripts]
-kiasumiles-mcp = "kiasumiles.server:main"
 kiasumiles-hosted = "kiasumiles.hosted:main"
-kiasumiles-setup = "kiasumiles.setup:main"
 kiasumiles-feedback-bot = "kiasumiles.feedback_bot:main"
 
 [tool.hatch.build.targets.wheel]

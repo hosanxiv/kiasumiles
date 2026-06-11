@@ -1,8 +1,7 @@
 from __future__ import annotations
 
-from .agent_contract import CATEGORY_MCC, agent_guide
+from .agent_contract import CATEGORY_MCC, hosted_agent_guide
 from .data.loader import DataLoader
-from .engine import wallet as wallet_store
 from .engine.merchant import find_merchant, infer_mcc_from_name
 from .engine.router import rank_cards
 
@@ -41,55 +40,20 @@ def list_cards(bank: str | None = None) -> dict:
     }
 
 
-def configure(cards: list[str]) -> dict:
-    valid_ids = {c.card_id for c in _loader.cards()}
-    invalid = [cid for cid in cards if cid not in valid_ids]
-
-    if invalid:
-        return {
-            "error": f"Invalid cards: {invalid}. Wallet not changed.",
-            "wallet_configured": bool(wallet_store.load_wallet()),
-        }
-
-    wallet_store.save_wallet(cards)
-    return {
-        "saved": cards,
-        "wallet_path": str(wallet_store.WALLET_PATH),
-    }
-
-
-def get_wallet() -> dict:
-    wallet_ids = wallet_store.load_wallet()
-    if not wallet_ids:
-        return {
-            "cards": [],
-            "message": "No wallet configured yet. Tell your agent which cards you carry.",
-        }
-
-    card_names = [
-        c.card_name
-        for c in _loader.cards()
-        if c.card_id in wallet_ids
-    ]
-    return {
-        "cards": card_names,
-    }
-
-
-def _lookup_for_wallet(
+def _lookup_for_cards(
     merchant: str,
-    wallet_ids: list[str],
+    cards: list[str],
     outlet: str | None = None,
     channel: str | None = None,
     category: str | None = None,
 ) -> dict:
-    wallet_has_amaze = "amaze" in wallet_ids
+    wallet_has_amaze = "amaze" in cards
     valid_ids = {c.card_id for c in _loader.cards()}
-    skipped = [cid for cid in wallet_ids if cid not in valid_ids]
+    skipped = [cid for cid in cards if cid not in valid_ids]
 
     wallet_cards = (
-        [c for c in _loader.cards() if c.card_id in wallet_ids]
-        if wallet_ids
+        [c for c in _loader.cards() if c.card_id in cards]
+        if cards
         else _loader.cards()
     )
     top_n = 5
@@ -111,14 +75,14 @@ def _lookup_for_wallet(
                 "merchant_matched": False,
                 "routing_note": "No merchant data - routed by category inference. Verify before relying on this.",
                 "recommendations": recommendations,
-                "wallet_configured": bool(wallet_ids),
+                "wallet_configured": bool(cards),
                 "skipped_cards": skipped,
             }
         return {
             "merchant": merchant,
             "merchant_matched": False,
             "message": f"No data found for '{merchant}'. Try passing category: dining, grocery, transport, petrol, pharmacy.",
-            "wallet_configured": bool(wallet_ids),
+            "wallet_configured": bool(cards),
             "skipped_cards": skipped,
         }
 
@@ -142,19 +106,10 @@ def _lookup_for_wallet(
         "gotcha": None,
         "low_confidence_note": low_confidence_note,
         "recommendations": recommendations,
-        "wallet_configured": bool(wallet_ids),
+        "wallet_configured": bool(cards),
         "merchant_matched": is_exact,
         "skipped_cards": skipped,
     }
-
-
-def lookup(
-    merchant: str,
-    outlet: str | None = None,
-    channel: str | None = None,
-    category: str | None = None,
-) -> dict:
-    return _lookup_for_wallet(merchant, wallet_store.load_wallet(), outlet, channel, category)
 
 
 def lookup_hosted(
@@ -164,14 +119,14 @@ def lookup_hosted(
     channel: str | None = None,
     category: str | None = None,
 ) -> dict:
-    result = _lookup_for_wallet(merchant, cards, outlet, channel, category)
+    result = _lookup_for_cards(merchant, cards, outlet, channel, category)
     result["wallet_stored"] = False
     result["data_version"] = data_version()["data_version"]
     return result
 
 
-def recommend_stack(cards: list[str] | None = None, top_n: int = 3) -> dict:
-    wallet_ids = cards if cards is not None else wallet_store.load_wallet()
+def recommend_stack(cards: list[str], top_n: int = 3) -> dict:
+    wallet_ids = cards
     valid_ids = {c.card_id for c in _loader.cards()}
     skipped = [cid for cid in wallet_ids if cid not in valid_ids]
     wallet_cards = [c for c in _loader.cards() if c.card_id in wallet_ids]
@@ -276,4 +231,4 @@ def data_version() -> dict:
 
 
 def guide() -> dict:
-    return agent_guide()
+    return hosted_agent_guide()
