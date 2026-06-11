@@ -729,16 +729,16 @@ def render_landing(version: dict) -> str:
           </div>
           <div class="examples-list">
             <div class="example">
-              <div class="question">"What card at Sheng Siong?"</div>
-              <div class="example-row"><div class="example-answer">UOB Visa Signature</div><div class="example-note">Next: UOB PP Visa</div></div>
+              <div class="question">"Best card at NTUC FairPrice?"</div>
+              <div class="example-row"><div class="example-answer">UOB Visa Signature</div><div class="example-note">4 mpd · next: UOB PP Visa</div></div>
             </div>
             <div class="example">
-              <div class="question">"Best card for Sinopec?"</div>
-              <div class="example-row"><div class="example-answer">UOB Visa Signature</div><div class="example-note">Check cap</div></div>
+              <div class="question">"Which card for Grab rides?"</div>
+              <div class="example-row"><div class="example-answer">UOB PP Visa</div><div class="example-note">4 mpd · up to S\$1,110/mo cap</div></div>
             </div>
             <div class="example">
-              <div class="question">"Which card for Sushi Tei?"</div>
-              <div class="example-row"><div class="example-answer">UOB Preferred Platinum Visa</div><div class="example-note">Medium confidence</div></div>
+              <div class="question">"SIA tickets online?"</div>
+              <div class="example-row"><div class="example-answer">UOB Visa Signature</div><div class="example-note">4 mpd · pair with KrisFlyer UOB</div></div>
             </div>
           </div>
         </div>
