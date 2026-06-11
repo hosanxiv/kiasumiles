@@ -5,21 +5,26 @@
 If you're in the miles game, you've asked this at least once - standing at the cashier,
 not quite sure if this is the 4 mpd one or the 1.2 mpd one.
 
-KiasuMiles solves this. It connects to your AI agent, learns your exact cards, and tells 
-you which one earns the most miles at any Singapore merchant — based on the actual MCC your 
-card posts under, not generic blog listicles.
+KiasuMiles solves this through MCP. Connect your AI agent to the hosted endpoint, pass the
+cards in a user's stack with each request, and get the best Singapore miles card for the
+merchant in front of you.
 
-Tell it which cards you carry. Once. It remembers. From then on, just ask.
+The server keeps card rules and merchant data current. It does not store user wallet data.
+Clients send card IDs per request.
 
-**No hosting. No API keys. Works offline.**
+**Hosted MCP endpoint:** `https://kiasumiles.space/mcp`
 
 ---
 
 ## Why it's different
 
-Most miles guides tell you *"use Card X for dining, Card Y for online shopping."* Useful — until your wallet has 6 cards and you're standing at the checkout trying to remember which one applies here.
+Most miles guides tell you *"use Card X for dining, Card Y for online shopping."* Useful
+until your wallet has 6 cards and you're standing at the checkout trying to remember which
+one applies here.
 
-KiasuMiles knows **your wallet specifically**. It filters out every card you don't own, factors in monthly caps, and if you carry Amaze, it automatically nets out the fee and calculates the combo earn rate.
+KiasuMiles ranks against **the user's current card stack**. A client passes the cards the
+user carries, KiasuMiles filters out everything else, factors in monthly caps, and returns
+the best usable option with caveats.
 
 You ask. It answers. One card. No second-guessing.
 
@@ -27,26 +32,94 @@ You ask. It answers. One card. No second-guessing.
 
 ## How it works
 
-1. Ask your agent to install KiasuMiles
-2. Tell your agent which cards you carry — once, in plain English
-3. At any merchant, just ask: *"which card?"*
+1. Connect an MCP-capable agent to `https://kiasumiles.space/mcp`
+2. Ask the agent to list supported cards and keep the user's card IDs client-side
+3. For each lookup, send the merchant plus the user's card IDs
+4. KiasuMiles returns the best card, earn rate, cap summary, and caveats
 
-Your agent returns your best card, the earn rate, and the monthly cap — from your wallet only.
+The hosted service is stateless for wallet data. It stores card rules and merchant data
+only.
 
 ---
 
-## Setup
+## Private data backend
 
-**Easiest:** Tell your agent to install it for you:
+The hosted app can read card rules and merchant mappings from a private Supabase project
+instead of bundled CSV files.
 
-> *"Install kiasumiles-mcp for me"*
+Set these environment variables in Vercel:
 
-Your agent handles the rest automatically.
+- `KIASUMILES_SUPABASE_URL`
+- `KIASUMILES_SUPABASE_SERVICE_ROLE_KEY`
+- `KIASUMILES_SUPABASE_CARDS_TABLE` (optional, default: `card_rules`)
+- `KIASUMILES_SUPABASE_MERCHANTS_TABLE` (optional, default: `merchant_mcc`)
+- `KIASUMILES_DATA_BACKEND` (optional: `auto`, `supabase`, or `csv`)
 
-**Or install directly:**
+Behavior:
+
+- `auto`: use Supabase when credentials are present, otherwise fall back to bundled CSV data
+- `supabase`: require Supabase and fail loudly if it is unavailable
+- `csv`: force bundled CSV data even if Supabase credentials exist
+
+The starter table schema lives at [supabase/schema.sql](/Users/hs/Documents/Projects/KiasuMiles/supabase/schema.sql).
+
+`kiasumiles_data_version` and `/health` include `data_backend` so you can confirm whether
+production is reading from `supabase` or `bundled_csv`.
+
+---
+
+## Hosted MCP
+
+Use the hosted MCP endpoint for agents that support Streamable HTTP MCP:
+
+```text
+https://kiasumiles.space/mcp
+```
+
+Hosted MCP tools:
+
+| Tool | What it does |
+|------|--------------|
+| `kiasumiles_lookup` | Best card for a merchant from card IDs supplied with the request |
+| `kiasumiles_list_cards` | See supported cards and stable card IDs |
+| `kiasumiles_recommend_stack` | Find gaps in a user's current card stack |
+| `kiasumiles_data_version` | Check current card and merchant data version |
+| `kiasumiles_agent_guide` | See integration and display guidance for agents |
+
+Hosted MCP deliberately does not expose `kiasumiles_configure` or `kiasumiles_get_wallet`.
+Wallet storage belongs in the client or user's own system.
+
+### Example hosted lookup shape
+
+```json
+{
+  "merchant": "NTUC FairPrice",
+  "cards": ["uob_ppv", "citi_rewards_mc"],
+  "channel": "mobile_contactless"
+}
+```
+
+Lookup responses include a short `reason_summary`, `reason_codes`, and `gotchas` so agents
+can explain why a card wins and warn about traps like wrong payment channel,
+partner-only bonuses, or minimum-spend requirements.
+
+---
+
+## Local MCP
+
+The package can still run as a local stdio MCP server for offline use:
 
 ```bash
 pip3 install kiasumiles-mcp && kiasumiles-setup
+```
+
+The local MCP server can save a wallet on the user's machine and run lookup without web
+calls. This is separate from the hosted MCP endpoint.
+
+Run a local MCP server directly:
+
+```bash
+kiasumiles-mcp
 ```
 
 The setup script auto-configures Claude Desktop and Claude Code if installed.
@@ -55,25 +128,60 @@ The setup script auto-configures Claude Desktop and Claude Code if installed.
 
 - **Claude Desktop**
 - **Claude Code (CLI)**
+- **Codex** - local MCP config can point at `kiasumiles-mcp`; this repo includes `AGENTS.md` guidance for Codex workers.
 - **OpenClaw** 
 - **Hermes** — after install, run `hermes mcp list` and `hermes mcp test kiasumiles` to verify. If KiasuMiles tools still don't appear after `/new`, restart the gateway with `hermes gateway restart`, then start a fresh chat.
-- **Any agent with pip access**
+- **Any MCP-capable agent with pip access or Streamable HTTP support**
+
+### ChatGPT app path
+
+KiasuMiles now has a hosted MCP boundary intended for ChatGPT Apps SDK work:
+
+- hosted MCP endpoint: `https://kiasumiles.space/mcp`
+- public landing page: `https://kiasumiles.space/`
+- privacy route: `https://kiasumiles.space/privacy`
+- health route: `https://kiasumiles.space/health`
+
+The reusable tool handlers live in `kiasumiles.tools`, separate from the FastMCP adapters,
+so hosted ChatGPT Apps SDK adapters and local MCP clients can share merchant matching and
+card-ranking behavior without duplicating business logic.
+
+### Codex plugin
+
+This repo includes a local Codex plugin at `plugins/kiasumiles` and a repo marketplace at `.agents/plugins/marketplace.json`.
+
+The plugin bundles:
+
+- MCP config for `kiasumiles-mcp`
+- a KiasuMiles skill for checkout-ready card recommendations
+- display guidance so Codex avoids showing card IDs, MCC codes, and raw wallet paths
+
+In Codex, add the repo marketplace and install **KiasuMiles**, then ask:
+
+> *"Use KiasuMiles to set up my wallet."*
 
 ---
 
-## Set up your card wallet
+## Wallet model
 
-> *"Use KiasuMiles to set up my wallet — show me what cards are available, then ask me which ones I have"*
+Hosted MCP:
 
-Your agent shows you all supported cards, asks which ones you carry, and saves your wallet. You only do this once. To check what's saved anytime:
+- The server does not store wallet data.
+- The client stores or collects the user's card stack.
+- Each recommendation request includes card IDs for that request.
+- Hosted tools do not include wallet configure or wallet read operations.
 
-> *"Use KiasuMiles to show me my wallet"*
+Local MCP:
+
+- The user's machine can store a local wallet.
+- Local tools include `kiasumiles_configure` and `kiasumiles_get_wallet`.
+- The query path stays offline.
 
 ---
 
 ## Daily use
 
-At a merchant, in the car, at checkout — just ask:
+At a merchant, in the car, at checkout, ask an MCP-connected agent:
 
 - *"What card at NTUC FairPrice?"*
 - *"Best card for Grab contactless?"*
@@ -81,32 +189,36 @@ At a merchant, in the car, at checkout — just ask:
 - *"Booking flights on Singapore Airlines — which card?"*
 - *"Which card at Shake Shack — paying online"*
 
-KiasuMiles surfaces your best option with the earn rate and cap. If you have Amaze, the combo math is already done.
-
----
-
-## Updating your wallet
-
-> *"Update my KiasuMiles wallet — add OCBC 90N Mastercard, remove UOB PPV."*
-
-Plain English. Your agent handles the rest.
+KiasuMiles surfaces the best option from the supplied card stack with the earn rate and cap.
+If Amaze is in the supplied stack, the combo math is already done.
 
 ---
 
 ## Tools
 
+Hosted MCP:
+
 | Tool | What it does |
 |------|--------------|
-| `kiasumiles_lookup` | Best card for a merchant — MCC, earn rate, cap |
-| `kiasumiles_configure` | Save your card wallet |
-| `kiasumiles_get_wallet` | See your currently saved cards |
-| `kiasumiles_list_cards` | See all 50+ supported cards |
+| `kiasumiles_lookup` | Best card for a merchant from supplied card IDs |
+| `kiasumiles_list_cards` | See supported cards |
+| `kiasumiles_recommend_stack` | Find gaps in a user's current card stack and suggest useful additions |
+| `kiasumiles_data_version` | Check bundled data version and counts |
+| `kiasumiles_agent_guide` | See integration and display guidance for agents |
+
+Local MCP also includes:
+
+| Tool | What it does |
+|------|--------------|
+| `kiasumiles_configure` | Save a local card wallet |
+| `kiasumiles_get_wallet` | See locally saved cards |
 
 ---
 
 ## Supported cards
 
-50+ Singapore credit cards in the database — but KiasuMiles only ever shows you results for cards **you actually carry**. Set up your wallet once; everything else is filtered out.
+50+ Singapore credit cards in the database, but recommendations are filtered to cards
+supplied by the client or saved in the local wallet.
 
 HSBC Revolution · UOB PPV · UOB Visa Signature · UOB PRVI Miles · UOB Lady's · KrisFlyer UOB · DBS Altitude · DBS yuu · DBS Woman's World · DBS Vantage · Citi Rewards · Citi PremierMiles · Citi Prestige · OCBC 90N · OCBC Rewards · OCBC VOYAGE · Maybank Horizon · Maybank World · Standard Chartered Journey · Standard Chartered Visa Infinite · BOC Elite Miles · Amex KrisFlyer · Amex KrisFlyer Ascend · Amex HighFlyer · Amaze combos · and more
 
@@ -123,6 +235,17 @@ Confidence levels are included in results — if a merchant has limited data poi
 ---
 
 ## Verify installation
+
+Hosted MCP:
+
+```bash
+curl -i -X POST https://kiasumiles.space/mcp \
+  -H 'Content-Type: application/json' \
+  -H 'Accept: application/json, text/event-stream' \
+  -d '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-06-18","capabilities":{},"clientInfo":{"name":"curl-smoke","version":"0.1"}}}'
+```
+
+Local MCP:
 
 > *"Check if you have access to KiasuMiles tools"*
 

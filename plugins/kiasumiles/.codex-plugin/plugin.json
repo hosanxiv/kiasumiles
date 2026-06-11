@@ -1,0 +1,22 @@
+{
+  "name": "kiasumiles",
+  "version": "0.1.0",
+  "description": "Local-first Singapore credit-card miles optimizer for Codex via MCP.",
+  "author": {
+    "name": "Hosan"
+  },
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "KiasuMiles",
+    "shortDescription": "Ask Codex which Singapore miles card to use at a merchant.",
+    "longDescription": "KiasuMiles bundles a local MCP server and agent guidance for Singapore credit-card miles recommendations. It keeps merchant lookup, wallet filtering, and card ranking offline at query time.",
+    "developerName": "Hosan",
+    "category": "Productivity",
+    "capabilities": [
+      "mcp",
+      "skills"
+    ],
+    "defaultPrompt": "Use KiasuMiles to help me choose the best card for a Singapore merchant."
+  },
+  "mcpServers": "./.mcp.json"
+}

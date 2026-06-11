@@ -1,0 +1,20 @@
+{
+  "name": "kiasumiles-local",
+  "interface": {
+    "displayName": "Kiasumiles Local"
+  },
+  "plugins": [
+    {
+      "name": "kiasumiles",
+      "source": {
+        "source": "local",
+        "path": "./plugins/kiasumiles"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}
