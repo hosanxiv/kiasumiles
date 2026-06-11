@@ -37,7 +37,7 @@ def test_card_rule_eligible_mccs_parsed():
     assert rule.earn_rate_mpd == 4.0
 
 
-def test_data_loader_loads_bundled_csvs():
+def test_data_loader_loads_demo_csvs():
     loader = DataLoader()
     merchants = loader.merchants()
     cards = loader.cards()
@@ -113,7 +113,7 @@ def test_data_loader_prefers_supabase_when_configured(monkeypatch):
     assert loader.merchants()[0].merchant_name == "Remote Merchant"
 
 
-def test_data_loader_falls_back_to_csv_when_supabase_fetch_fails(monkeypatch):
+def test_data_loader_falls_back_to_demo_csv_when_supabase_fetch_fails(monkeypatch):
     monkeypatch.setenv("KIASUMILES_SUPABASE_URL", "https://example.supabase.co")
     monkeypatch.setenv("KIASUMILES_SUPABASE_SERVICE_ROLE_KEY", "service-role")
     monkeypatch.setattr(

@@ -38,7 +38,7 @@ kiasumiles-feedback-bot = "kiasumiles.feedback_bot:main"
 
 [tool.hatch.build.targets.wheel]
 packages = ["kiasumiles"]
-include = ["kiasumiles/data/*.csv", "kiasumiles/static/**/*"]
+include = ["kiasumiles/data/demo/*.csv", "kiasumiles/static/**/*"]
 
 [tool.hatch.build.targets.sdist]
 exclude = [

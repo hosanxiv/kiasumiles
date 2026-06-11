@@ -1,0 +1,9 @@
+merchant_name,outlet,channel,mcc,mcc_category,confidence,data_points,last_verified
+NTUC FairPrice,,any,5411,Grocery,high,26,2026-06-10
+Cold Storage,,any,5411,Grocery,high,12,2026-06-10
+Grab,,app,4121,Transport,high,18,2026-06-10
+Shell,,any,5541,Petrol,medium,6,2026-06-10
+Watsons,,any,5912,Pharmacy,high,9,2026-06-10
+Singapore Airlines,,online,4511,Airlines,high,7,2026-06-10
+Agoda,,online,4722,Travel,medium,5,2026-06-10
+Marutama Ramen,,any,5812,Dining,medium,4,2026-06-10

@@ -43,7 +43,8 @@ class CardRule:
     earn_block_sgd: float = 1.0  # spend rounds down to nearest block before earn rate applies (UOB/DBS = $5, others = $1)
 
 
-_BUNDLED = Path(__file__).parent
+_PACKAGE_DATA_DIR = Path(__file__).parent
+_DEMO_DATA_DIR = _PACKAGE_DATA_DIR / "demo"
 _REMOTE_TIMEOUT_SECONDS = 10.0
 _SUPABASE_PAGE_SIZE = 1000
 
@@ -82,7 +83,9 @@ class DataLoader:
     def backend_name(self) -> str:
         if self._should_use_supabase():
             return "supabase"
-        return "bundled_csv"
+        if self._private_data_dir():
+            return "private_csv"
+        return "demo_csv"
 
     def _should_use_supabase(self) -> bool:
         if self._backend == "supabase":
@@ -99,6 +102,20 @@ class DataLoader:
 
     def _supabase_table(self, default: str, env_var: str) -> str:
         return os.environ.get(env_var, default).strip() or default
+
+    def _private_data_dir(self) -> Path | None:
+        raw = os.environ.get("KIASUMILES_DATA_DIR", "").strip()
+        if not raw:
+            return None
+        return Path(raw).expanduser()
+
+    def _csv_path(self, filename: str) -> Path:
+        private_dir = self._private_data_dir()
+        if private_dir is not None:
+            candidate = private_dir / filename
+            if candidate.exists():
+                return candidate
+        return _DEMO_DATA_DIR / filename
 
     def _fetch_supabase_rows(self, table_name: str) -> list[dict]:
         supabase_url = self._supabase_url().rstrip("/")
@@ -155,7 +172,7 @@ class DataLoader:
             except (KeyError, TypeError, ValueError, RuntimeError, URLError):
                 if self._backend == "supabase":
                     raise
-        path = _BUNDLED / "merchant_mcc.csv"
+        path = self._csv_path("merchant_mcc.csv")
         records = []
         with open(path, newline="", encoding="utf-8") as f:
             for row in csv.DictReader(f):
@@ -208,7 +225,7 @@ class DataLoader:
             except (KeyError, TypeError, ValueError, RuntimeError, URLError):
                 if self._backend == "supabase":
                     raise
-        path = _BUNDLED / "card_rules.csv"
+        path = self._csv_path("card_rules.csv")
         rules = []
         seen: set[str] = set()
         with open(path, newline="", encoding="utf-8") as f:
