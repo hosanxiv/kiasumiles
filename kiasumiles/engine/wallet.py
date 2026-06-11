@@ -16,7 +16,7 @@ def load_wallet() -> list[str]:
 def save_wallet(card_ids: list[str]) -> Path:
     """Save card IDs to wallet.yaml. Creates parent dirs if needed."""
     WALLET_PATH.parent.mkdir(parents=True, exist_ok=True)
-    content = "# KiasuMiles wallet — edit card IDs or tell Claude to reconfigure\ncards:\n"
+    content = "# KiasuMiles wallet - edit card IDs here or ask your agent to reconfigure\ncards:\n"
     content += "".join(f"  - {cid}\n" for cid in card_ids)
     WALLET_PATH.write_text(content, encoding="utf-8")
     return WALLET_PATH
