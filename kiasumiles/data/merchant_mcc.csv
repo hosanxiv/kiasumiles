@@ -4,7 +4,7 @@ Love Bonito (313 Mall - Shopback Pay),,online,5311,Department Store / Online,hig
 Pharmex Healthcare,,contactless,5311,Department Store / Online,high,0,
 changi,,any,5311,Department Store / Online,high,7,2026-04
 courts,,any,5311,Department Store / Online,medium,2,2025-04
-grab,,any,5311,Department Store / Online,high,1,2026-01
+grab,,any,7399,Business Services,high,1,2026-06
 heymax,,any,5311,Department Store / Online,high,37,2026-05
 iShopChangi (via ShopBack),,online,5311,Department Store / Online,high,0,
 ikea,,any,5311,Department Store / Online,medium,2,2024-11
@@ -74,7 +74,7 @@ yakun,,any,5812,Dining,high,54,2026-04
 Gain City Website,,online,5732,Electronics,high,0,
 Kuriosity,,contactless,5732,Electronics,high,0,
 Red Point Audio Electronics,,contactless,5732,Electronics,high,0,
-challenger,,any,5732,Electronics,medium,6,2025-09
+challenger,,any,5732,Electronics,medium,6,2026-06
 changi,,any,5732,Electronics,high,1,2026-04
 courts,,any,5732,Electronics,medium,1,2025-04
 harvey norman,,any,5732,Electronics,medium,9,2026-01
@@ -215,8 +215,8 @@ qoo10,,any,5411,Grocery,medium,1,2024-07
 shopee,,any,5411,Grocery,high,6,2026-05
 yakun,,any,5411,Grocery,high,28,2026-04
 VIE HOTEL,,online,7011,Hotels,high,0,
-Shopee,,contactless,5262,Marketplace,high,0,
-lazada,,any,5262,Marketplace,high,4,2026-05
+Shopee,,contactless,5262,Marketplace,high,27,2026-06
+lazada,,any,5262,Marketplace,high,4,2026-06
 shopee,,any,5262,Marketplace,high,27,2026-05
 esso,,any,5541,Petrol,high,5,2025-05
 fairprice,,any,5541,Petrol,high,1,2026-01
@@ -3269,7 +3269,7 @@ Jucy,,any,4722,Travel Agency,medium,1,2026-05
 Kayak,,online,4722,Travel Agency,medium,1,2026-05
 Kiwi.Com,,online,4722,Travel Agency,medium,1,2026-05
 Kkday,,online,4722,Travel Agency,medium,1,2026-05
-Klook,,online,4722,Travel Agency,medium,1,2026-05
+Klook,,online,4722,Travel Agency,high,1,2026-06
 L.G.E Travel,,any,4722,Travel Agency,medium,1,2026-05
 Lastminute.Com,,online,4722,Travel Agency,medium,1,2026-05
 Let'S Go Europe,,any,4722,Travel Agency,medium,1,2026-05
@@ -3308,3 +3308,11 @@ Muji,,any,5331,Variety Store,medium,1,2026-05
 Mustafa Centre,,any,5331,Variety Store,medium,1,2026-05
 Paypal eBay,,online,5331,Variety Store,medium,1,2026-05
 Stealth,,any,5331,Variety Store,medium,1,2026-05
+Grab,,online,7399,Business Services,high,1,2026-06
+SHOPEE SG MP (Diginut Official SG),,online,5262,Marketplace,medium,1,2026-06
+Lazada SG,,online,5262,Marketplace,medium,1,2026-06
+Challenger (Kris+ pay @ Nex),,online,5732,Electronics,medium,1,2026-06
+redmanshop.com,,online,5411,Grocery,medium,1,2026-06
+webuy,,any,4722,Travel Agency,medium,1,2026-06
+Beryl's Chocolate Harbourfront,,any,5441,Candy / Confectionery,medium,1,2026-06
+Chick-Fil-A (Bugis+),,any,5812,Dining,medium,1,2026-06

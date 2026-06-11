@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "kiasumiles": {
+      "command": "uvx",
+      "args": [
+        "kiasumiles-mcp"
+      ]
+    }
+  }
+}
