@@ -37,35 +37,133 @@ card IDs are sent with each request, used once, and dropped.
 
 ---
 
-## How it works
+## How to use it
 
-1. Connect an MCP-capable agent to `https://kiasumiles.space/mcp`
-2. Ask the agent to list supported cards, then keep your card IDs client-side
-3. For each lookup, send the merchant name plus your card IDs
-4. KiasuMiles returns the best card, earn rate, cap summary, and caveats
-
----
-
-## Hosted MCP
-
-For any agent that speaks Streamable HTTP MCP:
+Connect your MCP-capable agent to:
 
 ```text
 https://kiasumiles.space/mcp
 ```
 
+Then talk to your agent in plain English.
+
+### First-time setup prompt
+
+Copy and paste this:
+
+```text
+Use KiasuMiles. First help me set up my card stack.
+Ask me which banks I have cards with, show me the matching supported cards,
+then remember my selected cards for future KiasuMiles lookups.
+```
+
+Your "card stack" just means the credit cards you actually carry.
+
+### Everyday prompts
+
+After setup, ask checkout questions like:
+
+```text
+What card should I use at NTUC FairPrice?
+```
+
+```text
+I'm paying for Grab in the app. Which card?
+```
+
+```text
+Booking Singapore Airlines online. Which card gets the most miles?
+```
+
+KiasuMiles returns the best card from your card stack, the miles per dollar, the cap,
+and any caveats you should know before paying.
+
+### If the agent forgets to ask for your cards
+
+Paste this:
+
+```text
+Before answering, use KiasuMiles properly:
+ask me which cards I carry, map them to supported KiasuMiles cards,
+then recommend only from my card stack.
+```
+
+---
+
+## Setting Up Your Cards
+
+KiasuMiles does not keep a wallet on its server. Your agent or app keeps your card list
+and sends it with each question.
+
+Use this prompt when setting up for the first time:
+
+```text
+Use KiasuMiles to set up my card stack.
+Ask me which banks I use first.
+Then list supported cards for those banks only.
+After I choose my cards, use that card stack for future KiasuMiles lookups.
+```
+
+If your agent forgets your cards, just run the setup prompt again.
+
+You do not need to know card IDs. The agent should handle that mapping for you.
+
+## Amending Your Cards
+
+Use plain English. Examples:
+
+```text
+Add OCBC 90N to my KiasuMiles card stack.
+```
+
+```text
+Remove UOB PPV from my KiasuMiles card stack.
+```
+
+```text
+Replace Citi Rewards with DBS Woman's World in my KiasuMiles card stack.
+```
+
+Then continue asking normal checkout questions:
+
+```text
+Now what card should I use at Cold Storage?
+```
+
+## Checking Your Card Stack
+
+If you are not sure what your agent currently remembers, ask:
+
+```text
+Before using KiasuMiles, tell me what cards you currently have in my card stack.
+If you are not sure, ask me to set it up again.
+```
+
+You can also ask whether your current stack has gaps:
+
+```text
+Use KiasuMiles to review my current card stack.
+Tell me what categories are weak and what card I should consider adding.
+```
+
+---
+
+## Hosted MCP Details
+
+For agents and developers, KiasuMiles exposes these hosted MCP tools:
+
 | Tool | What it does |
 |------|--------------|
-| `kiasumiles_lookup` | Best card for a merchant, ranked from the card IDs you supply |
-| `kiasumiles_list_cards` | Supported cards and their stable card IDs |
-| `kiasumiles_recommend_stack` | Gaps in your current stack and what would fill them |
+| `kiasumiles_lookup` | Best card for a merchant, ranked from the cards supplied by the client |
+| `kiasumiles_list_cards` | Supported cards and their stable internal IDs |
+| `kiasumiles_recommend_stack` | Gaps in the user's current card stack |
 | `kiasumiles_data_version` | Current card and merchant data version |
 | `kiasumiles_agent_guide` | Integration and display guidance for agents |
 
-The hosted server deliberately has no `kiasumiles_configure` or `kiasumiles_get_wallet`.
-Wallet storage belongs in the client or in your own system, not on someone else's server.
+The hosted server deliberately has no wallet setup or wallet read tools. Wallet storage
+belongs in the agent, app, or user-controlled client.
 
-Example lookup payload:
+Example lookup shape:
 
 ```json
 {
@@ -107,7 +205,7 @@ curl -i -X POST https://kiasumiles.space/mcp \
 The repo carries a local Codex plugin at `plugins/kiasumiles` and a repo marketplace at
 `.agents/plugins/marketplace.json`. The plugin bundles the MCP config, a skill for
 checkout recommendations, and display guidance so Codex doesn't surface card IDs, MCC
-codes, or wallet paths at the user.
+codes, or raw technical fields at the user.
 
 In Codex, add the repo marketplace, install KiasuMiles, then ask:
 
@@ -115,18 +213,10 @@ In Codex, add the repo marketplace, install KiasuMiles, then ask:
 
 ---
 
-## Wallet model
+## For Maintainers
 
-Hosted:
-
-- The server stores no wallet data
-- The client keeps the user's card stack and sends card IDs with each request
-- No wallet configure or wallet read tools exist on the hosted side
-
-## Data backends
-
-The hosted app reads card rules and merchant mappings from a private Supabase project.
-The public repo ships small demo CSVs for development and tests.
+The hosted app reads card rules and merchant mappings from the configured production
+backend. The public package ships small demo CSVs for development and tests.
 
 Environment variables (set in Vercel for hosted deployments):
 

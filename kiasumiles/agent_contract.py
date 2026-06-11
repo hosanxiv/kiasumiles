@@ -13,6 +13,7 @@ CATEGORY_MCC: dict[str, str] = {
 
 HOSTED_DISPLAY_RULES: tuple[str, ...] = (
     "Use kiasumiles_lookup for Singapore card and merchant recommendations when this hosted MCP server is available.",
+    "Before the first lookup in a conversation, ask which cards the user carries if the client has not already supplied a card stack.",
     "Ask the user which banks they use before listing cards, then call kiasumiles_list_cards once per bank.",
     "Keep wallet data client-side. Pass the user's card IDs in the cards parameter for each lookup or stack recommendation.",
     "Never show card_id values, MCC codes, or raw technical fields unless the user asks for diagnostics.",
@@ -39,6 +40,10 @@ Use this whenever the user asks which card to use, what to tap, or which card ea
 miles at a Singapore merchant. Pass the user's wallet card IDs in cards for this request only.
 The hosted service does not store wallet data.
 
+Do not call this tool until you have a card stack for this request. If the client has not
+already supplied cards, ask which cards the user carries first. Use kiasumiles_list_cards
+to map the user's card names to stable card IDs, then call kiasumiles_lookup with those IDs.
+
 Pass the user's exact merchant name. Extract outlet and channel from natural language if present.
 If the merchant is not found, pass category when context makes it obvious.
 Accepted values: dining, grocery, transport, petrol, pharmacy, hotel, airlines, shopping.
@@ -50,6 +55,7 @@ raw card IDs, MCC codes, or technical fields unless the user asks for diagnostic
 
 Use this when the user asks whether their current card stack is good, what cards they should add,
 or what gaps exist. The cards parameter is required for hosted usage and is not stored.
+If the client has not already supplied cards, ask which cards the user carries first.
 
 Present covered categories, weak categories, and 1-3 suggested additions. Never show raw card IDs
 to the user.""",
