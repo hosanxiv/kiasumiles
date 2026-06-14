@@ -670,10 +670,10 @@ def render_landing(version: dict) -> str:
         <div class="phone-screen">
           <div class="phone-status"><span>9:41</span><span>&bull;&bull;&bull;</span></div>
           <div class="bubble ask">What card at Sheng Siong?</div>
-          <div class="bubble answer">Use UOB Visa Signature.</div>
+          <div class="bubble answer">Use UOB Preferred Platinum Visa.</div>
           <div class="phone-card">
-            <div class="muted-small" style="margin-top: 0;">Next best</div>
-            <div class="title">UOB PP Visa</div>
+            <div class="muted-small" style="margin-top: 0;">Top pick · 4 mpd</div>
+            <div class="title">UOB Preferred Platinum Visa</div>
             <div class="meter"><span></span></div>
             <div class="muted-small">Ranked from the cards sent with this request</div>
           </div>
@@ -730,15 +730,15 @@ def render_landing(version: dict) -> str:
           <div class="examples-list">
             <div class="example">
               <div class="question">"Best card at NTUC FairPrice?"</div>
-              <div class="example-row"><div class="example-answer">UOB Visa Signature</div><div class="example-note">4 mpd · next: UOB PP Visa</div></div>
+              <div class="example-row"><div class="example-answer">UOB Preferred Platinum Visa</div><div class="example-note">4 mpd · S\$600 cap/mo</div></div>
             </div>
             <div class="example">
               <div class="question">"Which card for Grab rides?"</div>
-              <div class="example-row"><div class="example-answer">UOB PP Visa</div><div class="example-note">4 mpd · up to S\$1,110/mo cap</div></div>
+              <div class="example-row"><div class="example-answer">KrisFlyer UOB</div><div class="example-note">1.2 mpd · MCC 7399, no bonus tier</div></div>
             </div>
             <div class="example">
               <div class="question">"SIA tickets online?"</div>
-              <div class="example-row"><div class="example-answer">UOB Visa Signature</div><div class="example-note">4 mpd · pair with KrisFlyer UOB</div></div>
+              <div class="example-row"><div class="example-answer">KrisFlyer UOB</div><div class="example-note">2.4 mpd · KrisFlyer redemptions</div></div>
             </div>
           </div>
         </div>
