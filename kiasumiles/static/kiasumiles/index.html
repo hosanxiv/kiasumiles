@@ -1,0 +1,584 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Ask which card to use at a merchant. KiasuMiles checks the rules against your cards, then tells you which one to tap." />
+  <title>KiasuMiles - The right card, before you tap.</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@92,500;100,650;108,800;112,850&family=Geist:wght@450;550;650;750;850&family=Geist+Mono:wght@500;650;750&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #061427;
+      --ink-2: #152a46;
+      --muted: #51627a;
+      --line: rgba(6, 20, 39, .12);
+      --blue: #1168ff;
+      --blue-2: #6aa2ff;
+      --mint: #2bd6ad;
+      --green: #5fb43a;
+      --green-2: #b7e76a;
+      --surface: #ffffff;
+      --wash: #f4f9ff;
+      --shadow: 0 30px 100px rgba(15, 47, 94, .16);
+      --soft-shadow: 0 18px 60px rgba(15, 47, 94, .10);
+      --radius-xl: 34px;
+      --radius-lg: 24px;
+      --radius-md: 16px;
+      --font-display: Archivo, Geist, ui-sans-serif, system-ui, -apple-system, sans-serif;
+      --font-sans: Geist, ui-sans-serif, system-ui, -apple-system, sans-serif;
+      --font-mono: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: #f7fbff;
+      color: var(--ink);
+      font-family: var(--font-sans);
+      font-feature-settings: "kern" 1, "liga" 1;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: geometricPrecision;
+    }
+    a { color: inherit; text-decoration: none; }
+    p, h1, h2, h3 { margin: 0; }
+    button, a { -webkit-tap-highlight-color: transparent; }
+    .page { overflow-x: hidden; width: 100%; max-width: 100%; }
+    .nav {
+      position: fixed;
+      z-index: 50;
+      inset: 22px 30px auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      min-height: 64px;
+      padding: 10px 12px 10px 18px;
+      border: 1px solid rgba(6, 20, 39, .12);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, .82);
+      backdrop-filter: blur(18px);
+      box-shadow: 0 14px 44px rgba(0, 0, 0, .06);
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 850;
+      font-size: 21px;
+      letter-spacing: -.04em;
+      white-space: nowrap;
+    }
+    .brand-mark {
+      width: 30px;
+      height: 30px;
+      border-radius: 11px;
+      background: linear-gradient(135deg, #003f37, #0ac39a);
+      color: white;
+      display: grid;
+      place-items: center;
+      font-size: 12px;
+      font-family: var(--font-mono);
+      letter-spacing: -.044em;
+      box-shadow: 0 10px 24px rgba(0, 0, 0, .08);
+    }
+    .navlinks { display: flex; align-items: center; gap: 24px; color: var(--ink-2); font-size: 14px; font-weight: 650; }
+    .nav-actions { display: flex; gap: 8px; align-items: center; }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 44px;
+      border-radius: 999px;
+      padding: 12px 18px;
+      font-weight: 800;
+      border: 1px solid var(--line);
+      background: white;
+      color: var(--ink);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, .055);
+      transition: transform .22s cubic-bezier(.16, 1, .3, 1), box-shadow .22s cubic-bezier(.16, 1, .3, 1), background .22s ease;
+      white-space: nowrap;
+    }
+    .btn:hover { transform: translateY(-1px); box-shadow: 0 16px 38px rgba(0, 0, 0, .075); }
+    .btn:active { transform: translateY(1px) scale(.99); }
+    .btn:focus-visible { outline: 3px solid rgba(17, 104, 255, .28); outline-offset: 3px; }
+    .btn.primary { background: #003f37; color: white; border-color: #003f37; box-shadow: 0 18px 42px rgba(0, 0, 0, .12); }
+    .btn.primary:hover { background: #002f29; }
+    .btn.blue { background: var(--blue); color: white; border-color: var(--blue); }
+    section { position: relative; min-height: 100dvh; padding: 120px clamp(22px, 5vw, 72px); }
+    h1, h2, h3 { font-family: var(--font-display); text-wrap: balance; }
+    h1 {
+      max-width: 1100px;
+      margin: 28px auto 0;
+      font-size: clamp(54px, 7.4vw, 96px);
+      line-height: .88;
+      letter-spacing: -.052em;
+      font-weight: 850;
+      text-shadow: 0 12px 42px rgba(9, 54, 58, .14);
+    }
+    h2 {
+      margin-top: 16px;
+      font-size: clamp(44px, 5.8vw, 82px);
+      line-height: .92;
+      letter-spacing: -.06em;
+      font-weight: 850;
+    }
+    h3 {
+      font-size: clamp(28px, 3vw, 42px);
+      line-height: 1.02;
+      letter-spacing: -.045em;
+      font-weight: 850;
+    }
+    .section-copy {
+      margin-top: 22px;
+      max-width: 560px;
+      color: var(--ink-2);
+      font-size: clamp(20px, 2.1vw, 28px);
+      line-height: 1.22;
+      letter-spacing: -.035em;
+      font-weight: 550;
+      text-wrap: pretty;
+    }
+    .caption { color: var(--muted); font-size: 14px; line-height: 1.45; font-weight: 650; }
+    .label-soft { color: var(--blue); font-weight: 800; letter-spacing: -.02em; }
+    .hero {
+      display: grid;
+      place-items: center;
+      text-align: center;
+      background:
+        radial-gradient(900px 520px at 50% 62%, rgba(43, 214, 173, .36), transparent 62%),
+        radial-gradient(900px 560px at 78% 18%, rgba(17, 104, 255, .14), transparent 64%),
+        linear-gradient(180deg, #ffffff 0%, #f5fbff 55%, #ecfff8 100%);
+      overflow: hidden;
+      padding-top: 112px;
+    }
+    .merchant-card {
+      position: absolute;
+      z-index: 2;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 132px;
+      min-height: 66px;
+      border-radius: 18px;
+      background: white;
+      padding: 14px 24px;
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(6, 20, 39, .08);
+      transform: rotate(var(--r));
+      white-space: nowrap;
+    }
+    .merchant-card img {
+      display: block;
+      width: auto;
+      max-width: 190px;
+      max-height: 46px;
+      object-fit: contain;
+    }
+    .merchant-card.logo-icon { min-width: 92px; padding: 12px 18px; }
+    .merchant-card.logo-icon img { width: 64px; height: 64px; max-width: 64px; max-height: 64px; }
+    .merchant-card.logo-tall img { width: 46px; max-width: 46px; max-height: 74px; }
+    .ntuc { left: 8%; top: 29%; --r: 7deg; }
+    .grab { left: 5%; top: 58%; --r: -4deg; }
+    .watsons { left: 7%; bottom: 11%; --r: 6deg; }
+    .shell { right: 5%; top: 54%; --r: -7deg; }
+    .shopee { right: 7%; bottom: 10%; --r: 8deg; }
+    .sia { right: 4%; top: 28%; --r: -6deg; opacity: .98; }
+    .sia img { width: 196px; max-width: 196px; max-height: 32px; }
+    .watsons img { max-width: 132px; max-height: 40px; }
+    .hero-copy { position: relative; z-index: 5; max-width: 1180px; padding-top: 18px; }
+    .hero-kicker {
+      display: inline-flex;
+      align-items: center;
+      border: 1px solid rgba(20, 180, 137, .24);
+      background: rgba(255, 255, 255, .72);
+      border-radius: 999px;
+      padding: 10px 16px;
+      color: #005b4a;
+      font-weight: 800;
+      box-shadow: 0 10px 28px rgba(0, 0, 0, .055);
+    }
+    .hero-subtitle {
+      margin: 28px auto 0;
+      max-width: 820px;
+      color: var(--ink-2);
+      font-size: clamp(21px, 2.2vw, 31px);
+      line-height: 1.18;
+      letter-spacing: -.045em;
+      font-weight: 600;
+      text-wrap: balance;
+    }
+    .hero-actions { margin-top: 34px; display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; }
+    .support-line {
+      display: inline-flex;
+      margin-top: 18px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, .68);
+      border: 1px solid rgba(6, 20, 39, .09);
+      padding: 9px 14px;
+      color: var(--muted);
+      font-weight: 750;
+      font-size: 14px;
+    }
+    .merchant-strip { margin: 30px auto 0; display: none; justify-content: center; flex-wrap: wrap; gap: 10px; max-width: 850px; }
+    .merchant-chip { display: inline-flex; align-items: center; justify-content: center; min-width: 92px; height: 44px; border-radius: 999px; background: rgba(255,255,255,.84); border: 1px solid rgba(6,20,39,.08); padding: 8px 14px; box-shadow: 0 10px 24px rgba(0,0,0,.045); }
+    .merchant-chip img { display:block; max-width: 96px; max-height: 28px; object-fit: contain; }
+    .radar {
+      display: grid;
+      grid-template-columns: .82fr 1.18fr;
+      gap: 40px;
+      align-items: center;
+      background:
+        radial-gradient(900px 460px at 72% 50%, rgba(17, 104, 255, .12), transparent 64%),
+        linear-gradient(135deg, #ffffff, #edf7ff 55%, #f7fbff);
+    }
+    .radar .copy-block { max-width: 610px; }
+    .rail { position: relative; min-height: 560px; border-radius: 44px; background: linear-gradient(135deg, rgba(255, 255, 255, .28), rgba(255, 255, 255, .78)); overflow: hidden; box-shadow: inset 0 0 0 1px rgba(6,20,39,.05); }
+    .rail-route { position: absolute; left: 6%; right: 6%; top: 24%; bottom: 24%; border-left: 0; pointer-events: none; }
+    .rail-route::before { content: ""; position: absolute; inset: 0; background:
+        repeating-linear-gradient(58deg, rgba(17,104,255,.0) 0 16px, rgba(17,104,255,.0) 16px),
+        linear-gradient(58deg, transparent calc(50% - 2px), rgba(17,104,255,.36) calc(50% - 2px) calc(50% + 2px), transparent calc(50% + 2px));
+    }
+    .station { position: absolute; display: grid; place-items: center; min-width: 124px; min-height: 70px; border-radius: 21px; background: white; border: 1px solid rgba(6, 20, 39, .08); box-shadow: 0 22px 58px rgba(0,0,0,.08); padding: 14px 22px; transform: rotate(var(--r)); }
+    .station img { display: block; max-width: 140px; max-height: 42px; object-fit: contain; }
+    .station.logo-icon { min-width: 88px; }
+    .station.logo-icon img { width: 58px; height: 58px; max-width: 58px; max-height: 58px; }
+    .station.logo-tall img { width: 48px; max-width: 48px; max-height: 70px; }
+    .st1 {left:5%;bottom:14%;--r:-6deg}
+    .st2 {left:20%;bottom:34%;--r:-3deg}
+    .st3 {left:36%;top:38%;--r:6deg}
+    .st4 {left:52%;top:24%;--r:-3deg}
+    .st5 {right:18%;top:14%;--r:-6deg}
+    .st6 {right:5%;top:30%;--r:4deg}
+    .radar-card { position: absolute; right: 6%; bottom: 9%; display: flex; align-items: baseline; gap: 12px; border-radius: 999px; background: white; box-shadow: var(--soft-shadow); border: 1px solid rgba(6,20,39,.10); padding: 14px 22px; }
+    .radar-card strong { font-size: 32px; color: var(--blue); letter-spacing: -.05em; }
+    .radar-card span { font-size: 15px; font-weight: 700; letter-spacing: -.01em; color: var(--ink-2); max-width: 220px; line-height: 1.2; }
+    .macro { min-height: 100dvh; display: grid; grid-template-columns: 1.08fr .92fr; align-items: center; gap: 44px; background: radial-gradient(800px 540px at 32% 46%, rgba(255,255,255,.30), transparent 62%), linear-gradient(135deg, #b3e35d, #75bd3b); color: #16351f; }
+    .macro h2 { color: #18321f; }
+    .ticket { position: relative; border-radius: 42px; background: #fbfbf0; border: 1px solid rgba(22, 53, 31, .15); box-shadow: 0 34px 96px rgba(0,0,0,.12); padding: clamp(36px, 5vw, 56px); transform: rotate(-3deg); overflow: hidden; }
+    .ticket::after { content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 24px; background: radial-gradient(circle at 12px 0, transparent 11px, #fbfbf0 12px) repeat-x; background-size: 24px 24px; }
+    .ticket-label { color: #5e9832; font-weight: 850; font-size: 22px; letter-spacing: -.02em; }
+    .ticket-card-art { width: min(330px, 86%); margin-top: 26px; border-radius: 16px; box-shadow: 0 24px 58px rgba(0,0,0,.15); border: 1px solid rgba(255,255,255,.5); transform: rotate(1.5deg); }
+    .ticket-title { margin-top: 28px; font-size: clamp(54px, 7vw, 102px); line-height: .88; letter-spacing: -.075em; font-weight: 850; color: #193922; }
+    .ticket-mpd { margin-top: 24px; font-size: clamp(100px, 13vw, 190px); line-height: .78; letter-spacing: -.09em; font-weight: 850; color: #5ea936; }
+    .fact-stack { display: grid; gap: 18px; }
+    .supporting-panel { border-radius: 26px; background: rgba(255, 255, 255, .74); border: 1px solid rgba(22, 53, 31, .12); box-shadow: 0 18px 46px rgba(0,0,0,.07); overflow: hidden; }
+    .supporting-row { display: flex; align-items: baseline; justify-content: space-between; gap: 18px; padding: 18px 24px; }
+    .supporting-row + .supporting-row { border-top: 1px solid rgba(22, 53, 31, .12); }
+    .supporting-row b { color: #4e842a; font-size: 14px; font-weight: 850; letter-spacing: -.01em; }
+    .supporting-row span { font-size: clamp(20px, 2.2vw, 26px); font-weight: 850; letter-spacing: -.04em; color: #18321f; }
+    .flow { display: grid; grid-template-columns: 1.05fr .95fr; align-items: center; gap: clamp(30px, 5vw, 76px); background: linear-gradient(135deg, #eaf6ff, #f8fcff); overflow: hidden; }
+    .flow::before { content: ""; position: absolute; inset: 0; background-image: radial-gradient(rgba(17,104,255,.10) 1px, transparent 1px); background-size: 28px 28px; opacity: .32; pointer-events: none; }
+    .flow-side { position: relative; z-index: 5; max-width: 580px; }
+    .flow h2 { font-size: clamp(42px, 4.8vw, 72px); line-height: .94; }
+    .flow-phone-wrap { position: relative; z-index: 2; display: grid; place-items: center; }
+    .chat-phone { width: min(340px, 86%); border-radius: 44px; background: #101827; padding: 12px; box-shadow: 0 42px 110px rgba(0,0,0,.18); }
+    .chat-screen { border-radius: 34px; background: #0f1622; padding: 22px 16px 18px; display: grid; gap: 14px; }
+    .chat-top { display: flex; align-items: center; justify-content: space-between; color: #8aa0bd; font-size: 12px; font-weight: 750; }
+    .chat-app { color: #fff; }
+    .bubble { border-radius: 20px; padding: 14px 16px; font-size: 15px; line-height: 1.4; }
+    .bubble.user { justify-self: end; max-width: 80%; background: var(--blue); color: #fff; font-weight: 700; border-bottom-right-radius: 6px; }
+    .bubble.bot { background: #1b2738; color: #e7eefb; border-bottom-left-radius: 6px; }
+    .bubble.bot b { color: #fff; }
+    .bot-sub { margin-top: 8px; color: #93a6c2; font-size: 13px; line-height: 1.4; }
+    .chat-foot { display: flex; gap: 8px; flex-wrap: wrap; }
+    .chat-foot span { border-radius: 999px; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.08); color: #9fb2cd; font-size: 12px; font-weight: 700; padding: 6px 10px; }
+    .privacy { display: grid; grid-template-columns: .72fr 1.28fr; gap: 34px; align-items: center; background: linear-gradient(135deg, #ffffff, #eef8f9); }
+    .vault { position: relative; height: 620px; border-radius: 42px; background: linear-gradient(135deg, rgba(255,255,255,.76), rgba(229,245,248,.86)); border: 1px solid rgba(6,20,39,.1); box-shadow: var(--shadow); overflow: hidden; }
+    .client-zone { position: absolute; top: 0; bottom: 0; right: 0; width: 38%; background: linear-gradient(180deg, rgba(17,104,255,.07), rgba(43,214,173,.05)); border-left: 2px dashed rgba(17,104,255,.28); }
+    .zone-tag { position: absolute; z-index: 4; top: 22px; border-radius: 999px; padding: 8px 13px; font-size: 12px; font-weight: 850; letter-spacing: .02em; box-shadow: 0 10px 22px rgba(0,0,0,.07); }
+    .zone-tag.server { left: 22px; background: #ffffff; border: 1px solid rgba(6,20,39,.10); color: var(--ink-2); }
+    .zone-tag.client { right: 22px; background: #061427; color: #fff; }
+    .safe { position: absolute; inset: 70px 44% 90px 56px; border-radius: 38px; background: rgba(255,255,255,.72); border: 8px solid rgba(145,178,195,.24); box-shadow: inset 0 0 36px rgba(0,0,0,.045), 0 30px 76px rgba(0,0,0,.09); }
+    .safe::before { content: "CARD RULES\A MERCHANT DATA\A CAP LOGIC\A CHANNEL RULES"; white-space: pre; position: absolute; inset: 70px; font-family: var(--font-mono); line-height: 2.1; color: #173b62; font-weight: 750; }
+    .cards-out { position: absolute; right: 40px; top: 96px; z-index: 3; display: grid; gap: 24px; }
+    .float-card { width: 230px; height: 126px; border-radius: 18px; background: linear-gradient(135deg, #0750a1, #052e5d); color: white; box-shadow: 0 20px 54px rgba(0,0,0,.14); padding: 18px; transform: rotate(var(--r)); font-weight: 850; }
+    .trust-labels { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 30px; }
+    .trust-labels span { border-radius: 999px; background: white; border: 1px solid rgba(6,20,39,.09); padding: 11px 14px; font-size: 14px; color: var(--ink-2); font-weight: 800; box-shadow: 0 10px 24px rgba(0,0,0,.045); }
+    .endpoint-section { min-height: 100dvh; display: grid; grid-template-columns: minmax(360px, .9fr) minmax(520px, 1.1fr); align-items: center; gap: clamp(32px, 5vw, 72px); background: radial-gradient(820px 520px at 78% 50%, rgba(17,104,255,.14), transparent 64%), linear-gradient(135deg, #ffffff, #f1f7ff 60%, #eef9f4); }
+    .endpoint-side { position: relative; z-index: 3; max-width: 560px; }
+    .endpoint-section h2 { max-width: 560px; }
+    .endpoint-section .section-copy { max-width: 520px; }
+    .endpoint-actions { margin-top: 32px; display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
+    .endpoint-tiny { margin-top: 22px; max-width: 520px; color: var(--muted); font-weight: 650; }
+    .route-stage { position: relative; z-index: 2; min-height: 560px; display: grid; place-items: center; }
+    .endpoint-hub { position: relative; z-index: 4; width: min(420px, 86%); margin-left: auto; border-radius: 28px; background: white; border: 1px solid rgba(6,20,39,.10); box-shadow: 0 34px 96px rgba(0,0,0,.12); padding: 26px; }
+    .endpoint-hub .hub-label { display: inline-flex; align-items: center; gap: 8px; color: #005b4a; font-weight: 800; font-size: 13px; letter-spacing: -.01em; }
+    .endpoint-hub .hub-label .live { width: 9px; height: 9px; border-radius: 999px; background: var(--mint); box-shadow: 0 0 0 5px rgba(43,214,173,.18); }
+    .endpoint-url { margin-top: 16px; display: block; border-radius: 16px; background: #f3f8ff; border: 1px solid rgba(17,104,255,.16); padding: 18px 20px; font-family: var(--font-mono); font-size: clamp(16px, 2vw, 21px); font-weight: 650; color: #0a2f66; overflow-wrap: anywhere; transition: background .2s ease, border-color .2s ease; }
+    .endpoint-url:hover { background: #e9f2ff; border-color: var(--blue); }
+    .endpoint-hub .hub-meta { margin-top: 14px; display: flex; flex-wrap: wrap; gap: 8px; }
+    .endpoint-hub .hub-meta span { border-radius: 999px; background: rgba(245,249,255,.9); border: 1px solid rgba(6,20,39,.07); padding: 7px 11px; font-size: 13px; font-weight: 700; color: var(--ink-2); }
+    .start-steps { position: relative; z-index: 4; list-style: none; margin: 0; padding: 0; display: grid; gap: 16px; width: min(520px, 100%); margin-left: auto; }
+    .start-step { display: grid; grid-template-columns: 44px 1fr; gap: 18px; align-items: start; border-radius: 24px; background: white; border: 1px solid rgba(6,20,39,.10); box-shadow: 0 24px 64px rgba(0,0,0,.08); padding: 22px 24px; }
+    .start-num { width: 36px; height: 36px; border-radius: 999px; display: grid; place-items: center; background: #003f37; color: white; font-family: var(--font-mono); font-weight: 750; font-size: 16px; }
+    .start-body b { display: block; font-size: 18px; font-weight: 850; letter-spacing: -.02em; color: var(--ink); }
+    .start-body p { margin-top: 4px; color: var(--ink-2); font-size: 14px; font-weight: 600; line-height: 1.4; }
+    .copy-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; margin-top: 12px; border-radius: 12px; background: #f3f8ff; border: 1px solid rgba(17,104,255,.18); padding: 11px 12px 11px 14px; cursor: pointer; text-align: left; transition: background .18s ease, border-color .18s ease; }
+    .copy-row:hover { background: #e9f2ff; border-color: var(--blue); }
+    .copy-row code { font-family: var(--font-mono); font-size: 13px; font-weight: 650; color: #0a2f66; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .copy-row.prompt code { white-space: normal; }
+    .copy-tag { flex: 0 0 auto; border-radius: 999px; background: var(--blue); color: white; font-size: 12px; font-weight: 800; padding: 5px 11px; }
+    .copy-row.copied .copy-tag { background: var(--green); }
+    .ask-example { margin-top: 12px; border-radius: 12px; background: #ecfff6; border: 1px solid rgba(43,214,173,.3); padding: 12px 14px; color: #045140; font-weight: 750; font-size: 14px; }
+
+    @media (prefers-reduced-motion: no-preference) {
+    .merchant-card, .station, .ticket, .float-card { transition: transform .7s cubic-bezier(.16, 1, .3, 1); }
+    .merchant-card:hover, .station:hover, .float-card:hover { transform: rotate(var(--r)) translateY(-6px) scale(1.03); }
+    .ticket:hover { transform: rotate(-3deg) translateY(-5px); }
+    }
+
+    @media (max-width: 980px) {
+    .navlinks { display: none; }
+    .nav { inset: 14px 14px auto; }
+    .radar, .macro, .privacy { grid-template-columns: 1fr; }
+    .macro { gap: 34px; }
+    .flow { grid-template-columns: 1fr; }
+    .flow-side { max-width: none; }
+    .safe { inset: 60px 44% 80px 50px; }
+    .cards-out { right: 18px; }
+    .endpoint-section { grid-template-columns: 1fr; }
+    .route-stage { min-height: 420px; }
+    }
+    @media (max-width: 760px) {
+    section { padding: 94px 22px; min-height: auto; }
+    .hero { min-height: 100dvh; padding-top: 112px; }
+    h1 { font-size: clamp(52px, 15vw, 76px); }
+    h2 { font-size: clamp(42px, 11vw, 62px); }
+    .merchant-card { display: none; }
+    .merchant-strip { display: flex; }
+    .rail { min-height: 560px; border-radius: 30px; }
+    .station { font-size: 18px; padding: 14px 17px; }
+    .radar-card { right: 20px; bottom: 22px; width: 300px; }
+    .ticket { transform: none; }
+    .ticket-mpd { font-size: clamp(90px, 28vw, 130px); }
+    .vault { height: 620px; border-radius: 30px; }
+    .client-zone { left: 0; right: 0; top: 52%; bottom: 0; width: auto; border-left: 0; border-top: 2px dashed rgba(17,104,255,.28); }
+    .zone-tag.server { left: 18px; top: 18px; }
+    .zone-tag.client { right: 18px; top: calc(52% + 18px); }
+    .safe { inset: 64px 24px auto 24px; height: 230px; }
+    .safe::before { inset: 44px 28px; font-size: 13px; line-height: 1.9; }
+    .cards-out { left: 18px; right: 18px; top: calc(52% + 64px); display: flex; flex-wrap: wrap; gap: 10px; }
+    .float-card { width: calc(50% - 5px); height: 92px; padding: 14px; transform: none !important; font-size: 13px; }
+    .float-card:nth-child(3) { width: 100%; }
+    .nav-actions .ghost { display: none; }
+    .brand { font-size: 18px; }
+    .endpoint-section { gap: 30px; }
+    .route-stage { min-height: auto; place-items: stretch; width: 100%; }
+    .start-steps { width: 100%; margin-left: 0; gap: 12px; }
+    .start-step { grid-template-columns: 34px 1fr; gap: 12px; border-radius: 20px; padding: 16px; }
+    .start-num { width: 32px; height: 32px; font-size: 14px; }
+    .copy-row { align-items: stretch; flex-direction: column; gap: 10px; }
+    .copy-row code { white-space: normal; overflow-wrap: anywhere; word-break: break-word; }
+    .copy-tag { width: fit-content; }
+    }
+    @media (max-width: 520px) {
+    .nav { padding: 9px 10px 9px 12px; min-height: 56px; }
+    .nav .btn { padding: 9px 12px; min-height: 40px; font-size: 13px; }
+    .brand-mark { width: 26px; height: 26px; border-radius: 9px; }
+    .hero-subtitle { font-size: 20px; }
+    .support-line { border-radius: 18px; }
+    .merchant-strip { justify-content: flex-start; }
+    .endpoint-url { font-size: 16px; padding: 14px 16px; }
+    .merchant-chip { min-width: 78px; height: 38px; padding: 7px 10px; }
+    .merchant-chip img { max-width: 82px; max-height: 24px; }
+    .start-step { grid-template-columns: 1fr; }
+    .start-num { margin-bottom: -4px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; transition-duration: .001ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <nav class="nav" aria-label="Primary navigation">
+      <a class="brand" href="#top"><span class="brand-mark">KM</span>KiasuMiles</a>
+      <div class="navlinks">
+        <a href="#radar">Merchant radar</a>
+        <a href="#answer">Answer</a>
+        <a href="#privacy">Privacy</a>
+        <a href="#start">Get started</a>
+      </div>
+      <div class="nav-actions">
+        <a class="btn ghost" href="#flow">See how it works</a>
+        <a class="btn primary" href="#start">Try KiasuMiles</a>
+      </div>
+    </nav>
+
+    <section id="top" class="hero">
+      <div class="merchant-card ntuc"><img src="assets/logos/fairprice-real-crop.png" alt="NTUC FairPrice"></div>
+      <div class="merchant-card grab"><img src="assets/logos/grab-colour.svg" alt="Grab"></div>
+      <div class="merchant-card watsons"><img src="assets/logos/watsons-crop.png" alt="Watsons"></div>
+      <div class="merchant-card shell logo-icon"><img src="assets/logos/shell-colour.svg" alt="Shell"></div>
+      <div class="merchant-card shopee logo-icon"><img src="assets/logos/shopee-real-crop.png" alt="Shopee"></div>
+      <div class="merchant-card sia"><img src="assets/logos/Singapore_Airlines_Logo.svg" alt="Singapore Airlines"></div>
+      <div class="hero-copy">
+        <span class="hero-kicker">Singapore card rewards</span>
+        <h1>The right card, before you tap.</h1>
+        <p class="hero-subtitle">Ask which card to use at a merchant. KiasuMiles checks the rules against your cards, then tells you which one to tap.</p>
+        <div class="hero-actions">
+          <a class="btn primary" href="#start">Try KiasuMiles</a>
+          <a class="btn" href="#flow">See how it works</a>
+        </div>
+        <div class="support-line">Wallet stays client-side. Rules stay server-side.</div>
+        <div class="merchant-strip" aria-label="Supported merchant examples">
+          <span class="merchant-chip"><img src="assets/logos/fairprice-real-crop.png" alt="NTUC FairPrice"></span>
+          <span class="merchant-chip"><img src="assets/logos/Singapore_Airlines_Logo.svg" alt="Singapore Airlines"></span>
+          <span class="merchant-chip"><img src="assets/logos/grab-colour.svg" alt="Grab"></span>
+          <span class="merchant-chip"><img src="assets/logos/shell-colour.svg" alt="Shell"></span>
+          <span class="merchant-chip"><img src="assets/logos/shopee-real-crop.png" alt="Shopee"></span>
+          <span class="merchant-chip"><img src="assets/logos/watsons-crop.png" alt="Watsons"></span>
+        </div>
+      </div>
+    </section>
+
+    <section id="radar" class="radar">
+      <div class="copy-block">
+        <p class="label-soft">Merchant radar</p>
+        <h2>It recognises the merchant, not just the category.</h2>
+        <p class="section-copy">NTUC FairPrice, Singapore Airlines, Grab, Shell, Shopee. KiasuMiles maps the place you’re paying to the rule that matters.</p>
+      </div>
+      <div class="rail" aria-label="Merchant signal map">
+        <div class="rail-route" aria-hidden="true"></div>
+        <div class="station st1"><img src="assets/logos/fairprice-real-crop.png" alt="NTUC FairPrice"></div>
+        <div class="station st2"><img src="assets/logos/Singapore_Airlines_Logo.svg" alt="Singapore Airlines"></div>
+        <div class="station st3 logo-icon"><img src="assets/logos/shell-colour.svg" alt="Shell"></div>
+        <div class="station st4"><img src="assets/logos/grab-colour.svg" alt="Grab"></div>
+        <div class="station st5 logo-icon"><img src="assets/logos/shopee-real-crop.png" alt="Shopee"></div>
+        <div class="station st6"><img src="assets/logos/watsons-crop.png" alt="Watsons"></div>
+        <div class="radar-card"><strong>3,317</strong><span>merchants matched to card rules.</span></div>
+      </div>
+    </section>
+
+    <section id="answer" class="macro">
+      <div class="ticket" aria-label="Best match recommendation ticket">
+        <div class="ticket-label">Best match</div>
+        <img class="ticket-card-art" src="assets/logos/uob-preferred-platinum-visa-card.png" alt="UOB Preferred Platinum Visa card">
+        <div class="ticket-title">UOB Preferred Platinum Visa</div>
+        <div class="ticket-mpd">4 mpd</div>
+      </div>
+      <div class="fact-stack">
+        <h2>Your cards. One answer.</h2>
+        <div class="supporting-panel">
+          <div class="supporting-row"><b>Merchant</b><span>Sheng Siong</span></div>
+          <div class="supporting-row"><b>Checked against</b><span>UOB PPV + UOB Signature</span></div>
+          <div class="supporting-row"><b>Cap</b><span>within limit</span></div>
+          <div class="supporting-row"><b>Wallet</b><span>client-side</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="flow" class="flow">
+      <div class="flow-side">
+        <p class="label-soft">How it works</p>
+        <h2>Ask. Get an answer.</h2>
+        <p class="section-copy">Ask your agent which card to use. KiasuMiles checks the rules against your cards. You get one card, with the reason why.</p>
+      </div>
+      <div class="flow-phone-wrap">
+        <div class="chat-phone" aria-label="Example KiasuMiles chat answering which card to use">
+          <div class="chat-screen">
+            <div class="chat-top"><span class="chat-app">KiasuMiles</span><span class="chat-worked">Rules checked</span></div>
+            <div class="bubble user">Which card should I use at Sheng Siong?</div>
+            <div class="bubble bot">
+              <div class="bot-line">Use <b>UOB Preferred Platinum Visa</b> at <b>Sheng Siong</b>: <b>4 mpd</b>, with a S$600 cap / calendar month.</div>
+              <div class="bot-sub">Matched as groceries in KiasuMiles data. If the cap is used up, the next clean fallback is UOB PRVI Miles Visa at 1.4 mpd.</div>
+            </div>
+            <div class="chat-foot"><span>merchant checked</span><span>rules applied</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="privacy" class="privacy">
+      <div>
+        <p class="label-soft">Trust and privacy</p>
+        <h2>Rules live here. Wallets do not.</h2>
+        <p class="section-copy">KiasuMiles stores the card rules and merchant data it needs to make a recommendation. Your cards stay with you, and each request is judged only on the cards you pass in.</p>
+        <div class="trust-labels">
+          <span>Server-side rules</span>
+          <span>Client-held cards</span>
+          <span>No wallet storage</span>
+        </div>
+      </div>
+      <div class="vault" aria-label="Privacy visual showing rules stored server-side and cards held client-side">
+        <div class="client-zone" aria-hidden="true"></div>
+        <span class="zone-tag server" aria-hidden="true">Server-side</span>
+        <span class="zone-tag client" aria-hidden="true">Client-side</span>
+        <div class="safe"></div>
+        <div class="cards-out">
+          <div class="float-card" style="--r:-7deg">Client card<br>UOB PPV</div>
+          <div class="float-card" style="--r:5deg;background:linear-gradient(135deg,#00785d,#003f37)">Client card<br>UOB Signature</div>
+          <div class="float-card" style="--r:-3deg;background:linear-gradient(135deg,#9aa8b9,#677586)">Client card<br>DBS WWMC</div>
+        </div>
+      </div>
+    </section>
+
+    <section id="start" class="endpoint-section">
+      <div class="endpoint-side">
+        <p class="label-soft">Get started</p>
+        <h2>Three steps. Then just ask.</h2>
+        <p class="section-copy">Point your agent at the endpoint, paste one setup prompt, and ask away. Works with Claude, Codex, and anything that speaks MCP.</p>
+        <div class="endpoint-actions">
+          <a class="btn primary" href="https://github.com/hosanxiv/kiasumiles" target="_blank" rel="noreferrer">Full setup guide on GitHub</a>
+        </div>
+        <p class="endpoint-tiny">No wallet to sync. Your cards stay in your agent.</p>
+      </div>
+      <div class="route-stage" aria-label="How to start using KiasuMiles">
+        <ol class="start-steps">
+          <li class="start-step">
+            <span class="start-num">1</span>
+            <div class="start-body">
+              <b>Connect the endpoint</b>
+              <p>Add this hosted MCP endpoint to your agent.</p>
+              <button class="copy-row" type="button" data-copy="https://kiasumiles.space/mcp">
+                <code>https://kiasumiles.space/mcp</code>
+                <span class="copy-tag">Copy</span>
+              </button>
+            </div>
+          </li>
+          <li class="start-step">
+            <span class="start-num">2</span>
+            <div class="start-body">
+              <b>Set up your cards</b>
+              <p>Paste this once. Your agent asks which banks you use and remembers your cards.</p>
+              <button class="copy-row prompt" type="button" data-copy="Use KiasuMiles. First help me set up my card stack. Ask me which banks I have cards with, show me the matching supported cards, then remember my selected cards for future KiasuMiles lookups.">
+                <code>Use KiasuMiles. First help me set up my card stack...</code>
+                <span class="copy-tag">Copy</span>
+              </button>
+            </div>
+          </li>
+          <li class="start-step">
+            <span class="start-num">3</span>
+            <div class="start-body">
+              <b>Ask before you tap</b>
+              <p>Then ask in plain English, anytime you're at a counter.</p>
+              <div class="ask-example">"What card should I use at NTUC FairPrice?"</div>
+            </div>
+          </li>
+        </ol>
+      </div>
+    </section>
+  </main>
+  <script>
+    document.querySelectorAll('.copy-row').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var text = b.getAttribute('data-copy') || '';
+        navigator.clipboard.writeText(text).then(function () {
+          var tag = b.querySelector('.copy-tag');
+          if (!tag) return;
+          var prev = tag.textContent;
+          tag.textContent = 'Copied';
+          b.classList.add('copied');
+          setTimeout(function () {
+            tag.textContent = prev;
+            b.classList.remove('copied');
+          }, 1600);
+        });
+      });
+    });
+  </script>
+</body>
+</html>

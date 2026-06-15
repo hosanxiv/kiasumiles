@@ -72,12 +72,20 @@ def test_landing_page_and_media_routes_are_served():
         landing = client.get("/")
         hero = client.get("/kiasumiles/hero.png")
         video = client.get("/kiasumiles/product-demo-60s.mp4")
+        logo = client.get("/assets/logos/grab-colour.svg")
+        namespaced_logo = client.get("/kiasumiles/assets/logos/grab-colour.svg")
+        blocked = client.get("/assets/logos/../secret.txt")
 
     assert landing.status_code == 200
-    assert "Your cards. Your merchants. Your best answer." in landing.text
+    assert "The right card, before you tap." in landing.text
     assert "https://kiasumiles.space/mcp" in landing.text
-    assert "does not store a wallet" in landing.text
+    assert "Wallet stays client-side" in landing.text
     assert hero.status_code == 200
     assert hero.headers["content-type"] == "image/png"
     assert video.status_code == 200
     assert video.headers["content-type"] == "video/mp4"
+    assert logo.status_code == 200
+    assert logo.headers["content-type"] == "image/svg+xml"
+    assert namespaced_logo.status_code == 200
+    assert namespaced_logo.headers["content-type"] == "image/svg+xml"
+    assert blocked.status_code == 404
