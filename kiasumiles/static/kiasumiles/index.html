@@ -348,10 +348,49 @@
     h1 { font-size: clamp(52px, 15vw, 76px); }
     h2 { font-size: clamp(42px, 11vw, 62px); }
     .merchant-card { display: none; }
-    .merchant-strip { display: flex; }
-    .rail { min-height: 560px; border-radius: 30px; }
-    .station { font-size: 18px; padding: 14px 17px; }
-    .radar-card { right: 20px; bottom: 22px; width: 300px; }
+    .merchant-strip {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+      max-width: 460px;
+    }
+    .merchant-chip { width: 100%; min-width: 0; }
+    .merchant-chip img { max-width: 100%; }
+    .rail {
+      min-height: auto;
+      border-radius: 30px;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      padding: 16px;
+    }
+    .rail-route { display: none; }
+    .station {
+      position: relative;
+      left: auto;
+      right: auto;
+      top: auto;
+      bottom: auto;
+      width: 100%;
+      min-width: 0;
+      min-height: 84px;
+      padding: 12px 14px;
+      transform: none !important;
+    }
+    .station img { max-width: 100%; max-height: 34px; }
+    .station.logo-icon img { width: 48px; height: 48px; max-width: 48px; max-height: 48px; }
+    .station.logo-tall img { width: 40px; max-width: 40px; max-height: 58px; }
+    .radar-card {
+      position: relative;
+      right: auto;
+      bottom: auto;
+      width: 100%;
+      margin-top: 2px;
+      grid-column: 1 / -1;
+      padding: 14px 18px;
+    }
+    .radar-card strong { font-size: 28px; }
+    .radar-card span { max-width: none; }
     .ticket { transform: none; }
     .ticket-mpd { font-size: clamp(90px, 28vw, 130px); }
     .vault { height: 620px; border-radius: 30px; }
@@ -380,10 +419,10 @@
     .brand-mark { width: 26px; height: 26px; border-radius: 9px; }
     .hero-subtitle { font-size: 20px; }
     .support-line { border-radius: 18px; }
-    .merchant-strip { justify-content: flex-start; }
+    .merchant-strip { gap: 6px; }
     .endpoint-url { font-size: 16px; padding: 14px 16px; }
-    .merchant-chip { min-width: 78px; height: 38px; padding: 7px 10px; }
-    .merchant-chip img { max-width: 82px; max-height: 24px; }
+    .merchant-chip { min-width: 0; width: 100%; height: 38px; padding: 7px 8px; }
+    .merchant-chip img { max-width: 100%; max-height: 22px; }
     .start-step { grid-template-columns: 1fr; }
     .start-num { margin-bottom: -4px; }
     }
