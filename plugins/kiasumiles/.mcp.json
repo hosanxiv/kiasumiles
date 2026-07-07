@@ -1,10 +1,7 @@
 {
   "mcpServers": {
     "kiasumiles": {
-      "command": "uvx",
-      "args": [
-        "kiasumiles-mcp"
-      ]
+      "url": "https://kiasumiles.space/mcp"
     }
   }
 }
