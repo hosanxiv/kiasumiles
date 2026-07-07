@@ -12,7 +12,6 @@ from starlette.responses import FileResponse, HTMLResponse, JSONResponse, PlainT
 
 from .agent_contract import HOSTED_TOOL_DESCRIPTIONS, hosted_agent_guide
 from .chatgpt_action import register_chatgpt_action_routes
-from .landing import render_landing
 from . import tools
 
 
@@ -69,8 +68,7 @@ register_chatgpt_action_routes(mcp)
 
 @mcp.custom_route("/", methods=["GET"])
 async def landing(_: Request) -> HTMLResponse:
-    version = tools.data_version()
-    return HTMLResponse(render_landing(version))
+    return HTMLResponse((STATIC_DIR / "index.html").read_text(encoding="utf-8"))
 
 
 @mcp.custom_route("/kiasumiles/hero.png", methods=["GET"])
@@ -81,6 +79,17 @@ async def hero_image(_: Request) -> FileResponse:
 @mcp.custom_route("/kiasumiles/product-demo-60s.mp4", methods=["GET"])
 async def product_demo(_: Request) -> FileResponse:
     return FileResponse(STATIC_DIR / "product-demo-60s.mp4", media_type="video/mp4")
+
+
+@mcp.custom_route("/assets/logos/{filename:path}", methods=["GET"])
+@mcp.custom_route("/kiasumiles/assets/logos/{filename:path}", methods=["GET"])
+async def logo_asset(request: Request) -> FileResponse:
+    filename = request.path_params["filename"]
+    path = (STATIC_DIR / "assets" / "logos" / filename).resolve()
+    logos_dir = (STATIC_DIR / "assets" / "logos").resolve()
+    if not path.is_file() or logos_dir not in path.parents:
+        return PlainTextResponse("Not found", status_code=404)
+    return FileResponse(path)
 
 
 @mcp.custom_route("/privacy", methods=["GET"])
