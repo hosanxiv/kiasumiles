@@ -20,7 +20,8 @@ HOSTED_DISPLAY_RULES: tuple[str, ...] = (
     "Display recommendations with card name, earn_rate_mpd, cap_summary, and reason_summary.",
     "If the user has not provided cards, ask which cards they carry before making a final recommendation.",
     "Treat routing_note and low_confidence_note as user-visible caveats.",
-    "Use kiasumiles_recommend_stack when the user asks what cards they should add or whether their current card stack has gaps.",
+    "Use kiasumiles_recommend_stack when the user asks whether their current card stack has weak categories.",
+    "Do not present kiasumiles_recommend_stack as a card acquisition recommender; hosted recommendations are scoped to cards supplied in the current request.",
 )
 
 HOSTED_TOOL_DESCRIPTIONS: dict[str, str] = {
@@ -51,14 +52,14 @@ Accepted values: dining, grocery, transport, petrol, pharmacy, hotel, airlines, 
 Present card name, earn_rate_mpd, cap_summary, and reason_summary. Use gotchas to warn about
 wrong payment channel, merchant-only bonus rules, minimum spend, and cap constraints. Never show
 raw card IDs, MCC codes, or technical fields unless the user asks for diagnostics.""",
-    "kiasumiles_recommend_stack": """Analyze a stateless wallet card list and suggest useful card additions.
+    "kiasumiles_recommend_stack": """Analyze a stateless wallet card list for weak categories.
 
-Use this when the user asks whether their current card stack is good, what cards they should add,
-or what gaps exist. The cards parameter is required for hosted usage and is not stored.
+Use this when the user asks whether their current card stack is good or what weak categories exist.
+The cards parameter is required for hosted usage and is not stored. This hosted tool only evaluates
+cards supplied in the current request; it does not suggest cards outside that request.
 If the client has not already supplied cards, ask which cards the user carries first.
 
-Present covered categories, weak categories, and 1-3 suggested additions. Never show raw card IDs
-to the user.""",
+Present covered and weak categories. Never show raw card IDs to the user.""",
     "kiasumiles_data_version": """Return the current KiasuMiles data version and row counts for diagnostics and freshness checks.""",
     "kiasumiles_agent_guide": """Return concise hosted integration guidance for agents. Use this for diagnostics, installation checks, or when an agent needs presentation rules.""",
 }

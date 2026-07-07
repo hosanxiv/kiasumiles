@@ -95,13 +95,23 @@ def test_truly_unknown_merchant_no_keyword_no_category_returns_not_found():
     assert result.get("recommendations") is None or result.get("recommendations") == []
 
 
-def test_stack_recommendations_find_gaps_for_small_wallet():
+def test_lookup_requires_cards_for_hosted_recommendation():
+    result = lookup_hosted("NTUC FairPrice", cards=[])
+
+    assert result["wallet_configured"] is False
+    assert result["wallet_stored"] is False
+    assert result["recommendations"] == []
+    assert "No cards were supplied" in result["message"]
+
+
+def test_stack_review_flags_weak_categories_for_small_wallet():
     result = recommend_stack(cards=["dbs_altitude_visa"], top_n=2)
 
     assert result["wallet_configured"] is True
-    assert result["recommended_additions"]
-    assert any(c["status"] in ("weak", "upgrade_available") for c in result["coverage"])
-    assert all("helps_categories" in card for card in result["recommended_additions"])
+    assert result["recommendation_scope"] == "supplied_cards_only"
+    assert result["recommended_additions"] == []
+    assert any(c["status"] == "weak" for c in result["coverage"])
+    assert all(c["suggested_cards"] == [] for c in result["coverage"])
 
 
 def test_stack_recommendations_accept_stateless_wallet():
@@ -115,6 +125,15 @@ def test_stack_recommendations_accept_stateless_wallet():
 def test_recommend_stack_requires_cards():
     with pytest.raises(TypeError):
         recommend_stack()  # type: ignore[call-arg]
+
+
+def test_recommend_stack_empty_cards_returns_no_recommendations():
+    result = recommend_stack(cards=[])
+
+    assert result["wallet_configured"] is False
+    assert result["coverage"] == []
+    assert result["recommended_additions"] == []
+    assert "No cards were supplied" in result["message"]
 
 
 def test_demo_loader_still_has_sample_data():

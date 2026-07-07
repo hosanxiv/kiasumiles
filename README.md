@@ -143,7 +143,7 @@ You can also ask whether your current stack has gaps:
 
 ```text
 Use KiasuMiles to review my current card stack.
-Tell me what categories are weak and what card I should consider adding.
+Tell me what categories are weak.
 ```
 
 ---
@@ -156,12 +156,26 @@ For agents and developers, KiasuMiles exposes these hosted MCP tools:
 |------|--------------|
 | `kiasumiles_lookup` | Best card for a merchant, ranked from the cards supplied by the client |
 | `kiasumiles_list_cards` | Supported cards and their stable internal IDs |
-| `kiasumiles_recommend_stack` | Gaps in the user's current card stack |
+| `kiasumiles_recommend_stack` | Weak categories in the cards supplied by the client |
 | `kiasumiles_data_version` | Current card and merchant data version |
 | `kiasumiles_agent_guide` | Integration and display guidance for agents |
 
 The hosted server deliberately has no wallet setup or wallet read tools. Wallet storage
-belongs in the agent, app, or user-controlled client.
+belongs in the agent, app, or user-controlled client. Hosted recommendations are scoped to
+the card IDs supplied in the current request; if no cards are supplied, the tools ask for a
+card stack instead of ranking the whole database.
+
+For ChatGPT Actions, the hosted server also exposes a public REST adapter:
+
+| Route | Purpose |
+|------|---------|
+| `GET /api/chatgpt/openapi.json` | OpenAPI schema for a private or public GPT Action |
+| `GET /api/chatgpt/cards?bank=UOB` | Card names by bank, without internal IDs |
+| `POST /api/chatgpt/lookup` | Stateless merchant lookup using cards supplied in the request |
+| `POST /api/chatgpt/recommend-stack` | Weak-category review using cards supplied in the request |
+
+The Action adapter accepts card names, resolves them internally, and strips raw card IDs
+and MCC fields from public JSON responses.
 
 Example lookup shape:
 
@@ -173,7 +187,7 @@ Example lookup shape:
 }
 ```
 
-Responses include `reason_summary`, `reason_codes`, and `gotchas`, so the agent can
+Lookup responses include `reason_summary`, `reason_codes`, and `gotchas`, so the agent can
 explain why a card wins and warn about traps: wrong payment channel, partner-only
 bonuses, minimum spend you haven't hit.
 

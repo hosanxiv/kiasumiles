@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "kiasumiles-mcp"
-version = "1.0.0"
+version = "1.0.1"
 description = "Hosted Singapore miles card optimizer for MCP clients — tells your agent which credit card earns the most miles at any merchant, based on MCC codes."
 readme = "README.md"
 requires-python = ">=3.10"
