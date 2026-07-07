@@ -51,11 +51,7 @@ def _lookup_for_cards(
     valid_ids = {c.card_id for c in _loader.cards()}
     skipped = [cid for cid in cards if cid not in valid_ids]
 
-    wallet_cards = (
-        [c for c in _loader.cards() if c.card_id in cards]
-        if cards
-        else _loader.cards()
-    )
+    wallet_cards = [c for c in _loader.cards() if c.card_id in cards]
     top_n = 5
 
     record, is_exact = find_merchant(
@@ -119,6 +115,18 @@ def lookup_hosted(
     channel: str | None = None,
     category: str | None = None,
 ) -> dict:
+    if not cards:
+        return {
+            "merchant": merchant,
+            "merchant_matched": False,
+            "message": "No cards were supplied. Ask which cards the user carries, then call this tool with those cards.",
+            "recommendations": [],
+            "wallet_configured": False,
+            "wallet_stored": False,
+            "skipped_cards": [],
+            "data_version": data_version()["data_version"],
+        }
+
     result = _lookup_for_cards(merchant, cards, outlet, channel, category)
     result["wallet_stored"] = False
     result["data_version"] = data_version()["data_version"]
@@ -131,47 +139,42 @@ def recommend_stack(cards: list[str], top_n: int = 3) -> dict:
     skipped = [cid for cid in wallet_ids if cid not in valid_ids]
     wallet_cards = [c for c in _loader.cards() if c.card_id in wallet_ids]
     wallet_has_amaze = "amaze" in wallet_ids
-    all_cards = _loader.cards()
+
+    if cards is not None and not wallet_ids:
+        return {
+            "wallet_configured": False,
+            "wallet_cards": [],
+            "skipped_cards": [],
+            "coverage": [],
+            "recommended_additions": [],
+            "recommendation_scope": "supplied_cards_only",
+            "message": "No cards were supplied. Ask which cards the user carries, then call this tool with those cards.",
+        }
 
     coverage = []
-    additions_by_card: dict[str, dict] = {}
 
     for category in _STACK_CATEGORIES:
-        wallet_ranked = rank_cards(
-            category["mcc"],
-            wallet_cards,
-            wallet_has_amaze,
-            1,
-            merchant_name=category["sample_merchant"],
-            channel=category["channel"],
-        ) if wallet_cards else []
-        market_ranked = rank_cards(
-            category["mcc"],
-            all_cards,
-            wallet_has_amaze,
-            8,
-            merchant_name=category["sample_merchant"],
-            channel=category["channel"],
+        wallet_ranked = (
+            rank_cards(
+                category["mcc"],
+                wallet_cards,
+                wallet_has_amaze,
+                1,
+                merchant_name=category["sample_merchant"],
+                channel=category["channel"],
+            )
+            if wallet_cards
+            else []
         )
 
         current_best = wallet_ranked[0] if wallet_ranked else None
-        market_best = market_ranked[0] if market_ranked else None
         current_rate = current_best["earn_rate_mpd"] if current_best else 0.0
-        market_rate = market_best["earn_rate_mpd"] if market_best else 0.0
-        gap = round(max(market_rate - current_rate, 0.0), 4)
 
         status = "covered"
         if not wallet_cards:
-            status = "no_wallet"
-        elif current_rate < 3.0 and market_rate >= 3.0:
+            status = "no_valid_cards"
+        elif current_rate < 3.0:
             status = "weak"
-        elif gap >= 1.0:
-            status = "upgrade_available"
-
-        suggested = [
-            r for r in market_ranked
-            if r["card_id"] not in wallet_ids and r["earn_rate_mpd"] > current_rate
-        ][:top_n]
 
         coverage.append({
             "category": category["category"],
@@ -180,31 +183,9 @@ def recommend_stack(cards: list[str], top_n: int = 3) -> dict:
             "channel": category["channel"],
             "status": status,
             "current_best": current_best,
-            "market_best": market_best,
-            "mpd_gap": gap,
-            "suggested_cards": suggested,
+            "mpd_gap": 0.0,
+            "suggested_cards": [],
         })
-
-        if status != "covered":
-            for suggestion in suggested:
-                entry = additions_by_card.setdefault(
-                    suggestion["card_id"],
-                    {
-                        "card_id": suggestion["card_id"],
-                        "card_name": suggestion["card_name"],
-                        "helps_categories": [],
-                        "best_earn_rate_mpd": suggestion["earn_rate_mpd"],
-                        "reason_summary": suggestion["reason_summary"],
-                    },
-                )
-                entry["helps_categories"].append(category["category"])
-                entry["best_earn_rate_mpd"] = max(entry["best_earn_rate_mpd"], suggestion["earn_rate_mpd"])
-
-    additions = sorted(
-        additions_by_card.values(),
-        key=lambda item: (len(item["helps_categories"]), item["best_earn_rate_mpd"]),
-        reverse=True,
-    )[:top_n]
 
     return {
         "wallet_configured": bool(wallet_ids),
@@ -214,7 +195,8 @@ def recommend_stack(cards: list[str], top_n: int = 3) -> dict:
         ],
         "skipped_cards": skipped,
         "coverage": coverage,
-        "recommended_additions": additions,
+        "recommended_additions": [],
+        "recommendation_scope": "supplied_cards_only",
     }
 
 

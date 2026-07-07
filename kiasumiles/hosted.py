@@ -11,6 +11,7 @@ from starlette.requests import Request
 from starlette.responses import FileResponse, HTMLResponse, JSONResponse, PlainTextResponse
 
 from .agent_contract import HOSTED_TOOL_DESCRIPTIONS, hosted_agent_guide
+from .chatgpt_action import register_chatgpt_action_routes
 from .landing import render_landing
 from . import tools
 
@@ -61,6 +62,9 @@ for _name, _description in HOSTED_TOOL_DESCRIPTIONS.items():
     _tool = globals()[_name]
     _tool.__doc__ = _description
     globals()[_name] = mcp.tool()(_tool)
+
+
+register_chatgpt_action_routes(mcp)
 
 
 @mcp.custom_route("/", methods=["GET"])
