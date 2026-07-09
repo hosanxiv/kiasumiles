@@ -16,6 +16,5 @@ __pycache__/
 *.token
 .env
 .env.*
-CASE_STUDY_OPENAI.md
 CONTEXT.md
 AGENTS.md

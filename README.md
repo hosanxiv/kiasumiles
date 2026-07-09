@@ -1,13 +1,13 @@
 # KiasuMiles
 
 <p align="center">
-  <a href="https://haohao.zo.space/kiasumiles">
+  <a href="https://kiasumiles.space">
     <img src="https://raw.githubusercontent.com/hosanxiv/kiasumiles/main/assets/kiasumiles-hero.png" alt="KiasuMiles landing page hero" width="100%">
   </a>
 </p>
 
 <p align="center">
-  <a href="https://haohao.zo.space/kiasumiles"><strong>View the live landing page and 60s demo</strong></a>
+  <a href="https://kiasumiles.space"><strong>View the live landing page and 60s demo</strong></a>
 </p>
 
 > "Which card do I use again?"

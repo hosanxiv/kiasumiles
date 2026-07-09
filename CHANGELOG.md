@@ -2,11 +2,9 @@
 
 ## 1.0.2 - 2026-07-10
 
-- Restored the local `kiasumiles-mcp` entry point and persistent wallet tools
-- Wallets are saved on the user's device and attached automatically to recommendations
-- Local recommendations use the live hosted card and merchant data
-- The hosted MCP and REST surfaces remain stateless and store no wallet data
-- Updated the Codex plugin to launch the wallet-aware local MCP again
+- Restored one-time card setup for local MCP clients
+- Uses the latest hosted card and merchant rules for recommendations
+- Improved the Codex plugin setup and wallet update flow
 
 ## 1.0.0 - 2026-06-11
 

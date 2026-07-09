@@ -10,7 +10,7 @@ readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "MIT" }
 authors = [
-    { name = "Hosan", email = "hosanxiv@gmail.com" }
+    { name = "Hosan" }
 ]
 keywords = ["singapore", "credit-card", "miles", "mcp", "kiasumiles"]
 classifiers = [

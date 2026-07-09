@@ -27,6 +27,9 @@ install_mcp.command
 *.token
 .vercel
 
-# Private data sources kept off GitHub
+# Local data sources
 kiasumiles/data/private/
 private-data/
+
+# Local-only notes and history backups
+.local-private/
