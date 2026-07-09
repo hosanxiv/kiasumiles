@@ -15,11 +15,9 @@
 If you're in the miles game, you've asked this at least once - standing at the cashier,
 not quite sure if this is the 4 mpd card or the 1.2 mpd one.
 
-KiasuMiles answers it over MCP. Point your agent at the hosted endpoint, send the cards
-you actually carry with each request, and get back the card that earns the most at the
-merchant in front of you.
-
-Hosted MCP endpoint: `https://kiasumiles.space/mcp`
+KiasuMiles answers it over MCP. Install it in your agent, configure your wallet once,
+then ask which card to use. Your wallet stays on your device while recommendations use
+the current KiasuMiles card and merchant data.
 
 ---
 
@@ -28,36 +26,37 @@ Hosted MCP endpoint: `https://kiasumiles.space/mcp`
 Miles guides tell you "Card X for dining, Card Y for online shopping". That works until
 your wallet has six cards and the merchant in front of you doesn't fit the chart.
 
-KiasuMiles ranks against the cards you actually hold. The client passes your card IDs,
-KiasuMiles filters out everything else, factors in monthly caps, and returns one usable
-answer with the caveats attached. No second guessing at the counter.
+KiasuMiles ranks against the cards you actually hold. The local MCP loads your saved wallet,
+sends it with the merchant request, and returns one usable answer with the caveats attached.
+No second guessing at the counter and no repeating your card list in every conversation.
 
-The server keeps card rules and merchant data current. It never stores your wallet:
-card IDs are sent with each request, used once, and dropped.
+The hosted service keeps card rules and merchant data current. It never stores your wallet:
+the local MCP sends the wallet with each request, where it is used once and dropped.
 
 ---
 
 ## How to use it
 
-Connect your MCP-capable agent to:
+Install the local MCP command in any agent that supports stdio MCP:
 
 ```text
-https://kiasumiles.space/mcp
+uvx kiasumiles-mcp
 ```
 
-Then talk to your agent in plain English.
+The Codex plugin already includes this command. Other clients can use the same command in
+their MCP configuration.
 
 ### First-time setup prompt
 
 Copy and paste this:
 
 ```text
-Use KiasuMiles. First help me set up my card stack.
+Use KiasuMiles. First help me set up my wallet.
 Ask me which banks I have cards with, show me the matching supported cards,
-then remember my selected cards for future KiasuMiles lookups.
+then save my selected cards locally for future KiasuMiles lookups.
 ```
 
-Your "card stack" just means the credit cards you actually carry.
+You only do this once. The wallet remains available in new conversations on the same device.
 
 ### Everyday prompts
 
@@ -75,76 +74,36 @@ I'm paying for Grab in the app. Which card?
 Booking Singapore Airlines online. Which card gets the most miles?
 ```
 
-KiasuMiles returns the best card from your card stack, the miles per dollar, the cap,
+KiasuMiles returns the best card from your saved wallet, the miles per dollar, the cap,
 and any caveats you should know before paying.
 
-### If the agent forgets to ask for your cards
+### Check or update the wallet
 
-Paste this:
+Use plain English:
 
 ```text
-Before answering, use KiasuMiles properly:
-ask me which cards I carry, map them to supported KiasuMiles cards,
-then recommend only from my card stack.
+Show me my KiasuMiles wallet.
 ```
+```text
+Add OCBC 90N to my KiasuMiles wallet.
+```
+```text
+Remove UOB PPV from my KiasuMiles wallet.
+```
+
+```text
+Review my KiasuMiles wallet and tell me which categories are weak.
+```
+
+You do not need to know card IDs or wallet paths. The agent handles them.
 
 ---
 
-## Setting Up Your Cards
+## Direct Hosted MCP
 
-KiasuMiles does not keep a wallet on its server. Your agent or app keeps your card list
-and sends it with each question.
-
-Use this prompt when setting up for the first time:
-
-```text
-Use KiasuMiles to set up my card stack.
-Ask me which banks I use first.
-Then list supported cards for those banks only.
-After I choose my cards, use that card stack for future KiasuMiles lookups.
-```
-
-If your agent forgets your cards, just run the setup prompt again.
-
-You do not need to know card IDs. The agent should handle that mapping for you.
-
-## Amending Your Cards
-
-Use plain English. Examples:
-
-```text
-Add OCBC 90N to my KiasuMiles card stack.
-```
-
-```text
-Remove UOB PPV from my KiasuMiles card stack.
-```
-
-```text
-Replace Citi Rewards with DBS Woman's World in my KiasuMiles card stack.
-```
-
-Then continue asking normal checkout questions:
-
-```text
-Now what card should I use at Cold Storage?
-```
-
-## Checking Your Card Stack
-
-If you are not sure what your agent currently remembers, ask:
-
-```text
-Before using KiasuMiles, tell me what cards you currently have in my card stack.
-If you are not sure, ask me to set it up again.
-```
-
-You can also ask whether your current stack has gaps:
-
-```text
-Use KiasuMiles to review my current card stack.
-Tell me what categories are weak.
-```
+Developers can still connect directly to `https://kiasumiles.space/mcp`. Direct remote
+connections are deliberately stateless: the client must supply the wallet with every request.
+Use the local `kiasumiles-mcp` command for the normal persistent-wallet experience.
 
 ---
 
@@ -207,12 +166,15 @@ curl -i -X POST https://kiasumiles.space/mcp \
 
 ### Supported agents
 
-- Codex
-- ChatGPT with MCP support
+- Codex plugin
+- Claude Desktop
 - Claude Code
 - OpenClaw
 - Hermes
-- Anything else with Streamable HTTP MCP support
+- Any agent that can launch a local stdio MCP command
+
+ChatGPT and other remote-only hosts can use the direct hosted MCP or Action surface, but
+wallet persistence depends on storage supplied by that host.
 
 ### Codex plugin
 
@@ -221,7 +183,7 @@ The repo carries a local Codex plugin at `plugins/kiasumiles` and a repo marketp
 checkout recommendations, and display guidance so Codex doesn't surface card IDs, MCC
 codes, or raw technical fields at the user.
 
-In Codex, add the repo marketplace, install KiasuMiles, then ask:
+In Codex, add the repo marketplace, install KiasuMiles, configure your wallet once, then ask:
 
 > "What card should I use at NTUC FairPrice?"
 

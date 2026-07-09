@@ -64,6 +64,35 @@ Present covered and weak categories. Never show raw card IDs to the user.""",
     "kiasumiles_agent_guide": """Return concise hosted integration guidance for agents. Use this for diagnostics, installation checks, or when an agent needs presentation rules.""",
 }
 
+LOCAL_DISPLAY_RULES: tuple[str, ...] = (
+    "Use kiasumiles_configure once when the user sets up or changes their wallet.",
+    "Use kiasumiles_lookup for merchant recommendations; the saved local wallet is added automatically.",
+    "Use kiasumiles_get_wallet when the user asks which cards are saved.",
+    "Ask which banks the user uses before listing cards, then call kiasumiles_list_cards once per bank.",
+    "Never show card IDs, MCC codes, wallet paths, or raw technical fields unless the user asks for diagnostics.",
+    "Display recommendations with card name, earn_rate_mpd, cap_summary, and reason_summary.",
+    "Treat routing_note and low_confidence_note as user-visible caveats.",
+)
+
+LOCAL_TOOL_DESCRIPTIONS: dict[str, str] = {
+    "kiasumiles_list_cards": """List supported Singapore credit cards for local wallet setup.
+
+Ask which banks the user has cards with first, then call this once per bank. Present card names
+only. Do not expose internal card IDs.""",
+    "kiasumiles_configure": """Save or replace the user's KiasuMiles wallet on this device.
+
+Use this after matching the card names the user carries. Include Amaze when mentioned. Confirm
+the saved card names in plain English. The hosted service does not store this wallet.""",
+    "kiasumiles_get_wallet": """Show the card names saved in the local KiasuMiles wallet.""",
+    "kiasumiles_lookup": """Recommend the best saved card for a Singapore merchant.
+
+The local wallet is attached automatically. Pass the exact merchant name plus outlet, channel,
+or category only when the user provides them. Never ask the user to repeat their saved cards.""",
+    "kiasumiles_recommend_stack": """Review weak categories in the locally saved wallet.""",
+    "kiasumiles_data_version": """Return the current hosted card and merchant data version.""",
+    "kiasumiles_agent_guide": """Return guidance for the persistent local KiasuMiles workflow.""",
+}
+
 
 def hosted_agent_guide() -> dict:
     return {
@@ -82,5 +111,27 @@ def hosted_agent_guide() -> dict:
                 "description": description.splitlines()[0],
             }
             for name, description in HOSTED_TOOL_DESCRIPTIONS.items()
+        ],
+    }
+
+
+def local_agent_guide() -> dict:
+    return {
+        "name": "KiasuMiles Local",
+        "summary": "Local wallet persistence with live hosted KiasuMiles recommendations.",
+        "runtime": {
+            "transport": "stdio MCP",
+            "query_time_network": True,
+            "wallet_stored_locally": True,
+            "wallet_stored_on_server": False,
+        },
+        "display_rules": list(LOCAL_DISPLAY_RULES),
+        "accepted_categories": dict(CATEGORY_MCC),
+        "tools": [
+            {
+                "name": name,
+                "description": description.splitlines()[0],
+            }
+            for name, description in LOCAL_TOOL_DESCRIPTIONS.items()
         ],
     }

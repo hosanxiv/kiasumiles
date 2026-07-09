@@ -535,11 +535,11 @@
       <div>
         <p class="label-soft">Trust and privacy</p>
         <h2>Rules live here. Wallets do not.</h2>
-        <p class="section-copy">KiasuMiles stores the card rules and merchant data it needs to make a recommendation. Your cards stay with you, and each request is judged only on the cards you pass in.</p>
+        <p class="section-copy">KiasuMiles stores the card rules and merchant data it needs to make a recommendation. Your wallet stays on your device, and the local MCP attaches it automatically when you ask.</p>
         <div class="trust-labels">
           <span>Server-side rules</span>
           <span>Client-held cards</span>
-          <span>No wallet storage</span>
+          <span>No server wallet</span>
         </div>
       </div>
       <div class="vault" aria-label="Privacy visual showing rules stored server-side and cards held client-side">
@@ -559,21 +559,21 @@
       <div class="endpoint-side">
         <p class="label-soft">Get started</p>
         <h2>Three steps. Then just ask.</h2>
-        <p class="section-copy">Point your agent at the endpoint, paste one setup prompt, and ask away. Works with Claude, Codex, and anything that speaks MCP.</p>
+        <p class="section-copy">Install the local MCP, configure your wallet once, and ask away. Works with Codex, Claude, and other agents that can launch a local MCP command.</p>
         <div class="endpoint-actions">
           <a class="btn primary" href="https://github.com/hosanxiv/kiasumiles" target="_blank" rel="noreferrer">Full setup guide on GitHub</a>
         </div>
-        <p class="endpoint-tiny">No wallet to sync. Your cards stay in your agent.</p>
+        <p class="endpoint-tiny">Your wallet is saved on this device. The hosted service stores nothing. Direct stateless endpoint: https://kiasumiles.space/mcp</p>
       </div>
       <div class="route-stage" aria-label="How to start using KiasuMiles">
         <ol class="start-steps">
           <li class="start-step">
             <span class="start-num">1</span>
             <div class="start-body">
-              <b>Connect the endpoint</b>
-              <p>Add this hosted MCP endpoint to your agent.</p>
-              <button class="copy-row" type="button" data-copy="https://kiasumiles.space/mcp">
-                <code>https://kiasumiles.space/mcp</code>
+              <b>Install KiasuMiles</b>
+              <p>Add the local MCP command to your agent.</p>
+              <button class="copy-row" type="button" data-copy="uvx kiasumiles-mcp">
+                <code>uvx kiasumiles-mcp</code>
                 <span class="copy-tag">Copy</span>
               </button>
             </div>
@@ -582,9 +582,9 @@
             <span class="start-num">2</span>
             <div class="start-body">
               <b>Set up your cards</b>
-              <p>Paste this once. Your agent asks which banks you use and remembers your cards.</p>
-              <button class="copy-row prompt" type="button" data-copy="Use KiasuMiles. First help me set up my card stack. Ask me which banks I have cards with, show me the matching supported cards, then remember my selected cards for future KiasuMiles lookups.">
-                <code>Use KiasuMiles. First help me set up my card stack...</code>
+              <p>Paste this once. Your wallet is saved locally for future conversations.</p>
+              <button class="copy-row prompt" type="button" data-copy="Use KiasuMiles. Help me configure my wallet. Ask which banks I use, show the matching cards, then save my selected cards locally.">
+                <code>Use KiasuMiles. Help me configure my wallet...</code>
                 <span class="copy-tag">Copy</span>
               </button>
             </div>

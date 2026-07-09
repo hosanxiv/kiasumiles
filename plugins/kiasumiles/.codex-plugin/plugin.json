@@ -1,7 +1,7 @@
 {
   "name": "kiasumiles",
-  "version": "1.0.1",
-  "description": "Hosted Singapore credit-card miles optimizer for Codex via MCP.",
+  "version": "1.0.2",
+  "description": "Singapore credit-card miles optimizer with a persistent local wallet.",
   "author": {
     "name": "Hosan"
   },
@@ -9,7 +9,7 @@
   "interface": {
     "displayName": "KiasuMiles",
     "shortDescription": "Ask Codex which Singapore miles card to use at a merchant.",
-    "longDescription": "KiasuMiles bundles a hosted MCP server and agent guidance for Singapore credit-card miles recommendations. It keeps merchant lookup and card ranking on the live KiasuMiles service while wallet data stays client-side.",
+    "longDescription": "Your KiasuMiles card wallet is saved on this device and automatically used for recommendations from the live hosted service. The hosted service does not store your wallet.",
     "developerName": "Hosan",
     "category": "Productivity",
     "capabilities": [

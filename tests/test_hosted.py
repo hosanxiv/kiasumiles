@@ -78,6 +78,7 @@ def test_landing_page_and_media_routes_are_served():
 
     assert landing.status_code == 200
     assert "The right card, before you tap." in landing.text
+    assert "uvx kiasumiles-mcp" in landing.text
     assert "https://kiasumiles.space/mcp" in landing.text
     assert "Wallet stays client-side" in landing.text
     assert hero.status_code == 200
