@@ -730,11 +730,11 @@ def render_landing(version: dict) -> str:
           <div class="examples-list">
             <div class="example">
               <div class="question">"Best card at NTUC FairPrice?"</div>
-              <div class="example-row"><div class="example-answer">UOB Preferred Platinum Visa</div><div class="example-note">4 mpd · S\$600 cap/mo</div></div>
+              <div class="example-row"><div class="example-answer">UOB Preferred Platinum Visa</div><div class="example-note">4 mpd · S$600 cap/mo</div></div>
             </div>
             <div class="example">
               <div class="question">"Which card for Grab rides?"</div>
-              <div class="example-row"><div class="example-answer">KrisFlyer UOB</div><div class="example-note">1.2 mpd · MCC 7399, no bonus tier</div></div>
+              <div class="example-row"><div class="example-answer">KrisFlyer UOB</div><div class="example-note">1.2 mpd · no bonus tier</div></div>
             </div>
             <div class="example">
               <div class="question">"SIA tickets online?"</div>
