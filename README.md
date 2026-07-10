@@ -15,9 +15,9 @@
 If you're in the miles game, you've asked this at least once - standing at the cashier,
 not quite sure if this is the 4 mpd card or the 1.2 mpd one.
 
-KiasuMiles answers it over MCP. Install it in your agent, configure your wallet once,
-then ask which card to use. Your wallet stays on your device while recommendations use
-the current KiasuMiles card and merchant data.
+KiasuMiles connects to your AI agent, remembers the cards you carry, and tells you which
+card earns the most miles at the merchant in front of you. Card rules and merchant data
+stay current through the hosted KiasuMiles service.
 
 ---
 
@@ -26,37 +26,23 @@ the current KiasuMiles card and merchant data.
 Miles guides tell you "Card X for dining, Card Y for online shopping". That works until
 your wallet has six cards and the merchant in front of you doesn't fit the chart.
 
-KiasuMiles ranks against the cards you actually hold. The local MCP loads your saved wallet,
-sends it with the merchant request, and returns one usable answer with the caveats attached.
-No second guessing at the counter and no repeating your card list in every conversation.
-
-The hosted service keeps card rules and merchant data current. It never stores your wallet:
-the local MCP sends the wallet with each request, where it is used once and dropped.
+KiasuMiles ranks against the cards you actually hold. Your agent remembers your selected
+card stack, checks it against the latest KiasuMiles rules, and returns one usable answer
+with the caveats attached. No second guessing at the counter.
 
 ---
 
-## How to use it
+## Get started
 
-Install the local MCP command in any agent that supports stdio MCP:
-
-```text
-uvx kiasumiles-mcp
-```
-
-The Codex plugin already includes this command. Other clients can use the same command in
-their MCP configuration.
-
-### First-time setup prompt
-
-Copy and paste this:
+Copy and paste this into your agent:
 
 ```text
-Use KiasuMiles. First help me set up my wallet.
-Ask me which banks I have cards with, show me the matching supported cards,
-then save my selected cards locally for future KiasuMiles lookups.
+Install KiasuMiles MCP for me: https://kiasumiles.space/mcp
+
+Use KiasuMiles. First help me set up my card stack. Ask me which banks I have cards with, show me the matching supported cards, then remember my selected cards for future KiasuMiles lookups.
 ```
 
-You only do this once. The wallet remains available in new conversations on the same device.
+You only do this once. After that, ask KiasuMiles which card to use whenever you are paying.
 
 ### Everyday prompts
 
@@ -74,36 +60,28 @@ I'm paying for Grab in the app. Which card?
 Booking Singapore Airlines online. Which card gets the most miles?
 ```
 
-KiasuMiles returns the best card from your saved wallet, the miles per dollar, the cap,
+KiasuMiles returns the best card from your card stack, the miles per dollar, the cap,
 and any caveats you should know before paying.
 
-### Check or update the wallet
+### Check or update your cards
 
 Use plain English:
 
 ```text
-Show me my KiasuMiles wallet.
+Show me my KiasuMiles card stack.
 ```
 ```text
-Add OCBC 90N to my KiasuMiles wallet.
+Add OCBC 90N to my KiasuMiles card stack.
 ```
 ```text
-Remove UOB PPV from my KiasuMiles wallet.
+Remove UOB PPV from my KiasuMiles card stack.
 ```
 
 ```text
-Review my KiasuMiles wallet and tell me which categories are weak.
+Review my KiasuMiles card stack and tell me which categories are weak.
 ```
 
-You do not need to know card IDs or wallet paths. The agent handles them.
-
----
-
-## Direct Hosted MCP
-
-Developers can still connect directly to `https://kiasumiles.space/mcp`. Direct remote
-connections are deliberately stateless: the client must supply the wallet with every request.
-Use the local `kiasumiles-mcp` command for the normal persistent-wallet experience.
+You do not need to know card IDs or technical setup details. The agent handles them.
 
 ---
 
@@ -166,26 +144,13 @@ curl -i -X POST https://kiasumiles.space/mcp \
 
 ### Supported agents
 
-- Codex plugin
+- ChatGPT
+- Codex
 - Claude Desktop
 - Claude Code
 - OpenClaw
 - Hermes
-- Any agent that can launch a local stdio MCP command
-
-ChatGPT and other remote-only hosts can use the direct hosted MCP or Action surface, but
-wallet persistence depends on storage supplied by that host.
-
-### Codex plugin
-
-The repo carries a local Codex plugin at `plugins/kiasumiles` and a repo marketplace at
-`.agents/plugins/marketplace.json`. The plugin bundles the MCP config, a skill for
-checkout recommendations, and display guidance so Codex doesn't surface card IDs, MCC
-codes, or raw technical fields at the user.
-
-In Codex, add the repo marketplace, install KiasuMiles, configure your wallet once, then ask:
-
-> "What card should I use at NTUC FairPrice?"
+- Any MCP-capable agent
 
 ---
 
