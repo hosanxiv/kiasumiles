@@ -197,7 +197,7 @@ in the stack, the combo math is already done.
 
 ## Supported cards
 
-50+ Singapore credit cards in the database. Recommendations only ever draw from the
+40+ Singapore credit cards in the database. Recommendations only ever draw from the
 cards you supply in the request.
 
 HSBC Revolution · UOB PPV · UOB Visa Signature · UOB PRVI Miles · UOB Lady's · KrisFlyer UOB · DBS Altitude · DBS yuu · DBS Woman's World · DBS Vantage · Citi Rewards · Citi PremierMiles · Citi Prestige · OCBC 90N · OCBC Rewards · OCBC VOYAGE · Maybank Horizon · Maybank World · Standard Chartered Journey · Standard Chartered Visa Infinite · BOC Elite Miles · Amex KrisFlyer · Amex KrisFlyer Ascend · Amex HighFlyer · Amaze combos · and more
