@@ -4,6 +4,13 @@ from kiasumiles.tools import lookup_hosted, data_version
 from starlette.testclient import TestClient
 
 
+PROOF_ASSETS = (
+    ("kiasumiles-real-life-720.webp", "image/webp"),
+    ("kiasumiles-real-life-1460.webp", "image/webp"),
+    ("kiasumiles-real-life-1460.jpg", "image/jpeg"),
+)
+
+
 def test_hosted_contract_excludes_local_wallet_tools():
     assert "kiasumiles_configure" not in HOSTED_TOOL_DESCRIPTIONS
     assert "kiasumiles_get_wallet" not in HOSTED_TOOL_DESCRIPTIONS
@@ -90,3 +97,59 @@ def test_landing_page_and_media_routes_are_served():
     assert namespaced_logo.status_code == 200
     assert namespaced_logo.headers["content-type"] == "image/svg+xml"
     assert blocked.status_code == 404
+
+
+def test_proof_assets_are_served_with_immutable_caching():
+    client = TestClient(hosted.app)
+    responses = [
+        client.get(f"/kiasumiles/assets/proof/{filename}")
+        for filename, _ in PROOF_ASSETS
+    ]
+
+    for response, (_, media_type) in zip(responses, PROOF_ASSETS):
+        assert response.status_code == 200
+        assert response.headers["content-type"] == media_type
+        assert response.headers["etag"]
+        assert response.headers["cache-control"] == "public, max-age=31536000, immutable"
+
+
+def test_proof_asset_route_rejects_unknown_and_encoded_traversal_paths():
+    client = TestClient(hosted.app)
+    unknown = client.get("/kiasumiles/assets/proof/not-a-proof.webp")
+    traversal = client.get(
+        "/kiasumiles/assets/proof/%2e%2e%2fkiasumiles-real-life-720.webp"
+    )
+
+    assert unknown.status_code == 404
+    assert traversal.status_code == 404
+
+
+def test_favicon_is_served_with_immutable_caching():
+    client = TestClient(hosted.app)
+    response = client.get("/favicon.svg")
+
+    assert response.status_code == 200
+    assert response.headers["content-type"] == "image/svg+xml"
+    assert response.headers["etag"]
+    assert response.headers["cache-control"] == "public, max-age=31536000, immutable"
+
+
+def test_landing_page_requires_revalidation():
+    client = TestClient(hosted.app)
+    response = client.get("/")
+
+    assert response.status_code == 200
+    assert response.headers["cache-control"] == "public, max-age=0, must-revalidate"
+
+
+def test_privacy_page_is_request_scoped_and_requires_revalidation():
+    client = TestClient(hosted.app)
+    response = client.get("/privacy")
+
+    assert response.status_code == 200
+    assert response.headers["cache-control"] == "public, max-age=0, must-revalidate"
+    assert 'href="/"' in response.text
+    assert "hello@theaiburrow.xyz" in response.text
+    assert "supplies selected card products for each lookup" in response.text
+    assert "does not store the stack" in response.text
+    assert "card IDs" not in response.text
