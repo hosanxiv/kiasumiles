@@ -87,7 +87,9 @@ def test_landing_page_and_media_routes_are_served():
     assert "The right card, before you tap." in landing.text
     assert "Install KiasuMiles MCP for me" in landing.text
     assert "https://kiasumiles.space/mcp" in landing.text
-    assert "Wallet stays client-side" in landing.text
+    assert "Your agent or local client holds your selected card products" in landing.text
+    assert "Hosted KiasuMiles ranks that request and does not store your stack." in landing.text
+    assert "Wallet stays client-side" not in landing.text
     assert hero.status_code == 200
     assert hero.headers["content-type"] == "image/png"
     assert video.status_code == 200

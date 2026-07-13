@@ -7,7 +7,7 @@
 </p>
 
 <p align="center">
-  <a href="https://kiasumiles.space"><strong>View the live landing page and 60s demo</strong></a>
+  <a href="https://kiasumiles.space"><strong>View the live KiasuMiles landing page</strong></a>
 </p>
 
 > "Which card do I use again?"
