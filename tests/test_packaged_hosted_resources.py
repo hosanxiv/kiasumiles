@@ -90,11 +90,14 @@ print(json.dumps({{
 
     with zipfile.ZipFile(wheel) as archive:
         wheel_files = set(archive.namelist())
+    extract_dir = tmp_path / "extracted"
     with tarfile.open(sdist) as archive:
         sdist_files = {
             "/".join(Path(member.name).parts[1:])
             for member in archive.getmembers()
         }
+        archive.extractall(extract_dir, filter="data")
+    extracted_root = next(extract_dir.iterdir())
 
     assert routes == {
         "/": {
@@ -129,12 +132,29 @@ print(json.dumps({{
     assert required_resources <= wheel_files
     required_sdist_files = required_resources | {
         "LICENSE",
+        "PKG-INFO",
         "README.md",
         "pyproject.toml",
         "kiasumiles/__init__.py",
-        "tests/test_packaged_hosted_resources.py",
     }
     assert required_sdist_files <= sdist_files
+    assert not any(path == "tests" or path.startswith("tests/") for path in sdist_files)
+
+    extracted_env = os.environ.copy()
+    extracted_env["PYTHONPATH"] = str(extracted_root)
+    extracted_env["PYTHONDONTWRITEBYTECODE"] = "1"
+    imported = subprocess.run(
+        [sys.executable, "-c", "import kiasumiles; print(kiasumiles.__file__)"],
+        cwd=extracted_root,
+        env=extracted_env,
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    assert Path(imported.stdout.strip()).resolve().is_relative_to(extracted_root.resolve())
+    package_metadata = (extracted_root / "PKG-INFO").read_text(encoding="utf-8")
+    assert "\nName: kiasumiles-mcp\n" in package_metadata
+    assert "\nVersion: 1.0.2\n" in package_metadata
 
     forbidden_sdist_files = sorted(
         path
