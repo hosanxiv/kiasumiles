@@ -9,6 +9,13 @@ import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
 PROOF_PATH = "/kiasumiles/assets/proof/kiasumiles-real-life-720.webp"
+MAX_SDIST_BYTES = 5 * 1024 * 1024
+FORBIDDEN_SDIST_TOP_LEVEL = {
+    ".playwright-cli",
+    ".superpowers",
+    "live-codex-captures",
+    "output",
+}
 
 
 def test_built_distributions_serve_lightweight_resources_without_legacy_media(tmp_path):
@@ -120,7 +127,24 @@ print(json.dumps({{
         "kiasumiles/static/kiasumiles/assets/proof/kiasumiles-real-life-1460.jpg",
     }
     assert required_resources <= wheel_files
-    assert required_resources <= sdist_files
+    required_sdist_files = required_resources | {
+        "LICENSE",
+        "README.md",
+        "pyproject.toml",
+        "kiasumiles/__init__.py",
+        "tests/test_packaged_hosted_resources.py",
+    }
+    assert required_sdist_files <= sdist_files
+
+    forbidden_sdist_files = sorted(
+        path
+        for path in sdist_files
+        if path.split("/", 1)[0] in FORBIDDEN_SDIST_TOP_LEVEL
+        or path.startswith(("interview-", "straits-times-"))
+    )
+    assert forbidden_sdist_files == []
+    assert sdist.stat().st_size < MAX_SDIST_BYTES
+
     for packaged_files in (wheel_files, sdist_files):
         assert "kiasumiles/static/kiasumiles/hero.png" not in packaged_files
         assert "kiasumiles/static/kiasumiles/product-demo-60s.mp4" not in packaged_files

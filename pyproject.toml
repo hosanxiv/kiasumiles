@@ -49,12 +49,17 @@ exclude = ["kiasumiles/static/"]
 "kiasumiles/static/kiasumiles/assets/proof" = "kiasumiles/static/kiasumiles/assets/proof"
 
 [tool.hatch.build.targets.sdist]
+include = [
+    "/kiasumiles",
+    "/tests",
+    "/LICENSE",
+    "/README.md",
+    "/pyproject.toml",
+    "/uv.lock",
+]
 exclude = [
-    ".claude/",
-    ".venv/",
-    "*.token",
-    ".env",
-    ".env.*",
+    "**/__pycache__/",
+    "**/*.pyc",
     "kiasumiles/static/",
 ]
 
