@@ -37,10 +37,15 @@ kiasumiles-feedback-bot = "kiasumiles.feedback_bot:main"
 
 [tool.hatch.build.targets.wheel]
 packages = ["kiasumiles"]
-# Landing-page media (kiasumiles/static/) is deliberately NOT shipped in the
-# wheel — Vercel serves it from the repo; pip users don't need 3.7MB of video.
+# Large landing-page media is deliberately not shipped in the wheel. The
+# lightweight resources used by hosted.py are selectively included below.
 include = ["kiasumiles/data/demo/*.csv"]
 exclude = ["kiasumiles/static/"]
+
+[tool.hatch.build.targets.wheel.force-include]
+"kiasumiles/static/kiasumiles/privacy.html" = "kiasumiles/static/kiasumiles/privacy.html"
+"kiasumiles/static/kiasumiles/favicon.svg" = "kiasumiles/static/kiasumiles/favicon.svg"
+"kiasumiles/static/kiasumiles/assets/proof" = "kiasumiles/static/kiasumiles/assets/proof"
 
 [tool.hatch.build.targets.sdist]
 exclude = [
@@ -51,6 +56,11 @@ exclude = [
     ".env.*",
     "kiasumiles/static/",
 ]
+
+[tool.hatch.build.targets.sdist.force-include]
+"kiasumiles/static/kiasumiles/privacy.html" = "kiasumiles/static/kiasumiles/privacy.html"
+"kiasumiles/static/kiasumiles/favicon.svg" = "kiasumiles/static/kiasumiles/favicon.svg"
+"kiasumiles/static/kiasumiles/assets/proof" = "kiasumiles/static/kiasumiles/assets/proof"
 
 [project.urls]
 Homepage = "https://github.com/hosanxiv/kiasumiles"
