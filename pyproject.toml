@@ -47,6 +47,12 @@ exclude = ["kiasumiles/static/"]
 "kiasumiles/static/kiasumiles/privacy.html" = "kiasumiles/static/kiasumiles/privacy.html"
 "kiasumiles/static/kiasumiles/favicon.svg" = "kiasumiles/static/kiasumiles/favicon.svg"
 "kiasumiles/static/kiasumiles/assets/proof" = "kiasumiles/static/kiasumiles/assets/proof"
+"kiasumiles/static/kiasumiles/assets/logos/fairprice-real-crop.png" = "kiasumiles/static/kiasumiles/assets/logos/fairprice-real-crop.png"
+"kiasumiles/static/kiasumiles/assets/logos/grab-colour.svg" = "kiasumiles/static/kiasumiles/assets/logos/grab-colour.svg"
+"kiasumiles/static/kiasumiles/assets/logos/watsons-crop.png" = "kiasumiles/static/kiasumiles/assets/logos/watsons-crop.png"
+"kiasumiles/static/kiasumiles/assets/logos/shell-colour.svg" = "kiasumiles/static/kiasumiles/assets/logos/shell-colour.svg"
+"kiasumiles/static/kiasumiles/assets/logos/shopee-real-crop.png" = "kiasumiles/static/kiasumiles/assets/logos/shopee-real-crop.png"
+"kiasumiles/static/kiasumiles/assets/logos/Singapore_Airlines_Logo.svg" = "kiasumiles/static/kiasumiles/assets/logos/Singapore_Airlines_Logo.svg"
 
 [tool.hatch.build.targets.sdist]
 include = [
@@ -67,6 +73,12 @@ exclude = [
 "kiasumiles/static/kiasumiles/privacy.html" = "kiasumiles/static/kiasumiles/privacy.html"
 "kiasumiles/static/kiasumiles/favicon.svg" = "kiasumiles/static/kiasumiles/favicon.svg"
 "kiasumiles/static/kiasumiles/assets/proof" = "kiasumiles/static/kiasumiles/assets/proof"
+"kiasumiles/static/kiasumiles/assets/logos/fairprice-real-crop.png" = "kiasumiles/static/kiasumiles/assets/logos/fairprice-real-crop.png"
+"kiasumiles/static/kiasumiles/assets/logos/grab-colour.svg" = "kiasumiles/static/kiasumiles/assets/logos/grab-colour.svg"
+"kiasumiles/static/kiasumiles/assets/logos/watsons-crop.png" = "kiasumiles/static/kiasumiles/assets/logos/watsons-crop.png"
+"kiasumiles/static/kiasumiles/assets/logos/shell-colour.svg" = "kiasumiles/static/kiasumiles/assets/logos/shell-colour.svg"
+"kiasumiles/static/kiasumiles/assets/logos/shopee-real-crop.png" = "kiasumiles/static/kiasumiles/assets/logos/shopee-real-crop.png"
+"kiasumiles/static/kiasumiles/assets/logos/Singapore_Airlines_Logo.svg" = "kiasumiles/static/kiasumiles/assets/logos/Singapore_Airlines_Logo.svg"
 
 [project.urls]
 Homepage = "https://github.com/hosanxiv/kiasumiles"
