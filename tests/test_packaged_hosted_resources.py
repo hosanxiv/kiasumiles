@@ -57,7 +57,7 @@ from starlette.testclient import TestClient
 from kiasumiles import hosted
 
 client = TestClient(hosted.app, raise_server_exceptions=False)
-paths = ["/privacy", "/favicon.svg", {PROOF_PATH!r}]
+paths = ["/", "/privacy", "/favicon.svg", {PROOF_PATH!r}]
 print(json.dumps({{
     path: {{
         "status": response.status_code,
@@ -90,6 +90,11 @@ print(json.dumps({{
         }
 
     assert routes == {
+        "/": {
+            "status": 200,
+            "content_type": "text/html; charset=utf-8",
+            "cache_control": "public, max-age=0, must-revalidate",
+        },
         "/privacy": {
             "status": 200,
             "content_type": "text/html; charset=utf-8",
@@ -107,6 +112,7 @@ print(json.dumps({{
         },
     }
     required_resources = {
+        "kiasumiles/static/kiasumiles/index.html",
         "kiasumiles/static/kiasumiles/privacy.html",
         "kiasumiles/static/kiasumiles/favicon.svg",
         "kiasumiles/static/kiasumiles/assets/proof/kiasumiles-real-life-720.webp",

@@ -43,6 +43,7 @@ include = ["kiasumiles/data/demo/*.csv"]
 exclude = ["kiasumiles/static/"]
 
 [tool.hatch.build.targets.wheel.force-include]
+"kiasumiles/static/kiasumiles/index.html" = "kiasumiles/static/kiasumiles/index.html"
 "kiasumiles/static/kiasumiles/privacy.html" = "kiasumiles/static/kiasumiles/privacy.html"
 "kiasumiles/static/kiasumiles/favicon.svg" = "kiasumiles/static/kiasumiles/favicon.svg"
 "kiasumiles/static/kiasumiles/assets/proof" = "kiasumiles/static/kiasumiles/assets/proof"
@@ -58,6 +59,7 @@ exclude = [
 ]
 
 [tool.hatch.build.targets.sdist.force-include]
+"kiasumiles/static/kiasumiles/index.html" = "kiasumiles/static/kiasumiles/index.html"
 "kiasumiles/static/kiasumiles/privacy.html" = "kiasumiles/static/kiasumiles/privacy.html"
 "kiasumiles/static/kiasumiles/favicon.svg" = "kiasumiles/static/kiasumiles/favicon.svg"
 "kiasumiles/static/kiasumiles/assets/proof" = "kiasumiles/static/kiasumiles/assets/proof"
@@ -69,4 +71,4 @@ Documentation = "https://github.com/hosanxiv/kiasumiles#readme"
 "Bug Tracker" = "https://github.com/hosanxiv/kiasumiles/issues"
 
 [project.optional-dependencies]
-dev = ["pytest>=8.0", "pytest-asyncio>=0.23"]
+dev = ["hatchling>=1.29", "pytest>=8.0", "pytest-asyncio>=0.23"]
