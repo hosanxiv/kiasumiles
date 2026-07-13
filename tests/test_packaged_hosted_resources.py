@@ -9,6 +9,18 @@ import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
 PROOF_PATH = "/kiasumiles/assets/proof/kiasumiles-real-life-720.webp"
+LOGO_ASSETS = (
+    ("fairprice-real-crop.png", "image/png"),
+    ("grab-colour.svg", "image/svg+xml"),
+    ("watsons-crop.png", "image/png"),
+    ("shell-colour.svg", "image/svg+xml"),
+    ("shopee-real-crop.png", "image/png"),
+    ("Singapore_Airlines_Logo.svg", "image/svg+xml"),
+)
+LOGO_PATHS = [
+    f"/kiasumiles/assets/logos/{filename}"
+    for filename, _ in LOGO_ASSETS
+]
 MAX_SDIST_BYTES = 5 * 1024 * 1024
 FORBIDDEN_SDIST_TOP_LEVEL = {
     ".playwright-cli",
@@ -64,7 +76,7 @@ from starlette.testclient import TestClient
 from kiasumiles import hosted
 
 client = TestClient(hosted.app, raise_server_exceptions=False)
-paths = ["/", "/privacy", "/favicon.svg", {PROOF_PATH!r}]
+paths = ["/", "/privacy", "/favicon.svg", {PROOF_PATH!r}] + {LOGO_PATHS!r}
 print(json.dumps({{
     path: {{
         "status": response.status_code,
@@ -99,7 +111,7 @@ print(json.dumps({{
         archive.extractall(extract_dir, filter="data")
     extracted_root = next(extract_dir.iterdir())
 
-    assert routes == {
+    expected_routes = {
         "/": {
             "status": 200,
             "content_type": "text/html; charset=utf-8",
@@ -121,6 +133,17 @@ print(json.dumps({{
             "cache_control": "public, max-age=31536000, immutable",
         },
     }
+    expected_routes.update(
+        {
+            path: {
+                "status": 200,
+                "content_type": media_type,
+                "cache_control": None,
+            }
+            for path, (_, media_type) in zip(LOGO_PATHS, LOGO_ASSETS)
+        }
+    )
+    assert routes == expected_routes
     required_resources = {
         "kiasumiles/static/kiasumiles/index.html",
         "kiasumiles/static/kiasumiles/privacy.html",
@@ -128,6 +151,9 @@ print(json.dumps({{
         "kiasumiles/static/kiasumiles/assets/proof/kiasumiles-real-life-720.webp",
         "kiasumiles/static/kiasumiles/assets/proof/kiasumiles-real-life-1460.webp",
         "kiasumiles/static/kiasumiles/assets/proof/kiasumiles-real-life-1460.jpg",
+    } | {
+        f"kiasumiles/static/kiasumiles/assets/logos/{filename}"
+        for filename, _ in LOGO_ASSETS
     }
     assert required_resources <= wheel_files
     required_sdist_files = required_resources | {
@@ -168,3 +194,7 @@ print(json.dumps({{
     for packaged_files in (wheel_files, sdist_files):
         assert "kiasumiles/static/kiasumiles/hero.png" not in packaged_files
         assert "kiasumiles/static/kiasumiles/product-demo-60s.mp4" not in packaged_files
+        assert (
+            "kiasumiles/static/kiasumiles/assets/logos/"
+            "uob-preferred-platinum-visa-card.png"
+        ) not in packaged_files
