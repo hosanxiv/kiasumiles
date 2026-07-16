@@ -128,7 +128,7 @@ Lookup responses include `reason_summary`, `reason_codes`, and `gotchas`, so the
 explain why a card wins and warn about traps: wrong payment channel, partner-only
 bonuses, minimum spend you haven't hit.
 
-The endpoint is rate limited per IP (30 requests a minute by default). Normal agent
+The endpoint is rate limited per IP (30 requests per minute by default). Normal agent
 use never gets near it.
 
 ### Try it
