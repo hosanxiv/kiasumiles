@@ -37,20 +37,50 @@ kiasumiles-feedback-bot = "kiasumiles.feedback_bot:main"
 
 [tool.hatch.build.targets.wheel]
 packages = ["kiasumiles"]
-# Landing-page media (kiasumiles/static/) is deliberately NOT shipped in the
-# wheel — Vercel serves it from the repo; pip users don't need 3.7MB of video.
+# Large landing-page media is deliberately not shipped in the wheel. The
+# lightweight resources used by hosted.py are selectively included below.
 include = ["kiasumiles/data/demo/*.csv"]
 exclude = ["kiasumiles/static/"]
 
+[tool.hatch.build.targets.wheel.force-include]
+"kiasumiles/static/kiasumiles/index.html" = "kiasumiles/static/kiasumiles/index.html"
+"kiasumiles/static/kiasumiles/privacy.html" = "kiasumiles/static/kiasumiles/privacy.html"
+"kiasumiles/static/kiasumiles/favicon.svg" = "kiasumiles/static/kiasumiles/favicon.svg"
+"kiasumiles/static/kiasumiles/assets/proof" = "kiasumiles/static/kiasumiles/assets/proof"
+"kiasumiles/static/kiasumiles/assets/logos/fairprice-real-crop.png" = "kiasumiles/static/kiasumiles/assets/logos/fairprice-real-crop.png"
+"kiasumiles/static/kiasumiles/assets/logos/grab-colour.svg" = "kiasumiles/static/kiasumiles/assets/logos/grab-colour.svg"
+"kiasumiles/static/kiasumiles/assets/logos/watsons-crop.png" = "kiasumiles/static/kiasumiles/assets/logos/watsons-crop.png"
+"kiasumiles/static/kiasumiles/assets/logos/shell-colour.svg" = "kiasumiles/static/kiasumiles/assets/logos/shell-colour.svg"
+"kiasumiles/static/kiasumiles/assets/logos/shopee-real-crop.png" = "kiasumiles/static/kiasumiles/assets/logos/shopee-real-crop.png"
+"kiasumiles/static/kiasumiles/assets/logos/Singapore_Airlines_Logo.svg" = "kiasumiles/static/kiasumiles/assets/logos/Singapore_Airlines_Logo.svg"
+"kiasumiles/static/kiasumiles/assets/logos/uob-preferred-platinum-visa-card.png" = "kiasumiles/static/kiasumiles/assets/logos/uob-preferred-platinum-visa-card.png"
+
 [tool.hatch.build.targets.sdist]
+include = [
+    "/kiasumiles",
+    "/LICENSE",
+    "/README.md",
+    "/pyproject.toml",
+    "/uv.lock",
+]
 exclude = [
-    ".claude/",
-    ".venv/",
-    "*.token",
-    ".env",
-    ".env.*",
+    "**/__pycache__/",
+    "**/*.pyc",
     "kiasumiles/static/",
 ]
+
+[tool.hatch.build.targets.sdist.force-include]
+"kiasumiles/static/kiasumiles/index.html" = "kiasumiles/static/kiasumiles/index.html"
+"kiasumiles/static/kiasumiles/privacy.html" = "kiasumiles/static/kiasumiles/privacy.html"
+"kiasumiles/static/kiasumiles/favicon.svg" = "kiasumiles/static/kiasumiles/favicon.svg"
+"kiasumiles/static/kiasumiles/assets/proof" = "kiasumiles/static/kiasumiles/assets/proof"
+"kiasumiles/static/kiasumiles/assets/logos/fairprice-real-crop.png" = "kiasumiles/static/kiasumiles/assets/logos/fairprice-real-crop.png"
+"kiasumiles/static/kiasumiles/assets/logos/grab-colour.svg" = "kiasumiles/static/kiasumiles/assets/logos/grab-colour.svg"
+"kiasumiles/static/kiasumiles/assets/logos/watsons-crop.png" = "kiasumiles/static/kiasumiles/assets/logos/watsons-crop.png"
+"kiasumiles/static/kiasumiles/assets/logos/shell-colour.svg" = "kiasumiles/static/kiasumiles/assets/logos/shell-colour.svg"
+"kiasumiles/static/kiasumiles/assets/logos/shopee-real-crop.png" = "kiasumiles/static/kiasumiles/assets/logos/shopee-real-crop.png"
+"kiasumiles/static/kiasumiles/assets/logos/Singapore_Airlines_Logo.svg" = "kiasumiles/static/kiasumiles/assets/logos/Singapore_Airlines_Logo.svg"
+"kiasumiles/static/kiasumiles/assets/logos/uob-preferred-platinum-visa-card.png" = "kiasumiles/static/kiasumiles/assets/logos/uob-preferred-platinum-visa-card.png"
 
 [project.urls]
 Homepage = "https://github.com/hosanxiv/kiasumiles"
@@ -59,4 +89,4 @@ Documentation = "https://github.com/hosanxiv/kiasumiles#readme"
 "Bug Tracker" = "https://github.com/hosanxiv/kiasumiles/issues"
 
 [project.optional-dependencies]
-dev = ["pytest>=8.0", "pytest-asyncio>=0.23"]
+dev = ["hatchling>=1.29", "pytest>=8.0", "pytest-asyncio>=0.23"]
