@@ -9,6 +9,7 @@ import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
 PROOF_PATH = "/kiasumiles/assets/proof/kiasumiles-real-life-720.webp"
+CHAT_PROOF_PATH = "/kiasumiles/assets/proof/kiasumiles-cold-storage-chat.jpg"
 LOGO_ASSETS = (
     ("fairprice-real-crop.png", "image/png"),
     ("grab-colour.svg", "image/svg+xml"),
@@ -16,6 +17,7 @@ LOGO_ASSETS = (
     ("shell-colour.svg", "image/svg+xml"),
     ("shopee-real-crop.png", "image/png"),
     ("Singapore_Airlines_Logo.svg", "image/svg+xml"),
+    ("uob-preferred-platinum-visa-card.png", "image/png"),
 )
 LOGO_PATHS = [
     f"/kiasumiles/assets/logos/{filename}"
@@ -76,7 +78,7 @@ from starlette.testclient import TestClient
 from kiasumiles import hosted
 
 client = TestClient(hosted.app, raise_server_exceptions=False)
-paths = ["/", "/privacy", "/favicon.svg", {PROOF_PATH!r}] + {LOGO_PATHS!r}
+paths = ["/", "/privacy", "/favicon.svg", {PROOF_PATH!r}, {CHAT_PROOF_PATH!r}] + {LOGO_PATHS!r}
 print(json.dumps({{
     path: {{
         "status": response.status_code,
@@ -132,6 +134,11 @@ print(json.dumps({{
             "content_type": "image/webp",
             "cache_control": "public, max-age=31536000, immutable",
         },
+            CHAT_PROOF_PATH: {
+                "status": 200,
+                "content_type": "image/jpeg",
+                "cache_control": "public, max-age=31536000, immutable",
+            },
     }
     expected_routes.update(
         {
@@ -151,6 +158,7 @@ print(json.dumps({{
         "kiasumiles/static/kiasumiles/assets/proof/kiasumiles-real-life-720.webp",
         "kiasumiles/static/kiasumiles/assets/proof/kiasumiles-real-life-1460.webp",
         "kiasumiles/static/kiasumiles/assets/proof/kiasumiles-real-life-1460.jpg",
+        "kiasumiles/static/kiasumiles/assets/proof/kiasumiles-cold-storage-chat.jpg",
     } | {
         f"kiasumiles/static/kiasumiles/assets/logos/{filename}"
         for filename, _ in LOGO_ASSETS
@@ -194,7 +202,3 @@ print(json.dumps({{
     for packaged_files in (wheel_files, sdist_files):
         assert "kiasumiles/static/kiasumiles/hero.png" not in packaged_files
         assert "kiasumiles/static/kiasumiles/product-demo-60s.mp4" not in packaged_files
-        assert (
-            "kiasumiles/static/kiasumiles/assets/logos/"
-            "uob-preferred-platinum-visa-card.png"
-        ) not in packaged_files

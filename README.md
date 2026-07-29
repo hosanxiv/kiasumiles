@@ -15,9 +15,9 @@
 If you're in the miles game, you've asked this at least once - standing at the cashier,
 not quite sure if this is the 4 mpd card or the 1.2 mpd one.
 
-KiasuMiles connects to your AI agent, remembers the cards you carry, and tells you which
-card earns the most miles at the merchant in front of you. Card rules and merchant data
-stay current through the hosted KiasuMiles service.
+KiasuMiles connects to an AI agent that supports remote MCP and tells you which of your
+selected cards earns the most miles at the merchant in front of you. Card rules and
+merchant data stay current through the hosted KiasuMiles service.
 
 ---
 
@@ -26,23 +26,80 @@ stay current through the hosted KiasuMiles service.
 Miles guides tell you "Card X for dining, Card Y for online shopping". That works until
 your wallet has six cards and the merchant in front of you doesn't fit the chart.
 
-KiasuMiles ranks against the cards you actually hold. Your agent remembers your selected
+KiasuMiles ranks against the cards you actually hold. Your AI agent supplies the selected
 card stack, checks it against the latest KiasuMiles rules, and returns one usable answer
-with the caveats attached. No second guessing at the counter.
+with the caveats attached. Whether the stack is remembered depends on your agent or
+client. No second guessing at the counter.
 
 ---
 
 ## Get started
 
-Copy and paste this into your agent:
+### Requirements
+
+You need an AI agent or client that supports remote MCP connections. The agent must also
+have permission to add or use the connection. Some environments can connect from a
+message; others require you or a workspace administrator to add the endpoint in settings.
+
+The KiasuMiles remote MCP endpoint is:
 
 ```text
-Install KiasuMiles MCP for me: https://kiasumiles.space/mcp
-
-Use KiasuMiles. First help me set up my card stack. Ask me which banks I have cards with, show me the matching supported cards, then remember my selected cards for future KiasuMiles lookups.
+https://kiasumiles.space/mcp
 ```
 
-You only do this once. After that, ask KiasuMiles which card to use whenever you are paying.
+### One message to start setup
+
+Copy and paste this exact message into your AI agent:
+
+```text
+Connect me to KiasuMiles at https://kiasumiles.space/mcp if your environment supports remote MCP connections and its tools are not already available.
+
+Ask before changing any settings. Do not say KiasuMiles is connected until you can actually list and use its tools.
+
+If you cannot add the connection yourself, say so plainly and stop. Do not invent setup instructions.
+
+Once connected, help me set up my card stack. Ask which banks I use, show me the matching supported cards, and ask me to confirm my selections.
+
+Before saving anything, explain only what the available tools document about storage and whether my selections will persist. Do not guess.
+
+After confirming my cards, ask for a Singapore merchant and recommend my best card.
+```
+
+### What happens the first time
+
+1. The agent checks whether the KiasuMiles tools are already available.
+2. If its environment allows it, the agent asks before adding the remote MCP connection.
+3. The agent verifies the connection by listing and using the available KiasuMiles tools.
+4. It asks which banks and supported cards you use.
+5. Before saving anything, it explains what its available tools say about storage and
+   persistence.
+6. It asks for a Singapore merchant and ranks only the cards you confirmed.
+
+If the agent cannot add a remote MCP connection itself, the prompt tells it to stop
+instead of guessing at product-specific menus. Add the endpoint through the agent's own
+documented settings, then run the message again.
+
+### Storage and persistence
+
+KiasuMiles never needs your card number, expiry date or CVV. It works only with the card
+names you choose to provide. How those names are remembered depends on your AI agent.
+
+The hosted KiasuMiles server exposes recommendation and card-reference tools, but no
+wallet save or wallet read tool. Each hosted recommendation is calculated from the cards
+the client supplies with that request. Do not assume your card stack will survive a new
+conversation unless your agent or client explicitly documents and confirms that behavior.
+
+### Compatibility and mobile
+
+Compatibility depends on a capability, not a brand name: the environment must support
+remote MCP connections and allow the KiasuMiles endpoint to be added. A desktop, web and
+mobile version of the same product may expose different integrations. Do not assume the
+mobile version works just because another version does; check the current settings and
+official documentation for the exact app and account you are using.
+
+**OpenClaw and Hermes via Telegram:** Paste the setup prompt directly into your Telegram
+chat. The agent will connect KiasuMiles and guide you through choosing your cards. Approve
+the connection if it asks.
 
 ### Everyday prompts
 
@@ -83,6 +140,36 @@ Review my KiasuMiles card stack and tell me which categories are weak.
 
 You do not need to know card IDs or technical setup details. The agent handles them.
 
+### Troubleshooting
+
+**The agent says it cannot connect**
+
+- Confirm that the environment supports remote MCP connections.
+- Check that the endpoint is exactly `https://kiasumiles.space/mcp`.
+- Use the environment's documented integration settings if connections cannot be added
+  from a conversation.
+- If a workspace administrator controls integrations, ask them to approve the endpoint.
+
+**The agent says it connected, but cannot list KiasuMiles tools**
+
+The connection is not verified yet. Ask it to reload existing connections only if that
+action is supported by the environment, then list the KiasuMiles tools. Do not treat an
+unchanged settings screen as proof that the tools work.
+
+**Your card stack is missing in a new conversation**
+
+That means the agent or client did not persist it in the way you expected. Run the setup
+message again and ask the agent to explain its documented storage behavior before saving.
+The hosted KiasuMiles server is not a wallet store.
+
+**The recommendation is too broad**
+
+Include the exact merchant and how you are paying, for example:
+
+```text
+Which of my cards should I use at NTUC FairPrice with Apple Pay?
+```
+
 ---
 
 ## Hosted MCP Details
@@ -102,7 +189,8 @@ belongs in the agent, app, or user-controlled client. Hosted recommendations are
 the card IDs supplied in the current request; if no cards are supplied, the tools ask for a
 card stack instead of ranking the whole database.
 
-For ChatGPT Actions, the hosted server also exposes a public REST adapter:
+For developers integrating through an OpenAPI action, the hosted server also exposes a
+public REST adapter:
 
 | Route | Purpose |
 |------|---------|
@@ -142,15 +230,11 @@ curl -i -X POST https://kiasumiles.space/mcp \
 
 ---
 
-### Supported agents
+### Client compatibility
 
-- ChatGPT
-- Codex
-- Claude Desktop
-- Claude Code
-- OpenClaw
-- Hermes
-- Any MCP-capable agent
+Use the hosted MCP endpoint from any AI agent or client that documents support for remote
+MCP connections. Setup and persistence are controlled by that environment, not by
+KiasuMiles.
 
 ---
 

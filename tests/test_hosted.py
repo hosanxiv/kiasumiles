@@ -8,6 +8,7 @@ PROOF_ASSETS = (
     ("kiasumiles-real-life-720.webp", "image/webp"),
     ("kiasumiles-real-life-1460.webp", "image/webp"),
     ("kiasumiles-real-life-1460.jpg", "image/jpeg"),
+    ("kiasumiles-cold-storage-chat.jpg", "image/jpeg"),
 )
 
 
@@ -81,14 +82,17 @@ def test_landing_page_and_media_routes_are_served():
         video = client.get("/kiasumiles/product-demo-60s.mp4")
         logo = client.get("/assets/logos/grab-colour.svg")
         namespaced_logo = client.get("/kiasumiles/assets/logos/grab-colour.svg")
+        card_art = client.get(
+            "/kiasumiles/assets/logos/uob-preferred-platinum-visa-card.png"
+        )
         blocked = client.get("/assets/logos/../secret.txt")
 
     assert landing.status_code == 200
     assert "The right card, before you tap." in landing.text
-    assert "Install KiasuMiles MCP for me" in landing.text
+    assert "Connect me to KiasuMiles at https://kiasumiles.space/mcp" in landing.text
     assert "https://kiasumiles.space/mcp" in landing.text
-    assert "Your agent or local client holds your selected card products" in landing.text
-    assert "Hosted KiasuMiles ranks that request and does not store your stack." in landing.text
+    assert "KiasuMiles never needs your card number, expiry date or CVV." in landing.text
+    assert "How those names are remembered depends on your AI agent." in landing.text
     assert "Wallet stays client-side" not in landing.text
     assert hero.status_code == 200
     assert hero.headers["content-type"] == "image/png"
@@ -98,6 +102,8 @@ def test_landing_page_and_media_routes_are_served():
     assert logo.headers["content-type"] == "image/svg+xml"
     assert namespaced_logo.status_code == 200
     assert namespaced_logo.headers["content-type"] == "image/svg+xml"
+    assert card_art.status_code == 200
+    assert card_art.headers["content-type"] == "image/png"
     assert blocked.status_code == 404
 
 

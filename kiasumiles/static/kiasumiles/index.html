@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Ask which card to use at a Singapore merchant. KiasuMiles checks the rules against the cards you supply, then tells you which one to tap.">
-  <title>KiasuMiles — The right card, before you tap.</title>
+  <meta name="description" content="Ask your AI agent which card to tap. KiasuMiles answers from the cards you actually own.">
+  <title>KiasuMiles: The right card, before you tap.</title>
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -15,12 +15,10 @@
       --ink: #061427;
       --ink-soft: #263a55;
       --muted: #62728a;
-      --blue: #1168ff;
       --mint: #2bd6ad;
-      --green: #5fb43a;
-      --lime: #b7e76a;
       --deep-green: #003f37;
       --wash: #f4f9ff;
+      --mint-wash: #e7fbf5;
       --surface: #ffffff;
       --line: rgba(6, 20, 39, .13);
       --shadow: 0 24px 70px rgba(18, 56, 105, .14);
@@ -49,7 +47,7 @@
     p { text-wrap: pretty; }
 
     :focus-visible {
-      outline: 3px solid rgba(17, 104, 255, .42);
+      outline: 3px solid rgba(0, 63, 55, .42);
       outline-offset: 4px;
     }
 
@@ -89,7 +87,7 @@
       border: 1px solid var(--line);
       border-radius: 16px;
       background: rgba(255, 255, 255, .88);
-      box-shadow: 0 12px 36px rgba(6, 20, 39, .07);
+      box-shadow: 0 4px 8px rgba(6, 20, 39, .07);
       backdrop-filter: blur(16px);
     }
     .brand {
@@ -135,19 +133,19 @@
       border-radius: 999px;
       background: white;
       color: var(--ink);
-      box-shadow: 0 10px 28px rgba(6, 20, 39, .08);
+      box-shadow: 0 4px 8px rgba(6, 20, 39, .08);
       font-weight: 800;
       line-height: 1.1;
       cursor: pointer;
       transition: transform .18s ease, box-shadow .18s ease, background .18s ease;
     }
-    .button:hover { transform: translateY(-2px); box-shadow: 0 15px 36px rgba(6, 20, 39, .12); }
+    .button:hover { transform: translateY(-2px); box-shadow: 0 6px 8px rgba(6, 20, 39, .12); }
     .button:active { transform: translateY(0); }
     .button.primary { border-color: var(--deep-green); background: var(--deep-green); color: white; }
-    .button.blue { border-color: var(--blue); background: var(--blue); color: white; }
+    .button.accent { border-color: var(--mint); background: var(--mint); color: var(--deep-green); }
 
     .eyebrow {
-      color: var(--blue);
+      color: var(--deep-green);
       font-family: var(--font-mono);
       font-size: 13px;
       font-weight: 750;
@@ -160,7 +158,7 @@
       margin-top: 16px;
       font-size: clamp(42px, 6vw, 76px);
       font-weight: 850;
-      letter-spacing: -.06em;
+      letter-spacing: -.04em;
       line-height: .94;
     }
     .section-copy {
@@ -177,9 +175,9 @@
       position: relative;
       padding: 176px 24px 126px;
       background:
-        radial-gradient(780px 470px at 50% 63%, rgba(43, 214, 173, .38), transparent 66%),
-        radial-gradient(760px 500px at 76% 15%, rgba(17, 104, 255, .16), transparent 67%),
-        linear-gradient(180deg, #ffffff 0%, #f5fbff 56%, #edfff9 100%);
+        radial-gradient(780px 470px at 50% 63%, rgba(43, 214, 173, .32), transparent 66%),
+        radial-gradient(760px 500px at 76% 15%, rgba(0, 63, 55, .1), transparent 67%),
+        linear-gradient(180deg, var(--surface) 0%, var(--wash) 56%, var(--mint-wash) 100%);
       text-align: center;
     }
     .hero-inner { position: relative; width: min(1440px, 100%); margin: 0 auto; }
@@ -193,7 +191,7 @@
       border-radius: 999px;
       background: rgba(255, 255, 255, .78);
       color: var(--deep-green);
-      box-shadow: 0 10px 28px rgba(6, 20, 39, .06);
+      box-shadow: 0 4px 8px rgba(6, 20, 39, .06);
       font-size: 14px;
       font-weight: 800;
     }
@@ -202,7 +200,7 @@
       margin: 26px auto 0;
       font-size: clamp(56px, 8vw, 96px);
       font-weight: 850;
-      letter-spacing: -.058em;
+      letter-spacing: -.04em;
       line-height: .9;
       text-shadow: 0 12px 38px rgba(9, 54, 58, .12);
     }
@@ -220,7 +218,7 @@
       display: inline-block;
       margin-top: 17px;
       padding: 9px 13px;
-      border: 1px solid rgba(6, 20, 39, .09);
+      border: 0;
       border-radius: 999px;
       background: rgba(255, 255, 255, .65);
       color: var(--muted);
@@ -235,7 +233,7 @@
       min-height: 68px;
       place-items: center;
       padding: 12px 18px;
-      border: 1px solid rgba(6, 20, 39, .09);
+      border: 0;
       border-radius: 16px;
       background: white;
       box-shadow: var(--shadow);
@@ -260,12 +258,12 @@
       position: relative;
       aspect-ratio: 1;
       max-width: 600px;
-      border: 1px solid rgba(17, 104, 255, .15);
+      border: 1px solid rgba(0, 63, 55, .16);
       border-radius: 50%;
       background:
-        radial-gradient(circle, rgba(17, 104, 255, .09) 0 2px, transparent 3px),
-        repeating-radial-gradient(circle, transparent 0 14%, rgba(17, 104, 255, .13) 14.3% 14.6%, transparent 14.9% 28%);
-      box-shadow: inset 0 0 80px rgba(17, 104, 255, .05);
+        radial-gradient(circle, rgba(0, 63, 55, .08) 0 2px, transparent 3px),
+        repeating-radial-gradient(circle, transparent 0 14%, rgba(0, 63, 55, .12) 14.3% 14.6%, transparent 14.9% 28%);
+      box-shadow: inset 0 0 80px rgba(0, 63, 55, .05);
     }
     .radar-figure::before,
     .radar-figure::after {
@@ -275,7 +273,7 @@
       left: 7%;
       width: 86%;
       height: 1px;
-      background: rgba(17, 104, 255, .13);
+      background: rgba(0, 63, 55, .13);
     }
     .radar-figure::after { transform: rotate(90deg); }
     .radar-sweep {
@@ -313,10 +311,12 @@
       border: 1px solid var(--line);
       border-radius: 12px;
       background: white;
-      box-shadow: 0 12px 34px rgba(17, 104, 255, .13);
+      box-shadow: 0 4px 8px rgba(0, 63, 55, .1);
       font-size: 13px;
       font-weight: 750;
     }
+    .radar-pin img { width: auto; height: auto; max-width: 82px; max-height: 28px; object-fit: contain; }
+    .radar-pin.pin-two img, .radar-pin.pin-three img, .radar-pin.pin-four img { width: 32px; height: 32px; }
     .pin-one { top: 14%; left: 39%; }
     .pin-two { top: 32%; right: 7%; }
     .pin-three { bottom: 13%; right: 26%; }
@@ -329,10 +329,10 @@
       max-width: 560px;
       margin-top: 30px;
       padding: 16px;
-      border: 1px solid rgba(17, 104, 255, .17);
+      border: 1px solid rgba(0, 63, 55, .17);
       border-radius: 16px;
       background: white;
-      box-shadow: 0 16px 44px rgba(17, 104, 255, .07);
+      box-shadow: none;
     }
     .match-icon {
       display: grid;
@@ -350,8 +350,8 @@
     .answer-section {
       padding: 112px 24px;
       background:
-        radial-gradient(600px 360px at 85% 0, rgba(183, 231, 106, .8), transparent 70%),
-        var(--green);
+        radial-gradient(600px 360px at 85% 0, rgba(43, 214, 173, .28), transparent 70%),
+        var(--mint-wash);
     }
     .answer-layout { display: grid; grid-template-columns: .8fr 1.2fr; align-items: center; gap: clamp(50px, 8vw, 100px); }
     .answer-section .eyebrow { color: var(--deep-green); }
@@ -359,10 +359,10 @@
     .ticket {
       position: relative;
       padding: clamp(24px, 4vw, 42px);
-      border: 1px solid rgba(6, 20, 39, .14);
+      border: 0;
       border-radius: 16px;
       background: white;
-      box-shadow: 18px 22px 0 rgba(0, 63, 55, .18), 0 32px 70px rgba(0, 63, 55, .18);
+      box-shadow: 14px 16px 0 rgba(0, 63, 55, .16);
       transform: rotate(1.2deg);
     }
     .ticket::before, .ticket::after {
@@ -372,10 +372,13 @@
       width: 22px;
       height: 22px;
       border-radius: 50%;
-      background: var(--green);
+      background: var(--mint-wash);
     }
     .ticket::before { left: -12px; }
     .ticket::after { right: -12px; }
+    .ticket-top { display: grid; grid-template-columns: minmax(150px, .62fr) minmax(0, 1fr); align-items: center; gap: clamp(18px, 4vw, 32px); }
+    .ticket-card-art { width: 100%; max-width: 230px; justify-self: center; border-radius: 12px; box-shadow: 0 6px 8px rgba(6, 20, 39, .2); transform: rotate(-1.5deg); }
+    .ticket-heading { min-width: 0; }
     .ticket-label {
       display: inline-flex;
       align-items: center;
@@ -390,9 +393,9 @@
       letter-spacing: .025em;
     }
     .ticket-merchant { margin-top: 25px; color: var(--muted); font-size: 15px; font-weight: 700; }
-    .ticket-card { margin-top: 7px; font-size: clamp(30px, 4.2vw, 52px); font-weight: 850; letter-spacing: -.055em; line-height: 1; }
+    .ticket-card { margin-top: 7px; font-size: clamp(30px, 4.2vw, 52px); font-weight: 850; letter-spacing: -.04em; line-height: 1; }
     .ticket-rate { display: flex; align-items: end; justify-content: space-between; gap: 20px; margin-top: 30px; padding-top: 24px; border-top: 2px dashed rgba(6, 20, 39, .18); }
-    .ticket-rate strong { font-family: var(--font-display); font-size: clamp(42px, 6vw, 68px); letter-spacing: -.06em; line-height: .85; }
+    .ticket-rate strong { font-family: var(--font-display); font-size: clamp(42px, 6vw, 68px); letter-spacing: -.04em; line-height: .85; }
     .ticket-rate span { color: var(--muted); font-size: 14px; font-weight: 700; text-align: right; }
     .ticket-details { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 25px; }
     .ticket-detail { padding: 15px; border-radius: 12px; background: var(--wash); }
@@ -403,45 +406,36 @@
     .flow-section .eyebrow { color: var(--mint); }
     .flow-section .section-copy { color: rgba(255, 255, 255, .68); }
     .flow-layout { display: grid; grid-template-columns: minmax(0, .88fr) minmax(500px, 1.12fr); gap: clamp(50px, 7vw, 90px); align-items: start; }
-    .flow-proof { display: grid; gap: 28px; }
-    .phone {
-      width: min(480px, 100%);
-      margin: 0 auto;
+    .flow-proof { display: grid; gap: 22px; }
+    .evidence-shot {
+      width: 100%;
       padding: 12px;
       border: 1px solid rgba(255, 255, 255, .16);
       border-radius: 16px;
-      background: #0b1d34;
-      box-shadow: 0 32px 80px rgba(0, 0, 0, .34);
+      background: var(--ink-soft);
+      box-shadow: 0 6px 8px rgba(0, 0, 0, .26);
     }
-    .phone-bar { display: flex; align-items: center; justify-content: space-between; min-height: 54px; padding: 8px 11px 13px; border-bottom: 1px solid rgba(255, 255, 255, .09); }
-    .phone-agent { display: flex; align-items: center; gap: 10px; font-weight: 750; }
-    .agent-dot { width: 32px; height: 32px; border-radius: 10px; background: linear-gradient(135deg, var(--blue), var(--mint)); }
-    .example-badge { color: rgba(255, 255, 255, .56); font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; }
-    .conversation { display: grid; gap: 14px; padding: 22px 12px 12px; }
-    .bubble { max-width: 88%; padding: 15px 17px; border-radius: 16px; font-size: 15px; line-height: 1.5; }
-    .bubble.user { justify-self: end; border-bottom-right-radius: 5px; background: var(--blue); }
-    .bubble.agent { justify-self: start; border-bottom-left-radius: 5px; background: rgba(255, 255, 255, .1); color: rgba(255, 255, 255, .91); }
-    .bubble.agent strong { color: white; }
-    .agent-answer { display: grid; gap: 10px; margin-top: 6px; padding-top: 13px; border-top: 1px solid rgba(255, 255, 255, .13); }
-    .answer-chip { color: var(--lime); font-family: var(--font-mono); font-size: 12px; font-weight: 750; }
+    .evidence-shot img { width: 100%; max-height: 700px; border-radius: 12px; object-fit: contain; object-position: top; }
+    .evidence-meta { padding: 11px 5px 1px; }
+    .evidence-shot figcaption { color: rgba(255, 255, 255, .72); font-size: 14px; line-height: 1.45; }
     .proof-photo { display: grid; grid-template-columns: minmax(190px, .72fr) 1fr; gap: 24px; align-items: center; padding: 16px; border: 1px solid rgba(255, 255, 255, .13); border-radius: 16px; background: rgba(255, 255, 255, .06); }
     .proof-photo picture, .proof-photo img { width: 100%; }
     .proof-photo img { aspect-ratio: 4 / 5; border-radius: 12px; object-fit: cover; }
     .proof-caption .eyebrow { margin-bottom: 12px; }
-    .proof-caption h3 { font-size: clamp(25px, 3vw, 34px); letter-spacing: -.045em; line-height: 1; }
+    .proof-caption h3 { font-size: clamp(25px, 3vw, 34px); letter-spacing: -.04em; line-height: 1; }
     .proof-caption p { margin-top: 13px; color: rgba(255, 255, 255, .67); font-size: 15px; line-height: 1.55; }
 
     .privacy-section {
       padding: 116px 24px;
       background:
-        radial-gradient(560px 360px at 12% 10%, rgba(43, 214, 173, .2), transparent 70%),
-        linear-gradient(180deg, #f7fffc, #f2f8ff);
+        radial-gradient(560px 360px at 12% 10%, rgba(43, 214, 173, .18), transparent 70%),
+        linear-gradient(180deg, var(--surface), var(--wash));
     }
     .privacy-layout { display: grid; grid-template-columns: .82fr 1.18fr; align-items: center; gap: clamp(54px, 8vw, 106px); }
     .privacy-diagram { display: grid; gap: 14px; }
-    .scope-card { padding: clamp(22px, 3vw, 32px); border: 1px solid var(--line); border-radius: 16px; background: white; box-shadow: 0 18px 50px rgba(15, 47, 94, .09); }
+    .scope-card { padding: clamp(22px, 3vw, 32px); border: 1px solid var(--line); border-radius: 16px; background: white; box-shadow: none; }
     .scope-card-top { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
-    .scope-icon { display: grid; width: 48px; height: 48px; place-items: center; border-radius: 12px; background: rgba(17, 104, 255, .11); color: var(--blue); font-family: var(--font-mono); font-weight: 850; }
+    .scope-icon { display: grid; width: 48px; height: 48px; place-items: center; border-radius: 12px; background: rgba(0, 63, 55, .11); color: var(--deep-green); font-family: var(--font-mono); font-weight: 850; }
     .scope-card.hosted .scope-icon { background: rgba(43, 214, 173, .18); color: var(--deep-green); }
     .scope-tag { padding: 7px 10px; border-radius: 999px; background: var(--wash); color: var(--muted); font-family: var(--font-mono); font-size: 11px; font-weight: 750; }
     .scope-card h3 { margin-top: 18px; font-size: 25px; letter-spacing: -.04em; }
@@ -455,14 +449,20 @@
     .start-section {
       padding: 116px 24px;
       background:
-        radial-gradient(620px 380px at 18% 12%, rgba(17, 104, 255, .16), transparent 70%),
-        radial-gradient(620px 420px at 85% 85%, rgba(43, 214, 173, .22), transparent 72%),
-        #f9fcff;
+        radial-gradient(620px 380px at 18% 12%, rgba(0, 63, 55, .1), transparent 70%),
+        radial-gradient(620px 420px at 85% 85%, rgba(43, 214, 173, .18), transparent 72%),
+        var(--wash);
     }
     .start-intro { text-align: center; }
     .start-intro .section-heading, .start-intro .section-copy { margin-right: auto; margin-left: auto; }
+    .agent-compatibility { display: grid; grid-template-columns: minmax(150px, .28fr) 1fr; align-items: center; gap: 24px; margin-top: 44px; padding: 20px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+    .agent-compatibility h3 { font-size: 20px; letter-spacing: -.025em; }
+    .agent-compatibility-copy p { max-width: 30ch; margin-top: 6px; color: var(--muted); font-size: 13px; line-height: 1.45; }
+    .agent-list { display: flex; flex-wrap: wrap; gap: 10px 24px; margin: 0; padding: 0; list-style: none; }
+    .agent-list li { display: inline-flex; align-items: center; gap: 8px; color: var(--ink-soft); font-size: 15px; font-weight: 750; }
+    .agent-list li::before { content: "✓"; color: var(--deep-green); font-size: 13px; font-weight: 850; }
     .steps { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 52px; }
-    .step { padding: clamp(22px, 4vw, 38px); border: 1px solid var(--line); border-radius: 16px; background: rgba(255, 255, 255, .92); box-shadow: 0 20px 56px rgba(15, 47, 94, .09); }
+    .step { padding: clamp(22px, 4vw, 38px); border: 1px solid var(--line); border-radius: 16px; background: rgba(255, 255, 255, .92); box-shadow: none; }
     .step-number { display: grid; width: 44px; height: 44px; place-items: center; border-radius: 12px; background: var(--deep-green); color: white; font-family: var(--font-mono); font-weight: 850; }
     .step h3 { margin-top: 20px; font-size: 30px; letter-spacing: -.045em; }
     .step > p { margin-top: 10px; color: var(--muted); line-height: 1.55; }
@@ -482,7 +482,7 @@
     }
     .copy-row { display: flex; flex-wrap: wrap; align-items: center; gap: 13px; }
     .copy-status { min-height: 24px; color: var(--deep-green); font-size: 13px; font-weight: 700; }
-    .example-ask { margin-top: 24px; padding: 18px; border: 1px solid rgba(43, 214, 173, .3); border-radius: 12px; background: #f4fffb; color: var(--deep-green); font-size: 17px; font-weight: 700; line-height: 1.45; }
+    .example-ask { margin-top: 24px; padding: 18px; border: 1px solid rgba(43, 214, 173, .3); border-radius: 12px; background: var(--mint-wash); color: var(--deep-green); font-size: 17px; font-weight: 700; line-height: 1.45; }
     .example-ask span { display: block; margin-bottom: 8px; font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; }
     .guide-link { margin-top: 20px; }
 
@@ -491,7 +491,7 @@
     .footer-brand { color: var(--muted); font-size: 14px; font-weight: 650; }
     .footer-links { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 3px 14px; }
     .footer-links a { display: inline-flex; align-items: center; min-height: 44px; color: var(--ink-soft); font-size: 14px; font-weight: 700; }
-    .footer-links a:hover { color: var(--blue); }
+    .footer-links a:hover { color: var(--deep-green); }
 
     @media (max-width: 1050px) {
       .hero { padding-bottom: 92px; }
@@ -504,7 +504,7 @@
       .radar-copy, .answer-copy, .flow-copy, .privacy-copy { max-width: 760px; }
       .radar-figure { width: min(600px, 100%); margin: 0 auto; }
       .ticket { width: min(720px, 100%); margin: 0 auto; transform: none; }
-      .flow-proof { grid-template-columns: minmax(340px, .8fr) minmax(0, 1.2fr); align-items: start; }
+      .flow-proof { grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; }
       .proof-photo { grid-template-columns: 1fr; }
       .privacy-diagram { width: min(760px, 100%); margin: 0 auto; }
     }
@@ -522,6 +522,7 @@
       .section-heading { font-size: clamp(40px, 12vw, 58px); }
       .radar-layout, .answer-layout, .flow-layout, .privacy-layout { gap: 48px; }
       .flow-proof { grid-template-columns: 1fr; }
+      .agent-compatibility { grid-template-columns: 1fr; gap: 14px; margin-top: 36px; }
       .ticket-details, .steps { grid-template-columns: 1fr; }
       .ticket { box-shadow: 10px 12px 0 rgba(0, 63, 55, .17), 0 26px 56px rgba(0, 63, 55, .15); }
       .ticket-rate { align-items: start; flex-direction: column; }
@@ -541,7 +542,10 @@
       .merchant-tile.grab img, .merchant-tile.shell img, .merchant-tile.shopee img { width: 37px; height: 37px; }
       .radar-center { width: 88px; height: 88px; border-width: 6px; font-size: 13px; }
       .radar-pin { min-width: 58px; min-height: 38px; padding: 6px 8px; font-size: 11px; }
+      .ticket-top { grid-template-columns: 1fr; }
+      .ticket-card-art { width: min(210px, 82%); justify-self: start; }
       .proof-photo { grid-template-columns: 1fr; }
+      .proof-photo img { aspect-ratio: 16 / 10; object-position: 50% 56%; }
       .copy-row .button { width: 100%; }
     }
 
@@ -574,12 +578,12 @@
         <div class="hero-copy">
           <p class="hero-kicker">Singapore miles, without the checkout guesswork</p>
           <h1 id="hero-title">The right card, before you tap.</h1>
-          <p class="hero-lede">Ask your agent which card to use. KiasuMiles recognises the merchant, checks the cards you supplied, and gives you one clear answer.</p>
+          <p class="hero-lede">Ask your AI agent which card to tap. KiasuMiles answers from the cards you actually own.</p>
           <div class="hero-actions">
             <a class="button primary" href="#start">Set up KiasuMiles</a>
             <a class="button" href="#flow">See an example</a>
           </div>
-          <p class="hero-note">Built for the cards and merchants Singaporeans actually use.</p>
+          <p class="hero-note">Your AI agent handles your card list. KiasuMiles checks the rules.</p>
         </div>
 
         <div class="merchant-cloud" aria-label="Works across familiar Singapore merchants">
@@ -609,13 +613,13 @@
       <div class="section-inner radar-layout">
         <div class="radar-copy">
           <p class="eyebrow">Merchant radar</p>
-          <h2 class="section-heading" id="radar-title">It recognises the merchant, not just the category.</h2>
-          <p class="section-copy">A supermarket can code differently from a delivery app. KiasuMiles matches the place in front of you, then checks the relevant card rules.</p>
+          <h2 class="section-heading" id="radar-title">Where you tap changes what you earn.</h2>
+          <p class="section-copy">A card worth 4 mpd at NTUC can earn far less on Grab. KiasuMiles pins the merchant, then checks your cards against that merchant's rules.</p>
           <div class="match-note">
             <span class="match-icon" aria-hidden="true">✓</span>
             <div>
-              <strong>NTUC FairPrice recognised</strong>
-              <p>The answer can account for how you pay, including Apple Pay or Google Pay.</p>
+              <strong>Down to how you tap</strong>
+              <p>Same shop can earn differently by method — it accounts for Apple Pay, Google Pay, or the physical card.</p>
             </div>
           </div>
         </div>
@@ -623,11 +627,11 @@
         <figure class="radar-figure" aria-label="Illustration of KiasuMiles matching familiar merchants">
           <div class="radar-sweep" aria-hidden="true"></div>
           <span class="radar-center">KiasuMiles</span>
-          <span class="radar-pin pin-one">FairPrice</span>
-          <span class="radar-pin pin-two">Grab</span>
-          <span class="radar-pin pin-three">Shopee</span>
-          <span class="radar-pin pin-four">Shell</span>
-          <span class="radar-pin pin-five">Watsons</span>
+          <span class="radar-pin pin-one"><img src="/kiasumiles/assets/logos/fairprice-real-crop.png" width="556" height="131" alt="FairPrice" loading="lazy" decoding="async"></span>
+          <span class="radar-pin pin-two"><img src="/kiasumiles/assets/logos/grab-colour.svg" width="32" height="32" alt="Grab" loading="lazy" decoding="async"></span>
+          <span class="radar-pin pin-three"><img src="/kiasumiles/assets/logos/shopee-real-crop.png" width="32" height="32" alt="Shopee" loading="lazy" decoding="async"></span>
+          <span class="radar-pin pin-four"><img src="/kiasumiles/assets/logos/shell-colour.svg" width="32" height="32" alt="Shell" loading="lazy" decoding="async"></span>
+          <span class="radar-pin pin-five"><img src="/kiasumiles/assets/logos/watsons-crop.png" width="540" height="108" alt="Watsons" loading="lazy" decoding="async"></span>
         </figure>
       </div>
     </section>
@@ -635,18 +639,22 @@
     <section class="answer-section" id="answer" aria-labelledby="answer-title">
       <div class="section-inner answer-layout">
         <div class="answer-copy">
-          <p class="eyebrow">One usable recommendation</p>
           <h2 class="section-heading" id="answer-title">Your cards. One answer.</h2>
-          <p class="section-copy">KiasuMiles ranks only the card products supplied with the request, then returns the best fit with the payment method and cap caveat attached.</p>
+          <p class="section-copy">KiasuMiles looks only at the cards you own, then gives you the best one for that shop, with the payment method and monthly cap spelled out.</p>
         </div>
 
         <figure class="ticket" aria-labelledby="ticket-title">
-          <figcaption class="ticket-label">Example using a demo card stack</figcaption>
-          <p class="ticket-merchant">NTUC FairPrice · mobile wallet checkout</p>
-          <h3 class="ticket-card" id="ticket-title">UOB Preferred Visa</h3>
+          <div class="ticket-top">
+            <img class="ticket-card-art" src="/kiasumiles/assets/logos/uob-preferred-platinum-visa-card.png" width="264" height="169" decoding="async" alt="UOB Preferred Visa card">
+            <div class="ticket-heading">
+              <figcaption class="ticket-label">Example · sample cards</figcaption>
+              <p class="ticket-merchant">NTUC FairPrice · paying by phone</p>
+              <h3 class="ticket-card" id="ticket-title">UOB Preferred Visa</h3>
+            </div>
+          </div>
           <div class="ticket-rate">
             <strong>4 mpd</strong>
-            <span>Best fit from the supplied demo cards</span>
+            <span>Top card of the set for this tap</span>
           </div>
           <div class="ticket-details">
             <div class="ticket-detail">
@@ -655,7 +663,7 @@
             </div>
             <div class="ticket-detail">
               <span>Monthly cap</span>
-              <strong>S$600 per calendar month; earns in S$5 blocks</strong>
+              <strong>S$600 a month, counted in S$5 blocks</strong>
             </div>
           </div>
         </figure>
@@ -665,26 +673,16 @@
     <section class="flow-section" id="flow" aria-labelledby="flow-title">
       <div class="section-inner flow-layout">
         <div class="flow-copy">
-          <p class="eyebrow">At the moment of payment</p>
-          <h2 class="section-heading" id="flow-title">Ask. Get an answer.</h2>
-          <p class="section-copy">No spreadsheet at the counter. Ask naturally, include how you are paying, and let your agent handle the lookup.</p>
+          <p class="eyebrow">Right when you're paying</p>
+          <h2 class="section-heading" id="flow-title">Ask, and you're done.</h2>
+          <p class="section-copy">No spreadsheet at the counter. Tell your AI agent where you are and how you're paying, and it does the rest.</p>
         </div>
 
         <div class="flow-proof">
-          <figure class="phone" aria-label="Example KiasuMiles agent conversation">
-            <figcaption class="phone-bar">
-              <span class="phone-agent"><span class="agent-dot" aria-hidden="true"></span>KiasuMiles</span>
-              <span class="example-badge">Example conversation</span>
-            </figcaption>
-            <div class="conversation">
-              <p class="bubble user">Which card should I use at NTUC FairPrice with Apple Pay?</p>
-              <div class="bubble agent">
-                <strong>Use UOB Preferred Visa with Apple Pay.</strong>
-                <div class="agent-answer">
-                  <span class="answer-chip">4 mpd · demo card stack</span>
-                  <span>Cap: S$600 per calendar month; earns in S$5 blocks.</span>
-                </div>
-              </div>
+          <figure class="evidence-shot">
+            <img src="/kiasumiles/assets/proof/kiasumiles-cold-storage-chat.jpg" width="1320" height="1157" decoding="async" alt="AI agent recommending DBS yuu Visa for Cold Storage, with conditions and backup cards">
+            <div class="evidence-meta">
+              <figcaption>A real KiasuMiles recommendation for Cold Storage.</figcaption>
             </div>
           </figure>
 
@@ -692,12 +690,12 @@
             <picture>
               <source type="image/webp" media="(max-width: 760px)" srcset="/kiasumiles/assets/proof/kiasumiles-real-life-720.webp 720w">
               <source type="image/webp" srcset="/kiasumiles/assets/proof/kiasumiles-real-life-720.webp 720w, /kiasumiles/assets/proof/kiasumiles-real-life-1460.webp 1168w" sizes="(max-width: 1050px) 42vw, 260px">
-              <img src="/kiasumiles/assets/proof/kiasumiles-real-life-1460.jpg" width="1168" height="1460" loading="lazy" decoding="async" alt="A person checking a KiasuMiles conversation on a phone at a restaurant">
+              <img src="/kiasumiles/assets/proof/kiasumiles-real-life-1460.jpg" width="1168" height="1460" decoding="async" alt="A person checking a KiasuMiles conversation on a phone at a restaurant">
             </picture>
             <figcaption class="proof-caption">
-              <p class="eyebrow">Made for the real moment</p>
+              <p class="eyebrow">Made for real life</p>
               <h3>Right there at the table.</h3>
-              <p>A real-world use of KiasuMiles. The example above explains the recommendation format; the photographed conversation is contextual proof, not a product transcript claim.</p>
+              <p>Pull it up at the table, ask, then tap the card it names.</p>
             </figcaption>
           </figure>
         </div>
@@ -707,33 +705,31 @@
     <section class="privacy-section" id="privacy" aria-labelledby="privacy-title">
       <div class="section-inner privacy-layout">
         <div class="privacy-copy">
-          <p class="eyebrow">Request-scoped by design</p>
-          <h2 class="section-heading" id="privacy-title">Your stack stays under your agent's control.</h2>
-          <p class="section-copy">Your agent or local client holds your selected card products under its own controls and supplies them when it asks for a lookup. Hosted KiasuMiles ranks that request and does not store your stack.</p>
+          <h2 class="section-heading" id="privacy-title">Only card names, never card details.</h2>
+          <p class="section-copy">KiasuMiles never needs your card number, expiry date or CVV. It works only with the card names you choose to provide. How those names are remembered depends on your AI agent.</p>
           <ul class="privacy-points">
-            <li>Your agent decides how and where your selection is remembered.</li>
-            <li>Only the supplied products are considered for that lookup.</li>
-            <li>KiasuMiles returns the recommendation and its practical caveats.</li>
+            <li>Card names only — never the number, expiry, or CVV.</li>
+            <li>Where your card list is stored is your agent's call, not ours.</li>
           </ul>
         </div>
 
-        <figure class="privacy-diagram" aria-label="Request-scoped card stack flow">
+        <figure class="privacy-diagram" aria-label="How card names move from your AI agent to KiasuMiles">
           <div class="scope-card">
             <div class="scope-card-top">
               <span class="scope-icon" aria-hidden="true">01</span>
-              <span class="scope-tag">Your controls</span>
+              <span class="scope-tag">Your side</span>
             </div>
-            <h3>Agent or local client</h3>
-            <p>Holds the card products you selected and sends them with your merchant question.</p>
+            <h3>Your AI agent</h3>
+            <p>Sends the card names you picked with each question.</p>
           </div>
-          <div class="scope-arrow">Selected products for this lookup</div>
+          <div class="scope-arrow">Just the card names</div>
           <div class="scope-card hosted">
             <div class="scope-card-top">
               <span class="scope-icon" aria-hidden="true">02</span>
               <span class="scope-tag">Hosted service</span>
             </div>
-            <h3>KiasuMiles rules engine</h3>
-            <p>Matches the merchant, ranks the supplied products, and returns an answer without retaining the stack.</p>
+            <h3>KiasuMiles</h3>
+            <p>Works out the shop, ranks your cards, and sends back one answer.</p>
           </div>
         </figure>
       </div>
@@ -742,23 +738,37 @@
     <section class="start-section" id="start" aria-labelledby="start-title">
       <div class="section-inner">
         <div class="start-intro">
-          <p class="eyebrow">Set up once</p>
-          <h2 class="section-heading" id="start-title">Two steps. Then just ask.</h2>
-          <p class="section-copy">Paste the setup prompt into your agent. It will connect KiasuMiles and help you choose your supported cards.</p>
+          <h2 class="section-heading" id="start-title">Set it up once, then just ask.</h2>
+          <p class="section-copy">If your AI agent supports remote MCP connections, connect KiasuMiles, confirm your cards, then ask whenever you are paying.</p>
         </div>
+
+        <section class="agent-compatibility" aria-labelledby="agent-requirements-title">
+          <div class="agent-compatibility-copy">
+            <h3 id="agent-requirements-title">What your agent needs</h3>
+            <p>Your AI agent must support remote MCP connections. Depending on the agent and your account permissions, you may need to add the connection in its settings.</p>
+          </div>
+        </section>
 
         <div class="steps">
           <article class="step">
             <span class="step-number">1</span>
-            <h3>Give this to your agent</h3>
-            <p>The wording works across compatible agent clients and keeps setup conversational.</p>
+            <h3>Connect KiasuMiles</h3>
             <div class="prompt-wrap">
-              <label class="eyebrow" for="setup-prompt">KiasuMiles setup prompt</label>
-              <textarea class="setup-prompt" id="setup-prompt" readonly>Install KiasuMiles MCP for me: https://kiasumiles.space/mcp
+              <label class="eyebrow" for="setup-prompt">Setup message</label>
+              <p>Copy this to your AI agent. It will either connect and verify the tools, or tell you plainly that it cannot.</p>
+              <textarea class="setup-prompt" id="setup-prompt" readonly>Connect me to KiasuMiles at https://kiasumiles.space/mcp if your environment supports remote MCP connections and its tools are not already available.
 
-Use KiasuMiles. First help me set up my card stack. Ask me which banks I have cards with, show me the matching supported cards, then remember my selected cards for future KiasuMiles lookups.</textarea>
+Ask before changing any settings. Do not say KiasuMiles is connected until you can actually list and use its tools.
+
+If you cannot add the connection yourself, say so plainly and stop. Do not invent setup instructions.
+
+Once connected, help me set up my card stack. Ask which banks I use, show me the matching supported cards, and ask me to confirm my selections.
+
+Before saving anything, explain only what the available tools document about storage and whether my selections will persist. Do not guess.
+
+After confirming my cards, ask for a Singapore merchant and recommend my best card.</textarea>
               <div class="copy-row">
-                <button class="button blue" id="copy-prompt" type="button" aria-label="Copy KiasuMiles setup prompt" data-copy="Install KiasuMiles MCP for me: https://kiasumiles.space/mcp&#10;&#10;Use KiasuMiles. First help me set up my card stack. Ask me which banks I have cards with, show me the matching supported cards, then remember my selected cards for future KiasuMiles lookups.">Copy setup prompt</button>
+                <button class="button accent" id="copy-prompt" type="button" aria-label="Copy KiasuMiles setup message" data-copy="Connect me to KiasuMiles at https://kiasumiles.space/mcp if your environment supports remote MCP connections and its tools are not already available.&#10;&#10;Ask before changing any settings. Do not say KiasuMiles is connected until you can actually list and use its tools.&#10;&#10;If you cannot add the connection yourself, say so plainly and stop. Do not invent setup instructions.&#10;&#10;Once connected, help me set up my card stack. Ask which banks I use, show me the matching supported cards, and ask me to confirm my selections.&#10;&#10;Before saving anything, explain only what the available tools document about storage and whether my selections will persist. Do not guess.&#10;&#10;After confirming my cards, ask for a Singapore merchant and recommend my best card.">Copy setup message</button>
                 <p class="copy-status" id="copy-status" aria-live="polite"></p>
               </div>
             </div>
@@ -767,7 +777,7 @@ Use KiasuMiles. First help me set up my card stack. Ask me which banks I have ca
           <article class="step">
             <span class="step-number">2</span>
             <h3>Ask at checkout</h3>
-            <p>Include the merchant and payment method. Your agent supplies the card products it remembers for that lookup.</p>
+            <p>Tell it where you are and how you're paying. It uses the card stack available to your agent and names the winner.</p>
             <blockquote class="example-ask">
               <span>Try this</span>
               “Which card should I use at NTUC FairPrice with Apple Pay?”
@@ -810,7 +820,7 @@ Use KiasuMiles. First help me set up my card stack. Ask me which banks I have ca
       function scheduleReset(delay) {
         clearResetTimer();
         resetTimer = window.setTimeout(function () {
-          button.textContent = "Copy setup prompt";
+          button.textContent = "Copy setup message";
           status.textContent = "";
           resetTimer = undefined;
         }, delay);
@@ -821,7 +831,7 @@ Use KiasuMiles. First help me set up my card stack. Ask me which banks I have ca
         prompt.select();
         prompt.setSelectionRange(0, prompt.value.length);
         button.textContent = "Copy manually";
-        status.textContent = "Copy failed. Select the prompt and copy it manually.";
+        status.textContent = "Copy didn't work. Select the message and copy it manually.";
         scheduleReset(6000);
       }
 
@@ -835,7 +845,7 @@ Use KiasuMiles. First help me set up my card stack. Ask me which banks I have ca
           }
           await navigator.clipboard.writeText(text);
           button.textContent = "Copied";
-          status.textContent = "KiasuMiles setup prompt copied.";
+          status.textContent = "Setup message copied.";
           scheduleReset(2500);
         } catch (error) {
           showManualFallback();

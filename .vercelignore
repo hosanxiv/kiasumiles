@@ -1,6 +1,9 @@
 .agents/
 .claude/
 .codex/
+.impeccable/
+.playwright-cli/
+.superpowers/
 .pytest_cache/
 .venv/
 dist/
@@ -9,6 +12,15 @@ plugins/
 scripts/
 tests/
 /assets/
+interview-*
+straits-times-*
+live-codex-captures/
+screenshots/
+tmp/
+output/
+**/supabase_logs.csv
+**/*supabase*logs*.csv
+*.log
 __pycache__/
 **/__pycache__/
 *.pyc

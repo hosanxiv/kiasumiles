@@ -20,6 +20,7 @@ PROOF_ASSETS = {
     "kiasumiles-real-life-720.webp": "image/webp",
     "kiasumiles-real-life-1460.webp": "image/webp",
     "kiasumiles-real-life-1460.jpg": "image/jpeg",
+    "kiasumiles-cold-storage-chat.jpg": "image/jpeg",
 }
 IMMUTABLE_CACHE_CONTROL = "public, max-age=31536000, immutable"
 REVALIDATE_CACHE_CONTROL = "public, max-age=0, must-revalidate"
