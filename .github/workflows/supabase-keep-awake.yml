@@ -1,0 +1,33 @@
+name: Supabase keep-awake
+
+on:
+  schedule:
+    # 08:17, 16:17, and 00:17 Singapore time. Avoid the busy top of the hour.
+    - cron: "17 0,8,16 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: supabase-keep-awake
+  cancel-in-progress: false
+
+jobs:
+  keep-awake:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Query Supabase
+        env:
+          KIASUMILES_SUPABASE_URL: ${{ secrets.KIASUMILES_SUPABASE_URL }}
+          KIASUMILES_SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.KIASUMILES_SUPABASE_SERVICE_ROLE_KEY }}
+        run: python .github/supabase_keepalive.py

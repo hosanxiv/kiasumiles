@@ -304,6 +304,32 @@ Backend selection:
 
 The database schema is at [supabase/schema.sql](supabase/schema.sql). Both `/health` and `kiasumiles_data_version` report the selected backend.
 
+### Supabase keep-awake
+
+The `Supabase keep-awake` GitHub Actions workflow performs one direct, read-only
+`card_rules` query at 08:17, 16:17, and 00:17 Singapore time each day. It does
+not use the hosted `/health` route, because a warm hosted process can serve
+cached data without touching Supabase. The query selects one identifier and
+never inserts, updates, or deletes data.
+
+Configure the encrypted repository secrets:
+
+1. In the GitHub repository, open **Settings → Secrets and variables → Actions**.
+2. Choose **New repository secret** and create
+   `KIASUMILES_SUPABASE_URL` with the production project API URL.
+3. Choose **New repository secret** again and create
+   `KIASUMILES_SUPABASE_SERVICE_ROLE_KEY` with the production service-role key
+   used by the hosted backend.
+
+Never put either value in the workflow file, source code, logs, or a pull
+request. The script prints only a generic success message or a sanitized error;
+a failed query exits non-zero so the workflow is visibly red in GitHub Actions.
+
+The scheduled trigger starts only after the workflow is on the repository's
+default branch. After merging, open **Actions → Supabase keep-awake → Run
+workflow** once and confirm the run succeeds. Keep GitHub Actions failure
+notifications enabled so a failed scheduled run is noticed.
+
 ## Feedback
 
 If a recommendation appears wrong or a merchant is missing, message [@kiasumilesbot](https://t.me/kiasumilesbot) on Telegram with the merchant name and the recommendation you received.
