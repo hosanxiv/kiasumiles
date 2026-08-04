@@ -16,6 +16,14 @@ from . import tools
 
 
 STATIC_DIR = Path(__file__).resolve().parent / "static" / "kiasumiles"
+PROOF_ASSETS = {
+    "kiasumiles-real-life-720.webp": "image/webp",
+    "kiasumiles-real-life-1460.webp": "image/webp",
+    "kiasumiles-real-life-1460.jpg": "image/jpeg",
+    "kiasumiles-cold-storage-chat.jpg": "image/jpeg",
+}
+IMMUTABLE_CACHE_CONTROL = "public, max-age=31536000, immutable"
+REVALIDATE_CACHE_CONTROL = "public, max-age=0, must-revalidate"
 
 
 def _port() -> int:
@@ -68,7 +76,19 @@ register_chatgpt_action_routes(mcp)
 
 @mcp.custom_route("/", methods=["GET"])
 async def landing(_: Request) -> HTMLResponse:
-    return HTMLResponse((STATIC_DIR / "index.html").read_text(encoding="utf-8"))
+    return HTMLResponse(
+        (STATIC_DIR / "index.html").read_text(encoding="utf-8"),
+        headers={"Cache-Control": REVALIDATE_CACHE_CONTROL},
+    )
+
+
+@mcp.custom_route("/favicon.svg", methods=["GET"])
+async def favicon(_: Request) -> FileResponse:
+    return FileResponse(
+        STATIC_DIR / "favicon.svg",
+        media_type="image/svg+xml",
+        headers={"Cache-Control": IMMUTABLE_CACHE_CONTROL},
+    )
 
 
 @mcp.custom_route("/kiasumiles/hero.png", methods=["GET"])
@@ -79,6 +99,19 @@ async def hero_image(_: Request) -> FileResponse:
 @mcp.custom_route("/kiasumiles/product-demo-60s.mp4", methods=["GET"])
 async def product_demo(_: Request) -> FileResponse:
     return FileResponse(STATIC_DIR / "product-demo-60s.mp4", media_type="video/mp4")
+
+
+@mcp.custom_route("/kiasumiles/assets/proof/{filename}", methods=["GET"])
+async def proof_asset(request: Request) -> FileResponse | PlainTextResponse:
+    filename = request.path_params["filename"]
+    media_type = PROOF_ASSETS.get(filename)
+    if media_type is None:
+        return PlainTextResponse("Not found", status_code=404)
+    return FileResponse(
+        STATIC_DIR / "assets" / "proof" / filename,
+        media_type=media_type,
+        headers={"Cache-Control": IMMUTABLE_CACHE_CONTROL},
+    )
 
 
 @mcp.custom_route("/assets/logos/{filename:path}", methods=["GET"])
@@ -95,39 +128,8 @@ async def logo_asset(request: Request) -> FileResponse:
 @mcp.custom_route("/privacy", methods=["GET"])
 async def privacy(_: Request) -> HTMLResponse:
     return HTMLResponse(
-        """<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>KiasuMiles Privacy Policy</title>
-  <style>
-    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; margin: 0; color: #151515; background: #faf9f6; }
-    main { max-width: 760px; margin: 0 auto; padding: 56px 24px; }
-    h1 { font-size: 36px; margin: 0 0 16px; }
-    h2 { margin-top: 32px; }
-    p, li { font-size: 17px; line-height: 1.55; }
-    a { color: #0f5b4f; }
-  </style>
-</head>
-<body>
-  <main>
-    <h1>Privacy Policy</h1>
-    <p>Last updated: 10 June 2026</p>
-    <p>KiasuMiles provides Singapore credit-card miles recommendations through a hosted MCP service.</p>
-    <h2>Wallet Data</h2>
-    <p>KiasuMiles does not store user wallet data. When a client requests a recommendation, it may send card IDs for that request only so the service can rank cards against current rules.</p>
-    <h2>Request Data</h2>
-    <p>Requests may include merchant names, payment channel hints, and card IDs. The service uses this data only to compute recommendations and diagnostics for that request.</p>
-    <h2>Logs</h2>
-    <p>Operational logs are used to maintain reliability and debug errors. We aim to avoid logging raw wallet payloads or sensitive personal information.</p>
-    <h2>Data Sources and Updates</h2>
-    <p>KiasuMiles maintains its own merchant and card-rule database and may update it centrally without requiring users to reinstall software.</p>
-    <h2>Contact</h2>
-    <p>Questions or correction requests can be sent to <a href="mailto:hello@theaiburrow.xyz">hello@theaiburrow.xyz</a>.</p>
-  </main>
-</body>
-</html>"""
+        (STATIC_DIR / "privacy.html").read_text(encoding="utf-8"),
+        headers={"Cache-Control": REVALIDATE_CACHE_CONTROL},
     )
 
 

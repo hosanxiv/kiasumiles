@@ -1,7 +1,7 @@
 {
   "name": "kiasumiles",
   "version": "1.0.2",
-  "description": "Singapore credit-card miles optimizer with a persistent local wallet.",
+  "description": "Hosted Singapore credit-card miles recommendations for the cards you choose.",
   "author": {
     "name": "Hosan"
   },
@@ -9,7 +9,7 @@
   "interface": {
     "displayName": "KiasuMiles",
     "shortDescription": "Ask Codex which Singapore miles card to use at a merchant.",
-    "longDescription": "Your KiasuMiles card wallet is saved on this device and automatically used for recommendations from the live hosted service. The hosted service does not store your wallet.",
+    "longDescription": "KiasuMiles checks the cards you choose against its hosted card rules and merchant data. Your agent supplies those cards for each lookup; the hosted service does not store a wallet.",
     "developerName": "Hosan",
     "category": "Productivity",
     "capabilities": [
