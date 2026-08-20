@@ -89,11 +89,13 @@ def test_landing_page_and_media_routes_are_served():
 
     assert landing.status_code == 200
     assert "The right card, before you tap." in landing.text
-    assert "Connect me to KiasuMiles at https://kiasumiles.space/mcp" in landing.text
+    assert "Connect KiasuMiles at https://kiasumiles.space/mcp" in landing.text
     assert "https://kiasumiles.space/mcp" in landing.text
-    assert "KiasuMiles never needs your card number, expiry date or CVV." in landing.text
-    assert "How those names are remembered depends on your AI agent." in landing.text
+    assert "We never see your card numbers." in landing.text
+    assert "KiasuMiles reads the rules, returns an answer, and does not store your card stack." in landing.text
     assert "Wallet stays client-side" not in landing.text
+    assert "Service status" not in landing.text
+    assert 'href="/health"' not in landing.text
     assert hero.status_code == 200
     assert hero.headers["content-type"] == "image/png"
     assert video.status_code == 200
