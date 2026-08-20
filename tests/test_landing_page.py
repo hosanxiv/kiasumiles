@@ -9,27 +9,18 @@ README = ROOT / "README.md"
 
 CURRENT_PALETTE = (
     "#061427",
-    "#1168ff",
+    "#263a55",
+    "#62728a",
     "#2bd6ad",
-    "#5fb43a",
-    "#b7e76a",
     "#003f37",
+    "#f4f9ff",
 )
 
 MERCHANT_ASSETS = (
     "fairprice-real-crop.png",
-    "grab-colour.svg",
     "watsons-crop.png",
     "shell-colour.svg",
-    "shopee-real-crop.png",
     "Singapore_Airlines_Logo.svg",
-)
-
-SIGNATURE_HEADINGS = (
-    "It recognises the merchant, not just the category.",
-    "Your cards. One answer.",
-    "Ask. Get an answer.",
-    "Two steps. Then just ask.",
 )
 
 FORBIDDEN = (
@@ -40,11 +31,14 @@ FORBIDDEN = (
     "UOB Preferred Platinum Visa",
     "Cap within limit",
     "Wallet stays client-side",
-    "Screen blurred for privacy",
+    "Service status",
+    'href="/health"',
+    "Codex and compatible agents",
+    "assets/mascot/",
 )
 
 
-def test_landing_preserves_press_recognisable_visual_contract():
+def test_landing_preserves_the_approved_visual_contract():
     landing = LANDING.read_text(encoding="utf-8")
 
     for colour in CURRENT_PALETTE:
@@ -53,9 +47,14 @@ def test_landing_preserves_press_recognisable_visual_contract():
         assert asset in landing
 
     assert "The right card, before you tap." in landing
-    for section_id in ("radar", "answer", "flow", "privacy", "start"):
+    assert '<span class="brand-mark" aria-hidden="true">KM</span>' in landing
+    for section_id in ("answer", "flow", "privacy", "start"):
         assert f'id="{section_id}"' in landing
-    for heading in SIGNATURE_HEADINGS:
+    for heading in (
+        "Your cards. One answer.",
+        "Ask, and you're done.",
+        "Set it up once, then just ask.",
+    ):
         assert heading in landing
 
 
@@ -63,23 +62,32 @@ def test_landing_copy_is_truthful_and_accessible():
     landing = LANDING.read_text(encoding="utf-8")
 
     required_copy = (
+        "Ask your AI agent which card to tap. KiasuMiles answers from the cards you actually own.",
+        "Copy this to your AI agent. It will either connect and verify the tools, or tell you plainly that it cannot.",
+        "Connect KiasuMiles at https://kiasumiles.space/mcp.",
+        "kiasumiles_data_version successfully",
+        "Claude and other agents",
+        "Read the setup guide on GitHub",
+        "We never see your card numbers.",
+        "does not store your card stack",
         "UOB Preferred Visa",
+        "uob-preferred-platinum-visa-card.png",
         "Apple Pay",
-        "Example using a demo card stack",
-        "kiasumiles-real-life-720.webp",
+        "Example · sample cards",
+        "/kiasumiles/assets/proof/kiasumiles-cold-storage-chat.jpg",
+        "A real KiasuMiles recommendation for Cold Storage.",
         "/privacy",
-        "/health",
         "github.com/hosanxiv/kiasumiles",
         "t.me/kiasumilesbot",
-        'aria-label="Copy KiasuMiles setup prompt"',
+        'aria-label="Copy KiasuMiles setup message"',
         'aria-live="polite"',
-        "Copy failed. Select the prompt and copy it manually.",
+        "Copy didn't work. Select the message and copy it manually.",
     )
     for copy in required_copy:
         assert copy in landing
 
 
-def test_landing_is_small_and_has_no_stale_or_internal_copy():
+def test_landing_is_small_and_has_no_removed_or_internal_copy():
     landing_bytes = LANDING.read_bytes()
     landing = landing_bytes.decode("utf-8")
 
