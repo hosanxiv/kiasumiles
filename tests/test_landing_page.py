@@ -18,9 +18,11 @@ CURRENT_PALETTE = (
 
 MERCHANT_ASSETS = (
     "fairprice-real-crop.png",
+    "grab-colour.svg",
     "watsons-crop.png",
     "shell-colour.svg",
     "Singapore_Airlines_Logo.svg",
+    "din-tai-fung-logo.svg",
 )
 
 FORBIDDEN = (
@@ -63,6 +65,7 @@ def test_landing_copy_is_truthful_and_accessible():
 
     required_copy = (
         "Ask your AI agent which card to tap. KiasuMiles answers from the cards you actually own.",
+        "Maximise your miles, without the guesswork.",
         "Copy this to your AI agent. It will either connect and verify the tools, or tell you plainly that it cannot.",
         "Connect KiasuMiles at https://kiasumiles.space/mcp.",
         "kiasumiles_data_version successfully",
