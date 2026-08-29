@@ -78,7 +78,6 @@ class DataLoader:
     def __init__(self, backend: str | None = None) -> None:
         self._merchants: list[MerchantRecord] | None = None
         self._cards: list[CardRule] | None = None
-        self._changes: list[RuleChange] | None = None
         self._backend = backend or os.environ.get("KIASUMILES_DATA_BACKEND", "auto").strip().lower()
 
     def merchants(self) -> list[MerchantRecord]:
@@ -92,9 +91,7 @@ class DataLoader:
         return self._cards
 
     def changes(self) -> list[RuleChange]:
-        if self._changes is None:
-            self._changes = self._load_changes()
-        return self._changes
+        return self._load_changes()
 
     def backend_name(self) -> str:
         if self._should_use_supabase():
@@ -260,16 +257,11 @@ class DataLoader:
         return rules
 
     def _load_changes(self) -> list[RuleChange]:
-        rows = None
         if self._should_use_supabase():
-            try:
-                rows = self._fetch_supabase_rows(
-                    self._supabase_table("rule_changes", "KIASUMILES_SUPABASE_CHANGES_TABLE")
-                )
-            except (KeyError, TypeError, ValueError, RuntimeError, URLError):
-                if self._backend == "supabase":
-                    raise
-        if rows is None:
+            rows = self._fetch_supabase_rows(
+                self._supabase_table("rule_changes", "KIASUMILES_SUPABASE_CHANGES_TABLE")
+            )
+        else:
             with open(self._csv_path("rule_changes.csv"), newline="", encoding="utf-8") as f:
                 rows = list(csv.DictReader(f))
         return [

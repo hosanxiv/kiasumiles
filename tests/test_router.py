@@ -156,6 +156,53 @@ def test_amount_estimate_respects_five_dollar_earn_blocks(cards):
     assert result["estimated_miles"] == 40.0
 
 
+def test_dbs_amount_estimate_respects_declared_five_dollar_block(cards):
+    altitude = next(c for c in cards if c.card_id == "dbs_altitude_visa")
+
+    result = rank_cards(
+        "9999", [altitude], wallet_has_amaze=False, top_n=1, amount_sgd=9.0,
+    )[0]
+
+    assert result["estimated_miles"] == 6.0
+
+
+def test_amaze_fee_does_not_reduce_miles_credited(cards):
+    amaze = next(c for c in cards if c.card_id == "amaze_citi")
+
+    result = rank_cards(
+        "5812", [amaze], wallet_has_amaze=True, top_n=1,
+        channel="contactless", amount_sgd=20.0,
+    )[0]
+
+    assert result["earn_rate_mpd"] == pytest.approx(3.96)
+    assert result["estimated_miles"] == 80.0
+
+
+def test_single_transaction_never_proves_monthly_minimum_spend():
+    rule = CardRule(
+        card_id="minimum-spend",
+        card_name="Minimum Spend Card",
+        bank="Test",
+        network="Visa",
+        eligible_mccs=["5812"],
+        earn_rate_mpd=4.0,
+        base_rate_mpd=0.4,
+        cap_sgd=None,
+        cap_period="",
+        min_spend=1000.0,
+        requires_amaze=False,
+        amaze_fee_pct=0.0,
+    )
+
+    result = rank_cards(
+        "5812", [rule], wallet_has_amaze=False, top_n=1,
+        channel="contactless", rate_mode="guaranteed", amount_sgd=1200.0,
+    )[0]
+
+    assert result["earn_rate_mpd"] == pytest.approx(rule.base_rate_mpd)
+    assert "bonus_conditions_unknown" in result["reason_codes"]
+
+
 def test_guaranteed_rate_falls_back_when_cap_progress_is_unknown(cards):
     uob_ppv = next(c for c in cards if c.card_id == "uob_ppv")
 

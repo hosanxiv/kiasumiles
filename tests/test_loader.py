@@ -130,6 +130,44 @@ def test_data_loader_falls_back_to_demo_csv_when_supabase_fetch_fails(monkeypatc
     assert loader.merchants()
 
 
+def test_changes_are_read_fresh_from_supabase(monkeypatch):
+    monkeypatch.setenv("KIASUMILES_SUPABASE_URL", "https://example.supabase.co")
+    monkeypatch.setenv("KIASUMILES_SUPABASE_SERVICE_ROLE_KEY", "service-role")
+    calls = 0
+
+    def fake_fetch(self, table_name):
+        nonlocal calls
+        assert table_name == "rule_changes"
+        calls += 1
+        return [{
+            "changed_on": f"2026-08-{calls:02d}",
+            "effective_on": "",
+            "entity_type": "card_rule",
+            "entity_name": "Example Card",
+            "change_type": "updated",
+            "summary": "Public terms refreshed.",
+        }]
+
+    monkeypatch.setattr(DataLoader, "_fetch_supabase_rows", fake_fetch)
+    loader = DataLoader()
+
+    assert loader.changes()[0].changed_on == "2026-08-01"
+    assert loader.changes()[0].changed_on == "2026-08-02"
+
+
+def test_changes_do_not_mask_supabase_failure_with_demo_history(monkeypatch):
+    monkeypatch.setenv("KIASUMILES_SUPABASE_URL", "https://example.supabase.co")
+    monkeypatch.setenv("KIASUMILES_SUPABASE_SERVICE_ROLE_KEY", "service-role")
+    monkeypatch.setattr(
+        DataLoader,
+        "_fetch_supabase_rows",
+        lambda self, table_name: (_ for _ in ()).throw(RuntimeError("boom")),
+    )
+
+    with pytest.raises(RuntimeError, match="boom"):
+        DataLoader().changes()
+
+
 def test_fetch_supabase_rows_paginates(monkeypatch):
     monkeypatch.setenv("KIASUMILES_SUPABASE_URL", "https://example.supabase.co")
     monkeypatch.setenv("KIASUMILES_SUPABASE_SERVICE_ROLE_KEY", "service-role")

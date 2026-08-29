@@ -185,13 +185,13 @@ def _condition_summary(rule: CardRule) -> str | None:
 def _rounded_miles(rule: CardRule, amount_sgd: float, rate_mpd: float) -> float:
     if amount_sgd <= 0:
         return 0.0
+    eligible_spend = math.floor(amount_sgd / rule.earn_block_sgd) * rule.earn_block_sgd
     if rule.card_id == "dbs_wwmc" and rate_mpd > rule.base_rate_mpd:
-        base = math.floor(amount_sgd * rule.base_rate_mpd / 2) * 2
-        bonus = math.floor(amount_sgd * (rate_mpd - rule.base_rate_mpd) / 2) * 2
+        base = math.floor(eligible_spend * rule.base_rate_mpd / 2) * 2
+        bonus = math.floor(eligible_spend * (rate_mpd - rule.base_rate_mpd) / 2) * 2
         return float(base + bonus)
     if rule.bank == "DBS" and rule.card_id != "dbs_yuu_visa":
-        return float(math.floor(amount_sgd * rate_mpd / 2) * 2)
-    eligible_spend = math.floor(amount_sgd / rule.earn_block_sgd) * rule.earn_block_sgd
+        return float(math.floor(eligible_spend * rate_mpd / 2) * 2)
     return round(eligible_spend * rate_mpd, 2)
 
 
@@ -239,9 +239,7 @@ def rank_cards(
             rule, mcc, wallet_has_amaze, merchant_name, channel
         )
         condition_summary = _condition_summary(rule)
-        min_spend_unknown = bool(
-            rule.min_spend and (amount_sgd is None or amount_sgd < rule.min_spend)
-        )
+        min_spend_unknown = bool(rule.min_spend)
         cap_unknown = rule.cap_sgd is not None
         conditional = bool(
             mpd > rule.base_rate_mpd and (min_spend_unknown or cap_unknown)
@@ -268,7 +266,17 @@ def rank_cards(
             "rate_status": "conditional" if conditional and rate_mode == "conditional" else "guaranteed",
             "condition_summary": condition_summary,
             "amount_sgd": amount_sgd,
-            "estimated_miles": _estimated_miles(rule, amount_sgd, mpd) if amount_sgd is not None else None,
+            "estimated_miles": (
+                _estimated_miles(
+                    rule,
+                    amount_sgd,
+                    rule.earn_rate_mpd
+                    if rule.requires_amaze and mpd > rule.base_rate_mpd
+                    else mpd,
+                )
+                if amount_sgd is not None
+                else None
+            ),
         })
 
     scored.sort(
