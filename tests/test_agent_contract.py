@@ -8,6 +8,8 @@ def test_agent_guide_lists_tools_and_display_rules():
 
     assert guide["name"] == "KiasuMiles Hosted"
     assert "kiasumiles_lookup" in tool_names
+    assert "kiasumiles_compare_payment_methods" in tool_names
+    assert "kiasumiles_changes_since" in tool_names
     assert "kiasumiles_agent_guide" in tool_names
     assert guide["display_rules"]
     assert guide["accepted_categories"]["dining"] == "5812"

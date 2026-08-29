@@ -41,8 +41,10 @@ def test_data_loader_loads_demo_csvs():
     loader = DataLoader()
     merchants = loader.merchants()
     cards = loader.cards()
+    changes = loader.changes()
     assert len(merchants) > 0
     assert len(cards) > 0
+    assert len(changes) > 0
 
 
 def test_data_loader_merchant_names_are_strings():

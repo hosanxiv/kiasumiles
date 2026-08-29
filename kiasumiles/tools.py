@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+import math
+from datetime import date
+
 from .agent_contract import CATEGORY_MCC, hosted_agent_guide
 from .data.loader import DataLoader
 from .engine.merchant import find_merchant, infer_mcc_from_name
@@ -46,12 +49,17 @@ def _lookup_for_cards(
     outlet: str | None = None,
     channel: str | None = None,
     category: str | None = None,
+    amount_sgd: float | None = None,
 ) -> dict:
     wallet_has_amaze = "amaze" in cards
     valid_ids = {c.card_id for c in _loader.cards()}
-    skipped = [cid for cid in cards if cid not in valid_ids]
+    skipped = [cid for cid in cards if cid not in valid_ids and cid != "amaze"]
 
     wallet_cards = [c for c in _loader.cards() if c.card_id in cards]
+    if wallet_has_amaze and "citi_rewards_mc" in cards and "amaze_citi" not in cards:
+        pairing = next((c for c in _loader.cards() if c.card_id == "amaze_citi"), None)
+        if pairing:
+            wallet_cards.append(pairing)
     top_n = 5
 
     record, is_exact = find_merchant(
@@ -63,7 +71,12 @@ def _lookup_for_cards(
         if fallback_mcc:
             recommendations = rank_cards(
                 fallback_mcc, wallet_cards, wallet_has_amaze, top_n,
-                merchant_name=merchant, channel=None,
+                merchant_name=merchant, channel=channel,
+                rate_mode="guaranteed", amount_sgd=amount_sgd,
+            )
+            conditional_recommendations = rank_cards(
+                fallback_mcc, wallet_cards, wallet_has_amaze, top_n,
+                merchant_name=merchant, channel=channel, amount_sgd=amount_sgd,
             )
             return {
                 "merchant": merchant,
@@ -71,6 +84,8 @@ def _lookup_for_cards(
                 "merchant_matched": False,
                 "routing_note": "No merchant data - routed by category inference. Verify before relying on this.",
                 "recommendations": recommendations,
+                "conditional_recommendations": conditional_recommendations,
+                "recommendation_basis": "guaranteed_without_spend_progress",
                 "wallet_configured": bool(cards),
                 "skipped_cards": skipped,
             }
@@ -89,7 +104,14 @@ def _lookup_for_cards(
     )
 
     ranking_channel = channel or record.channel
-    recommendations = rank_cards(record.mcc, wallet_cards, wallet_has_amaze, top_n, record.merchant_name, ranking_channel)
+    recommendations = rank_cards(
+        record.mcc, wallet_cards, wallet_has_amaze, top_n, record.merchant_name,
+        ranking_channel, rate_mode="guaranteed", amount_sgd=amount_sgd,
+    )
+    conditional_recommendations = rank_cards(
+        record.mcc, wallet_cards, wallet_has_amaze, top_n, record.merchant_name,
+        ranking_channel, amount_sgd=amount_sgd,
+    )
 
     return {
         "merchant": record.merchant_name,
@@ -102,6 +124,8 @@ def _lookup_for_cards(
         "gotcha": None,
         "low_confidence_note": low_confidence_note,
         "recommendations": recommendations,
+        "conditional_recommendations": conditional_recommendations,
+        "recommendation_basis": "guaranteed_without_spend_progress",
         "wallet_configured": bool(cards),
         "merchant_matched": is_exact,
         "skipped_cards": skipped,
@@ -114,7 +138,15 @@ def lookup_hosted(
     outlet: str | None = None,
     channel: str | None = None,
     category: str | None = None,
+    amount_sgd: float | None = None,
 ) -> dict:
+    if amount_sgd is not None and (
+        not isinstance(amount_sgd, (int, float))
+        or isinstance(amount_sgd, bool)
+        or not math.isfinite(amount_sgd)
+        or amount_sgd <= 0
+    ):
+        raise ValueError("amount_sgd must be a finite number greater than 0.")
     if not cards:
         return {
             "merchant": merchant,
@@ -127,10 +159,86 @@ def lookup_hosted(
             "data_version": data_version()["data_version"],
         }
 
-    result = _lookup_for_cards(merchant, cards, outlet, channel, category)
+    result = _lookup_for_cards(merchant, cards, outlet, channel, category, amount_sgd)
     result["wallet_stored"] = False
     result["data_version"] = data_version()["data_version"]
     return result
+
+
+def compare_payment_methods(
+    merchant: str,
+    cards: list[str],
+    amount_sgd: float | None = None,
+    outlet: str | None = None,
+    category: str | None = None,
+) -> dict:
+    direct_cards = [card for card in cards if card not in {"amaze", "amaze_citi"}]
+    methods = []
+    for payment_method in ("mobile_contactless", "contactless", "online"):
+        result = lookup_hosted(
+            merchant, direct_cards, outlet, payment_method, category, amount_sgd
+        )
+        methods.append({
+            "payment_method": payment_method,
+            "best_guaranteed": (result.get("recommendations") or [None])[0],
+            "best_if_conditions_met": (result.get("conditional_recommendations") or [None])[0],
+            "routing_note": result.get("routing_note"),
+            "low_confidence_note": result.get("low_confidence_note"),
+        })
+
+    has_amaze_pair = "amaze" in cards and (
+        "citi_rewards_mc" in cards or "amaze_citi" in cards
+    )
+    if has_amaze_pair:
+        result = lookup_hosted(
+            merchant, ["amaze", "amaze_citi"], outlet, "contactless", category, amount_sgd
+        )
+        methods.append({
+            "payment_method": "amaze",
+            "best_guaranteed": (result.get("recommendations") or [None])[0],
+            "best_if_conditions_met": (result.get("conditional_recommendations") or [None])[0],
+            "routing_note": result.get("routing_note"),
+            "low_confidence_note": result.get("low_confidence_note"),
+        })
+
+    valid_ids = {c.card_id for c in _loader.cards()} | {"amaze"}
+    return {
+        "merchant": merchant,
+        "amount_sgd": amount_sgd,
+        "methods": methods,
+        "wallet_stored": False,
+        "skipped_cards": [card for card in cards if card not in valid_ids],
+        "data_version": data_version()["data_version"],
+    }
+
+
+def changes_since(since: str, limit: int = 20) -> dict:
+    try:
+        date.fromisoformat(since)
+    except (TypeError, ValueError) as exc:
+        raise ValueError("since must be an ISO date in YYYY-MM-DD format.") from exc
+    if not 1 <= limit <= 100:
+        raise ValueError("limit must be between 1 and 100.")
+    changes = sorted(
+        (change for change in _loader.changes() if change.changed_on >= since),
+        key=lambda change: (change.changed_on, change.entity_name),
+        reverse=True,
+    )[:limit]
+    return {
+        "since": since,
+        "changes": [
+            {
+                "changed_on": change.changed_on,
+                "effective_on": change.effective_on or None,
+                "entity_type": change.entity_type,
+                "entity_name": change.entity_name,
+                "change_type": change.change_type,
+                "summary": change.summary,
+            }
+            for change in changes
+        ],
+        "data_version": data_version()["data_version"],
+    }
 
 
 def recommend_stack(cards: list[str], top_n: int = 3) -> dict:

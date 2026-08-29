@@ -49,8 +49,23 @@ def kiasumiles_lookup(
     outlet: str | None = None,
     channel: str | None = None,
     category: str | None = None,
+    amount_sgd: float | None = None,
 ) -> dict:
-    return tools.lookup_hosted(merchant, cards, outlet, channel, category)
+    return tools.lookup_hosted(merchant, cards, outlet, channel, category, amount_sgd)
+
+
+def kiasumiles_compare_payment_methods(
+    merchant: str,
+    cards: list[str],
+    amount_sgd: float | None = None,
+    outlet: str | None = None,
+    category: str | None = None,
+) -> dict:
+    return tools.compare_payment_methods(merchant, cards, amount_sgd, outlet, category)
+
+
+def kiasumiles_changes_since(since: str, limit: int = 20) -> dict:
+    return tools.changes_since(since, limit)
 
 
 def kiasumiles_recommend_stack(cards: list[str], top_n: int = 3) -> dict:

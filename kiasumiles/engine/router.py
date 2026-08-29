@@ -1,4 +1,5 @@
 from __future__ import annotations
+import math
 from ..data.loader import CardRule
 
 
@@ -172,6 +173,39 @@ def _reason_summary(card_name: str, mpd: float, reasons: list[str], gotchas: lis
     return f"{card_name} earns {mpd:g} mpd for this transaction."
 
 
+def _condition_summary(rule: CardRule) -> str | None:
+    conditions = []
+    if rule.min_spend:
+        conditions.append(f"S${rule.min_spend:g} minimum spend")
+    if rule.cap_sgd is not None:
+        conditions.append(_cap_summary(rule))
+    return " · ".join(conditions) or None
+
+
+def _rounded_miles(rule: CardRule, amount_sgd: float, rate_mpd: float) -> float:
+    if amount_sgd <= 0:
+        return 0.0
+    if rule.card_id == "dbs_wwmc" and rate_mpd > rule.base_rate_mpd:
+        base = math.floor(amount_sgd * rule.base_rate_mpd / 2) * 2
+        bonus = math.floor(amount_sgd * (rate_mpd - rule.base_rate_mpd) / 2) * 2
+        return float(base + bonus)
+    if rule.bank == "DBS" and rule.card_id != "dbs_yuu_visa":
+        return float(math.floor(amount_sgd * rate_mpd / 2) * 2)
+    eligible_spend = math.floor(amount_sgd / rule.earn_block_sgd) * rule.earn_block_sgd
+    return round(eligible_spend * rate_mpd, 2)
+
+
+def _estimated_miles(rule: CardRule, amount_sgd: float, rate_mpd: float) -> float:
+    if rate_mpd > rule.base_rate_mpd and rule.cap_sgd is not None:
+        bonus_spend = min(amount_sgd, rule.cap_sgd)
+        return round(
+            _rounded_miles(rule, bonus_spend, rate_mpd)
+            + _rounded_miles(rule, amount_sgd - bonus_spend, rule.base_rate_mpd),
+            2,
+        )
+    return _rounded_miles(rule, amount_sgd, rate_mpd)
+
+
 def effective_mpd(
     rule: CardRule,
     mcc: str,
@@ -191,8 +225,12 @@ def rank_cards(
     top_n: int,
     merchant_name: str | None = None,
     channel: str | None = None,
+    rate_mode: str = "conditional",
+    amount_sgd: float | None = None,
 ) -> list[dict]:
     """Rank cards by effective mpd for a given MCC. Returns top_n results."""
+    if rate_mode not in {"conditional", "guaranteed"}:
+        raise ValueError("rate_mode must be 'conditional' or 'guaranteed'.")
     scored = []
     for rule in card_rules:
         if rule.card_id == "amaze":
@@ -200,6 +238,19 @@ def rank_cards(
         mpd, reason_codes, reasons, gotchas = _rule_diagnostics(
             rule, mcc, wallet_has_amaze, merchant_name, channel
         )
+        condition_summary = _condition_summary(rule)
+        min_spend_unknown = bool(
+            rule.min_spend and (amount_sgd is None or amount_sgd < rule.min_spend)
+        )
+        cap_unknown = rule.cap_sgd is not None
+        conditional = bool(
+            mpd > rule.base_rate_mpd and (min_spend_unknown or cap_unknown)
+        )
+        if rate_mode == "guaranteed" and conditional:
+            mpd = rule.base_rate_mpd
+            reason_codes.append("bonus_conditions_unknown")
+            reasons = []
+            gotchas.append("Bonus conditions or remaining cap were not confirmed.")
         scored.append({
             "card_id": rule.card_id,
             "card_name": rule.card_name,
@@ -214,7 +265,17 @@ def rank_cards(
             "reason_summary": _reason_summary(rule.card_name, round(mpd, 4), reasons, gotchas),
             "reason_codes": reason_codes,
             "gotchas": gotchas,
+            "rate_status": "conditional" if conditional and rate_mode == "conditional" else "guaranteed",
+            "condition_summary": condition_summary,
+            "amount_sgd": amount_sgd,
+            "estimated_miles": _estimated_miles(rule, amount_sgd, mpd) if amount_sgd is not None else None,
         })
 
-    scored.sort(key=lambda x: x["earn_rate_mpd"], reverse=True)
+    scored.sort(
+        key=lambda x: (
+            x["estimated_miles"] if x["estimated_miles"] is not None else x["earn_rate_mpd"],
+            x["earn_rate_mpd"],
+        ),
+        reverse=True,
+    )
     return scored[:top_n]

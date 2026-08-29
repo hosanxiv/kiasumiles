@@ -143,3 +143,62 @@ def test_citi_rewards_mobile_contactless_grocery_falls_to_base(cards):
     assert "channel_not_eligible" in results[0]["reason_codes"]
     assert "bonus_rate_applied" not in results[0]["reason_codes"]
     assert "shopping-like categories" in results[0]["gotchas"][0]
+
+
+def test_amount_estimate_respects_five_dollar_earn_blocks(cards):
+    uob_ppv = next(c for c in cards if c.card_id == "uob_ppv")
+
+    result = rank_cards(
+        "5812", [uob_ppv], wallet_has_amaze=False, top_n=1,
+        channel="mobile_contactless", amount_sgd=12.50,
+    )[0]
+
+    assert result["estimated_miles"] == 40.0
+
+
+def test_guaranteed_rate_falls_back_when_cap_progress_is_unknown(cards):
+    uob_ppv = next(c for c in cards if c.card_id == "uob_ppv")
+
+    result = rank_cards(
+        "5812", [uob_ppv], wallet_has_amaze=False, top_n=1,
+        channel="mobile_contactless", rate_mode="guaranteed", amount_sgd=12.50,
+    )[0]
+
+    assert result["earn_rate_mpd"] == pytest.approx(uob_ppv.base_rate_mpd)
+    assert result["estimated_miles"] == 4.0
+    assert result["rate_status"] == "guaranteed"
+
+
+def test_conditional_estimate_applies_base_rate_above_available_cap():
+    rule = CardRule(
+        card_id="capped",
+        card_name="Capped Card",
+        bank="Test",
+        network="Visa",
+        eligible_mccs=["5812"],
+        earn_rate_mpd=4.0,
+        base_rate_mpd=1.0,
+        cap_sgd=10.0,
+        cap_period="calendar_month",
+        min_spend=0.0,
+        requires_amaze=False,
+        amaze_fee_pct=0.0,
+    )
+
+    result = rank_cards(
+        "5812", [rule], wallet_has_amaze=False, top_n=1, amount_sgd=15.0,
+    )[0]
+
+    assert result["estimated_miles"] == 45.0
+    assert result["rate_status"] == "conditional"
+
+
+def test_dbs_womans_world_uses_split_points_rounding(cards):
+    wwmc = next(c for c in cards if c.card_id == "dbs_wwmc")
+
+    result = rank_cards(
+        "5812", [wwmc], wallet_has_amaze=False, top_n=1,
+        channel="online", amount_sgd=1.0,
+    )[0]
+
+    assert result["estimated_miles"] == 2.0

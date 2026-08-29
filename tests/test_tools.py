@@ -1,6 +1,7 @@
 import pytest
 
 from kiasumiles.data.loader import DataLoader
+from kiasumiles import tools
 from kiasumiles.tools import list_cards, lookup_hosted, recommend_stack
 
 
@@ -30,7 +31,8 @@ def test_lookup_dining_merchant_returns_recommendations():
 
     assert result["mcc"] == "5411"
     assert len(result["recommendations"]) > 0
-    assert result["recommendations"][0]["earn_rate_mpd"] >= 4.0
+    assert result["recommendations"][0]["earn_rate_mpd"] == pytest.approx(0.4)
+    assert result["conditional_recommendations"][0]["earn_rate_mpd"] >= 4.0
 
 
 def test_lookup_unknown_merchant_returns_not_matched():
@@ -141,3 +143,55 @@ def test_demo_loader_still_has_sample_data():
 
     assert loader.cards()
     assert loader.merchants()
+
+
+def test_lookup_returns_guaranteed_and_conditional_results_with_amount():
+    result = lookup_hosted(
+        "NTUC FairPrice",
+        cards=["uob_ppv", "dbs_altitude_visa"],
+        channel="mobile_contactless",
+        amount_sgd=50.0,
+    )
+
+    assert result["recommendation_basis"] == "guaranteed_without_spend_progress"
+    assert result["recommendations"][0]["rate_status"] == "guaranteed"
+    assert result["conditional_recommendations"][0]["estimated_miles"] is not None
+
+
+@pytest.mark.parametrize("amount", [0, -1, float("nan"), float("inf")])
+def test_lookup_rejects_invalid_amounts(amount):
+    with pytest.raises(ValueError, match="finite number greater than 0"):
+        lookup_hosted("NTUC FairPrice", cards=["uob_ppv"], amount_sgd=amount)
+
+
+def test_payment_method_comparison_includes_amaze_only_when_supplied():
+    without_amaze = tools.compare_payment_methods(
+        "NTUC FairPrice", cards=["citi_rewards_mc"], amount_sgd=20.0
+    )
+    with_amaze = tools.compare_payment_methods(
+        "NTUC FairPrice", cards=["citi_rewards_mc", "amaze"], amount_sgd=20.0
+    )
+
+    assert [row["payment_method"] for row in without_amaze["methods"]] == [
+        "mobile_contactless", "contactless", "online"
+    ]
+    assert [row["payment_method"] for row in with_amaze["methods"]][-1] == "amaze"
+    assert "amaze" not in with_amaze["skipped_cards"]
+
+
+def test_payment_method_comparison_preserves_channel_for_inferred_merchant():
+    result = tools.compare_payment_methods(
+        "brand-new ramen kiosk", cards=["uob_ppv"], amount_sgd=20.0
+    )
+    methods = {row["payment_method"]: row for row in result["methods"]}
+
+    assert methods["mobile_contactless"]["best_if_conditions_met"]["earn_rate_mpd"] == 4.0
+    assert methods["contactless"]["best_if_conditions_met"]["earn_rate_mpd"] == pytest.approx(0.4)
+
+
+def test_changes_since_returns_source_neutral_history():
+    result = tools.changes_since("2026-08-01")
+
+    assert result["changes"]
+    assert all(change["changed_on"] >= "2026-08-01" for change in result["changes"])
+    assert all("source" not in key for change in result["changes"] for key in change)

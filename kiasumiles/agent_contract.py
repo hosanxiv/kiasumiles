@@ -20,6 +20,8 @@ HOSTED_DISPLAY_RULES: tuple[str, ...] = (
     "Display recommendations with card name, earn_rate_mpd, cap_summary, and reason_summary.",
     "If the user has not provided cards, ask which cards they carry before making a final recommendation.",
     "Treat routing_note and low_confidence_note as user-visible caveats.",
+    "Treat recommendations as guaranteed fallbacks when spend progress is unknown. Show conditional_recommendations separately and state their conditions.",
+    "When the user provides a transaction amount, pass amount_sgd and display estimated_miles.",
     "Use kiasumiles_recommend_stack when the user asks whether their current card stack has weak categories.",
     "Do not present kiasumiles_recommend_stack as a card acquisition recommender; hosted recommendations are scoped to cards supplied in the current request.",
 )
@@ -52,6 +54,15 @@ Accepted values: dining, grocery, transport, petrol, pharmacy, hotel, airlines, 
 Present card name, earn_rate_mpd, cap_summary, and reason_summary. Use gotchas to warn about
 wrong payment channel, merchant-only bonus rules, minimum spend, and cap constraints. Never show
 raw card IDs, MCC codes, or technical fields unless the user asks for diagnostics.""",
+    "kiasumiles_compare_payment_methods": """Compare payment methods for the same merchant and supplied card stack.
+
+Use this when the user asks whether to pay by mobile wallet, physical contactless card, online, or
+through Amaze. Pass amount_sgd when known. Amaze is compared only when the user supplied it.
+Present the best guaranteed and conditional result for each method with conditions and caveats.""",
+    "kiasumiles_changes_since": """Summarize source-neutral card and merchant rule changes since an ISO date.
+
+Use this when the user asks what changed or whether the data was updated. Present changed_on,
+effective_on when present, entity_name, and summary. Do not infer or disclose private sources.""",
     "kiasumiles_recommend_stack": """Analyze a stateless wallet card list for weak categories.
 
 Use this when the user asks whether their current card stack is good or what weak categories exist.

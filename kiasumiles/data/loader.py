@@ -43,6 +43,16 @@ class CardRule:
     earn_block_sgd: float = 1.0  # spend rounds down to nearest block before earn rate applies (UOB/DBS = $5, others = $1)
 
 
+@dataclass
+class RuleChange:
+    changed_on: str
+    effective_on: str
+    entity_type: str
+    entity_name: str
+    change_type: str
+    summary: str
+
+
 _PACKAGE_DATA_DIR = Path(__file__).parent
 _DEMO_DATA_DIR = _PACKAGE_DATA_DIR / "demo"
 _REMOTE_TIMEOUT_SECONDS = 10.0
@@ -68,6 +78,7 @@ class DataLoader:
     def __init__(self, backend: str | None = None) -> None:
         self._merchants: list[MerchantRecord] | None = None
         self._cards: list[CardRule] | None = None
+        self._changes: list[RuleChange] | None = None
         self._backend = backend or os.environ.get("KIASUMILES_DATA_BACKEND", "auto").strip().lower()
 
     def merchants(self) -> list[MerchantRecord]:
@@ -79,6 +90,11 @@ class DataLoader:
         if self._cards is None:
             self._cards = self._load_cards()
         return self._cards
+
+    def changes(self) -> list[RuleChange]:
+        if self._changes is None:
+            self._changes = self._load_changes()
+        return self._changes
 
     def backend_name(self) -> str:
         if self._should_use_supabase():
@@ -242,3 +258,28 @@ class DataLoader:
                     earn_block_sgd=float(row.get("earn_block_sgd") or 1),
                 ))
         return rules
+
+    def _load_changes(self) -> list[RuleChange]:
+        rows = None
+        if self._should_use_supabase():
+            try:
+                rows = self._fetch_supabase_rows(
+                    self._supabase_table("rule_changes", "KIASUMILES_SUPABASE_CHANGES_TABLE")
+                )
+            except (KeyError, TypeError, ValueError, RuntimeError, URLError):
+                if self._backend == "supabase":
+                    raise
+        if rows is None:
+            with open(self._csv_path("rule_changes.csv"), newline="", encoding="utf-8") as f:
+                rows = list(csv.DictReader(f))
+        return [
+            RuleChange(
+                changed_on=str(row["changed_on"]).strip(),
+                effective_on=str(row.get("effective_on") or "").strip(),
+                entity_type=str(row["entity_type"]).strip(),
+                entity_name=str(row["entity_name"]).strip(),
+                change_type=str(row["change_type"]).strip(),
+                summary=str(row["summary"]).strip(),
+            )
+            for row in rows
+        ]

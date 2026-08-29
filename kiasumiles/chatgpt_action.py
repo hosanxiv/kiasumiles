@@ -74,6 +74,7 @@ def _openapi_spec() -> dict:
                 "type": "string",
                 "enum": ["dining", "grocery", "transport", "petrol", "pharmacy", "hotel", "airlines", "shopping"],
             },
+            "amount_sgd": {"type": "number", "exclusiveMinimum": 0},
         },
     }
     stack_body = {
@@ -88,7 +89,7 @@ def _openapi_spec() -> dict:
         "openapi": "3.1.0",
         "info": {
             "title": "KiasuMiles ChatGPT Action",
-            "version": "1.0.1",
+            "version": "1.1.0",
             "description": "Stateless Singapore credit-card miles recommendations for cards supplied in the current request.",
         },
         "servers": [{"url": base_url}],
@@ -117,6 +118,28 @@ def _openapi_spec() -> dict:
                         "content": {"application/json": {"schema": lookup_body}},
                     },
                     "responses": {"200": {"description": "Stateless recommendation result"}},
+                }
+            },
+            "/api/chatgpt/compare-payment-methods": {
+                "post": {
+                    "operationId": "comparePaymentMethods",
+                    "summary": "Compare payment methods for the supplied cards.",
+                    "requestBody": {
+                        "required": True,
+                        "content": {"application/json": {"schema": lookup_body}},
+                    },
+                    "responses": {"200": {"description": "Payment-method comparison"}},
+                }
+            },
+            "/api/chatgpt/changes": {
+                "get": {
+                    "operationId": "listRuleChanges",
+                    "summary": "List source-neutral rule changes since a date.",
+                    "parameters": [
+                        {"name": "since", "in": "query", "required": True, "schema": {"type": "string", "format": "date"}},
+                        {"name": "limit", "in": "query", "required": False, "schema": {"type": "integer", "minimum": 1, "maximum": 100, "default": 20}},
+                    ],
+                    "responses": {"200": {"description": "Rule change history"}},
                 }
             },
             "/api/chatgpt/recommend-stack": {
@@ -160,15 +183,48 @@ def register_chatgpt_action_routes(mcp) -> None:
     async def chatgpt_lookup(request: Request) -> JSONResponse:
         body = await request.json()
         cards, unmatched = _resolve_card_inputs(body.get("cards") or [])
-        result = tools.lookup_hosted(
-            str(body.get("merchant") or ""),
-            cards,
-            body.get("outlet"),
-            body.get("channel"),
-            body.get("category"),
-        )
+        try:
+            result = tools.lookup_hosted(
+                str(body.get("merchant") or ""),
+                cards,
+                body.get("outlet"),
+                body.get("channel"),
+                body.get("category"),
+                body.get("amount_sgd"),
+            )
+        except ValueError as exc:
+            return JSONResponse({"error": str(exc)}, status_code=400)
         if unmatched:
             result["unmatched_cards"] = unmatched
+        return JSONResponse(_public_json(result))
+
+    @mcp.custom_route("/api/chatgpt/compare-payment-methods", methods=["POST"])
+    async def chatgpt_compare_payment_methods(request: Request) -> JSONResponse:
+        body = await request.json()
+        cards, unmatched = _resolve_card_inputs(body.get("cards") or [])
+        try:
+            result = tools.compare_payment_methods(
+                str(body.get("merchant") or ""),
+                cards,
+                body.get("amount_sgd"),
+                body.get("outlet"),
+                body.get("category"),
+            )
+        except ValueError as exc:
+            return JSONResponse({"error": str(exc)}, status_code=400)
+        if unmatched:
+            result["unmatched_cards"] = unmatched
+        return JSONResponse(_public_json(result))
+
+    @mcp.custom_route("/api/chatgpt/changes", methods=["GET"])
+    async def chatgpt_changes(request: Request) -> JSONResponse:
+        try:
+            result = tools.changes_since(
+                request.query_params.get("since") or "",
+                int(request.query_params.get("limit") or 20),
+            )
+        except ValueError as exc:
+            return JSONResponse({"error": str(exc)}, status_code=400)
         return JSONResponse(_public_json(result))
 
     @mcp.custom_route("/api/chatgpt/recommend-stack", methods=["POST"])
