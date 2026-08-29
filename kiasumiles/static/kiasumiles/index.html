@@ -113,6 +113,13 @@
     .privacy-points { display: grid; gap: 13px; margin: 28px 0 0; padding: 0; list-style: none; }
     .privacy-points li { display: grid; grid-template-columns: 28px 1fr; gap: 10px; color: var(--ink-soft); line-height: 1.5; }
     .privacy-points li::before { content: "✓"; display: grid; width: 24px; height: 24px; place-items: center; border-radius: 50%; background: rgba(43,214,173,.2); color: var(--deep-green); font-size: 13px; font-weight: 850; }
+    .faq-section { padding: 90px 24px; background: #fff; }
+    .faq-inner { width: min(820px,100%); margin: 0 auto; }
+    .faq-inner h2 { font-size: clamp(46px,6vw,70px); font-weight: 850; letter-spacing: -.04em; line-height: .94; }
+    .faq-list { margin-top: 34px; border-bottom: 1px solid var(--line); }
+    .faq-item { border-top: 1px solid var(--line); }
+    .faq-item summary { padding: 22px 4px; cursor: pointer; font-family: var(--display); font-size: clamp(19px,2vw,23px); font-weight: 800; letter-spacing: -.02em; }
+    .faq-item p { max-width: 760px; padding: 0 4px 24px; color: var(--ink-soft); font-size: 17px; line-height: 1.6; }
     .site-footer { padding: 28px 24px 34px; border-top: 1px solid var(--line); background: #fff; }
     .footer-inner { display: flex; align-items: center; justify-content: space-between; gap: 26px; width: min(var(--content),100%); margin: 0 auto; }
     .footer-brand { color: var(--muted); font-size: 14px; font-weight: 650; }
@@ -139,7 +146,7 @@
       .merchant { position: static; width: auto; min-height: 56px; padding: 9px; transform: none !important; }
       .merchant.grab, .merchant.shell, .merchant.dtf { width: auto; }
       .merchant img { max-height: 32px; }
-      .start-section, .answer-section, .flow-section, .privacy-section { padding: 76px 18px; }
+      .start-section, .answer-section, .flow-section, .privacy-section, .faq-section { padding: 76px 18px; }
       .start-inner, .answer-inner, .flow-inner { gap: 42px; }
       .start-copy h2, .answer-copy h2, .flow-copy h2, .privacy-copy h2 { font-size: clamp(42px,12vw,58px); }
       .start-copy > p { font-size: 18px; }
@@ -219,6 +226,19 @@
 
     <section class="privacy-section" id="privacy" aria-labelledby="privacy-title">
       <div class="privacy-copy"><h2 id="privacy-title">We never see your card numbers.</h2><p>You tell your AI agent which cards you own. When you ask a question, it sends only the card names, never the numbers. KiasuMiles reads the rules, returns an answer, and does not store your card stack.</p><ul class="privacy-points"><li>Card names only, never the number, expiry, or CVV.</li><li>Where your card list is stored is your agent's call, not ours.</li></ul></div>
+    </section>
+
+    <section class="faq-section" id="faq" aria-labelledby="faq-title">
+      <div class="faq-inner">
+        <h2 id="faq-title">Questions I get about KiasuMiles.</h2>
+        <div class="faq-list">
+          <details class="faq-item"><summary>What is KiasuMiles?</summary><p>I built KiasuMiles so your AI agent can pick the best card from the ones you own. It matches the merchant and payment method against Singapore credit-card miles rules, then returns the conditions and a fallback.</p></details>
+          <details class="faq-item"><summary>Will it work with my AI agent?</summary><p>Paste the setup message into your AI agent. Agents that can connect to external tools will add KiasuMiles or ask you to approve the connection. Some apps may need you to add it through their settings.</p></details>
+          <details class="faq-item"><summary>Does KiasuMiles store my cards?</summary><p>For each lookup, your agent sends the card names you confirmed. The hosted service returns an answer without keeping a wallet. We never receive your card number, expiry date, or CVV.</p></details>
+          <details class="faq-item"><summary>How accurate are the recommendations?</summary><p>I keep the card rules and merchant matches updated, but banks change their terms and merchants sometimes process payments under an unexpected category. Check the conditions and fallback before you tap.</p></details>
+          <details class="faq-item"><summary>What if a merchant or card rule looks wrong?</summary><p>Send me feedback through Telegram with the merchant name, outlet, and how you paid. Leave out your card number and any personal payment details.</p></details>
+        </div>
+      </div>
     </section>
   </main>
 
