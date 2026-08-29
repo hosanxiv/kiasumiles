@@ -63,8 +63,10 @@
     .merchant img { max-width: 100%; max-height: 42px; object-fit: contain; }
     .merchant.fairprice { top: 210px; left: max(24px, calc(50% - 690px)); transform: rotate(5deg); }
     .merchant.watsons { bottom: 92px; left: max(34px, calc(50% - 680px)); transform: rotate(-5deg); }
+    .merchant.grab { top: 392px; left: max(22px, calc(50% - 760px)); width: 94px; transform: rotate(-3deg); }
     .merchant.sia { top: 210px; right: max(24px, calc(50% - 690px)); transform: rotate(-5deg); }
     .merchant.shell { right: max(44px, calc(50% - 670px)); bottom: 92px; width: 94px; transform: rotate(5deg); }
+    .merchant.dtf { right: max(24px, calc(50% - 760px)); top: 392px; transform: rotate(3deg); }
 
     .start-section { padding: 88px 24px 94px; background: var(--ink); color: #fff; }
     .start-inner { display: grid; grid-template-columns: minmax(300px,.72fr) minmax(520px,1.28fr); align-items: center; gap: clamp(44px,7vw,94px); width: min(var(--content),100%); margin: 0 auto; }
@@ -133,7 +135,7 @@
       .hero-lede { font-size: 19px; }
       .hero-actions { display: grid; }
       .hero-actions .button { width: 100%; }
-      .merchant-cloud { position: relative; display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; width: 100%; margin-top: 44px; }
+      .merchant-cloud { position: relative; display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; width: 100%; margin-top: 44px; }
       .merchant { position: static; width: auto; min-height: 56px; padding: 9px; transform: none !important; }
       .merchant img { max-height: 32px; }
       .start-section, .answer-section, .flow-section, .privacy-section { padding: 76px 18px; }
@@ -165,7 +167,7 @@
   <main id="main-content">
     <section class="hero" id="top" aria-labelledby="hero-title">
       <div class="hero-inner">
-        <p class="hero-kicker">Singapore miles, without the checkout guesswork</p>
+        <p class="hero-kicker">Maximise your miles, without the guesswork.</p>
         <h1 id="hero-title">The right card, before you tap.</h1>
         <p class="hero-lede">Ask your AI agent which card to tap. KiasuMiles answers from the cards you actually own.</p>
         <div class="hero-actions"><a class="button primary" href="#start">Set up KiasuMiles</a><a class="button" href="#flow">See an example</a></div>
@@ -173,8 +175,10 @@
       <div class="merchant-cloud" aria-label="Works across familiar Singapore merchants">
         <span class="merchant fairprice"><img src="assets/logos/fairprice-real-crop.png" width="556" height="131" alt="FairPrice"></span>
         <span class="merchant watsons"><img src="assets/logos/watsons-crop.png" width="540" height="108" alt="Watsons"></span>
+        <span class="merchant grab"><img src="assets/logos/grab-colour.svg" width="54" height="54" alt="Grab"></span>
         <span class="merchant sia"><img src="assets/logos/Singapore_Airlines_Logo.svg" width="178" height="40" alt="Singapore Airlines"></span>
         <span class="merchant shell"><img src="assets/logos/shell-colour.svg" width="54" height="54" alt="Shell"></span>
+        <span class="merchant dtf"><img src="assets/logos/din-tai-fung-logo.svg" width="300" height="123" alt="Din Tai Fung"></span>
       </div>
     </section>
 
@@ -213,7 +217,7 @@
     </section>
 
     <section class="privacy-section" id="privacy" aria-labelledby="privacy-title">
-      <div class="privacy-copy"><h2 id="privacy-title">We never see your card numbers.</h2><p>You tell your AI agent which cards you own. When you ask a question, it sends only the card names, never the numbers. KiasuMiles reads the rules, returns an answer, and does not store your card stack.</p><ul class="privacy-points"><li>Card names only — never the number, expiry, or CVV.</li><li>Where your card list is stored is your agent's call, not ours.</li></ul></div>
+      <div class="privacy-copy"><h2 id="privacy-title">We never see your card numbers.</h2><p>You tell your AI agent which cards you own. When you ask a question, it sends only the card names, never the numbers. KiasuMiles reads the rules, returns an answer, and does not store your card stack.</p><ul class="privacy-points"><li>Card names only, never the number, expiry, or CVV.</li><li>Where your card list is stored is your agent's call, not ours.</li></ul></div>
     </section>
   </main>
 
