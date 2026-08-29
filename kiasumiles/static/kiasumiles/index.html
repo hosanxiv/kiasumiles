@@ -36,7 +36,7 @@
     h1, h2, h3, p, figure { margin: 0; }
     h1, h2, h3 { font-family: var(--display); text-wrap: balance; }
     p { text-wrap: pretty; }
-    :focus-visible { outline: 3px solid var(--mint); outline-offset: 4px; }
+    :focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; box-shadow: 0 0 0 6px #fff; }
 
     .skip-link { position: fixed; z-index: 100; top: 12px; left: 12px; min-height: 44px; padding: 12px 16px; border-radius: 12px; background: var(--ink); color: #fff; font-weight: 750; transform: translateY(-160%); transition: transform .2s ease-out; }
     .skip-link:focus { transform: translateY(0); }
@@ -137,6 +137,7 @@
       .hero-actions .button { width: 100%; }
       .merchant-cloud { position: relative; display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; width: 100%; margin-top: 44px; }
       .merchant { position: static; width: auto; min-height: 56px; padding: 9px; transform: none !important; }
+      .merchant.grab, .merchant.shell, .merchant.dtf { width: auto; }
       .merchant img { max-height: 32px; }
       .start-section, .answer-section, .flow-section, .privacy-section { padding: 76px 18px; }
       .start-inner, .answer-inner, .flow-inner { gap: 42px; }
