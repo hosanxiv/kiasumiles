@@ -180,6 +180,8 @@ def compare_payment_methods(
         )
         methods.append({
             "payment_method": payment_method,
+            "merchant_matched": result.get("merchant_matched", False),
+            "message": result.get("message"),
             "best_guaranteed": (result.get("recommendations") or [None])[0],
             "best_if_conditions_met": (result.get("conditional_recommendations") or [None])[0],
             "routing_note": result.get("routing_note"),
@@ -195,6 +197,8 @@ def compare_payment_methods(
         )
         methods.append({
             "payment_method": "amaze",
+            "merchant_matched": result.get("merchant_matched", False),
+            "message": result.get("message"),
             "best_guaranteed": (result.get("recommendations") or [None])[0],
             "best_if_conditions_met": (result.get("conditional_recommendations") or [None])[0],
             "routing_note": result.get("routing_note"),

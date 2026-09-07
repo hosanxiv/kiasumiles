@@ -7,6 +7,7 @@ from starlette.requests import Request
 from starlette.responses import JSONResponse
 
 from . import tools
+from .agent_contract import CONVERSATION_FLOW
 
 
 _PUBLIC_FORBIDDEN_KEYS = {"card_id", "mcc", "mcc_category", "reason_codes"}
@@ -90,7 +91,11 @@ def _openapi_spec() -> dict:
         "info": {
             "title": "KiasuMiles ChatGPT Action",
             "version": "1.1.0",
-            "description": "Stateless Singapore credit-card miles recommendations for cards supplied in the current request.",
+            "description": (
+                "Stateless Singapore credit-card miles recommendations. Read this schema once per conversation. "
+                "Use lookupMerchant when payment is known; otherwise use comparePaymentMethods. "
+                "The server does not save the card stack. " + CONVERSATION_FLOW
+            ),
         },
         "servers": [{"url": base_url}],
         "paths": {
@@ -123,7 +128,7 @@ def _openapi_spec() -> dict:
             "/api/chatgpt/compare-payment-methods": {
                 "post": {
                     "operationId": "comparePaymentMethods",
-                    "summary": "Compare payment methods for the supplied cards.",
+                    "summary": "Compare payment methods in one request when payment is unspecified or the user asks to compare.",
                     "requestBody": {
                         "required": True,
                         "content": {"application/json": {"schema": lookup_body}},

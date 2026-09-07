@@ -41,6 +41,22 @@ def test_lookup_unknown_merchant_returns_not_matched():
     assert result["merchant_matched"] is False
 
 
+@pytest.mark.parametrize("category", [None, "shopping"])
+def test_comparison_preserves_unknown_merchant_context(category):
+    result = tools.compare_payment_methods(
+        "xyzzy_nonexistent_9999", ["citi_rewards_mc", "amaze"], category=category
+    )
+    assert len(result["methods"]) == 4
+    for method in result["methods"]:
+        assert method["merchant_matched"] is False
+        if category is None:
+            assert "No data found" in method["message"]
+            assert method["best_guaranteed"] is None
+        else:
+            assert "category inference" in method["routing_note"]
+            assert method["best_guaranteed"] is not None
+
+
 def test_lookup_skips_unknown_cards():
     result = lookup_hosted("NTUC FairPrice", cards=["hsbc_revolution", "not_a_card"])
 

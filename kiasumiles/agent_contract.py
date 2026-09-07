@@ -11,10 +11,24 @@ CATEGORY_MCC: dict[str, str] = {
     "shopping": "5311",
 }
 
+CONVERSATION_FLOW = (
+    "Reuse cards and resolved names already supplied in this conversation. Ask which cards the user "
+    "has only when missing; offer banks as a fallback. Fetch the supported list once for multiple "
+    "banks and filter internally. Accept unambiguous named cards without reconfirming the full stack; "
+    "ask the user to choose when a name has multiple variants or they supplied only banks. "
+    "If payment method is unspecified, compare methods in one call and briefly show physical-card "
+    "and mobile-wallet options. Ask only if missing information materially changes the answer and "
+    "cannot be covered by alternatives. Treat spend progress as optional and show bonus conditions "
+    "and guaranteed fallbacks when it is unknown. Lead with card, rate and essential conditions, "
+    "including uncertainty and fallback where relevant. Expand only on request. "
+    "Do not repeat setup or discovery for each purchase or promise memory across conversations."
+)
+
 HOSTED_DISPLAY_RULES: tuple[str, ...] = (
+    CONVERSATION_FLOW,
     "Use kiasumiles_lookup for Singapore card and merchant recommendations when this hosted MCP server is available.",
     "Before the first lookup in a conversation, ask which cards the user carries if the client has not already supplied a card stack.",
-    "Ask the user which banks they use before listing cards, then call kiasumiles_list_cards once per bank.",
+    "Ask which cards the user carries; offer banks as a fallback if they do not know the names. Reuse cards already supplied in the conversation. Clarify ambiguous variants only; do not reconfirm an explicit, unambiguous card list.",
     "Keep wallet data client-side. Pass the user's card IDs in the cards parameter for each lookup or stack recommendation.",
     "Never show card_id values, MCC codes, or raw technical fields unless the user asks for diagnostics.",
     "Display recommendations with card name, earn_rate_mpd, cap_summary, and reason_summary.",
@@ -29,11 +43,9 @@ HOSTED_DISPLAY_RULES: tuple[str, ...] = (
 HOSTED_TOOL_DESCRIPTIONS: dict[str, str] = {
     "kiasumiles_list_cards": """List supported Singapore credit cards and their stable card IDs for hosted MCP requests.
 
-Ask the user which banks they have cards with before listing cards. Common banks: UOB, DBS,
-OCBC, Citibank, HSBC, American Express, Standard Chartered, Maybank. Then call this once per
-bank they mention with the bank parameter set, and present a short list per bank.
-
-Only call without bank if the user explicitly asks "show me ALL cards" or "what's the full list".
+Skip bank questions when cards are already named. Reuse mappings from this conversation.
+For one bank, filter by bank. For multiple banks or named cards, call once without bank and
+filter internally. Show relevant cards only. Clarify ambiguous variants rather than guessing.
 
 Use card IDs internally as request parameters, but never show card_id values to the user unless
 they ask for diagnostics.""",
@@ -53,12 +65,15 @@ Accepted values: dining, grocery, transport, petrol, pharmacy, hotel, airlines, 
 
 Present card name, earn_rate_mpd, cap_summary, and reason_summary. Use gotchas to warn about
 wrong payment channel, merchant-only bonus rules, minimum spend, and cap constraints. Never show
-raw card IDs, MCC codes, or technical fields unless the user asks for diagnostics.""",
+raw card IDs, MCC codes, or technical fields unless the user asks for diagnostics.
+
+""" + CONVERSATION_FLOW,
     "kiasumiles_compare_payment_methods": """Compare payment methods for the same merchant and supplied card stack.
 
-Use this when the user asks whether to pay by mobile wallet, physical contactless card, online, or
+Use this when payment method is unspecified or the user asks whether to pay by mobile wallet, physical contactless card, online, or
 through Amaze. Pass amount_sgd when known. Amaze is compared only when the user supplied it.
-Present the best guaranteed and conditional result for each method with conditions and caveats.""",
+Present the best guaranteed and conditional result for each method with conditions and caveats.
+Show a returned message when no recommendation is available; never invent a merchant match.""",
     "kiasumiles_changes_since": """Summarize source-neutral card and merchant rule changes since an ISO date.
 
 Use this when the user asks what changed or whether the data was updated. Present changed_on,
@@ -76,10 +91,11 @@ Present covered and weak categories. Never show raw card IDs to the user.""",
 }
 
 LOCAL_DISPLAY_RULES: tuple[str, ...] = (
+    "Reuse saved cards. Clarify ambiguous variants only. Keep answers brief with essential conditions and uncertainty; do not ask for optional spend progress.",
     "Use kiasumiles_configure once when the user sets up or changes their wallet.",
     "Use kiasumiles_lookup for merchant recommendations; the saved local wallet is added automatically.",
     "Use kiasumiles_get_wallet when the user asks which cards are saved.",
-    "Ask which banks the user uses before listing cards, then call kiasumiles_list_cards once per bank.",
+    "Skip bank questions when cards are named. List cards once for multiple banks and filter internally.",
     "Never show card IDs, MCC codes, wallet paths, or raw technical fields unless the user asks for diagnostics.",
     "Display recommendations with card name, earn_rate_mpd, cap_summary, and reason_summary.",
     "Treat routing_note and low_confidence_note as user-visible caveats.",
@@ -88,8 +104,8 @@ LOCAL_DISPLAY_RULES: tuple[str, ...] = (
 LOCAL_TOOL_DESCRIPTIONS: dict[str, str] = {
     "kiasumiles_list_cards": """List supported Singapore credit cards for local wallet setup.
 
-Ask which banks the user has cards with first, then call this once per bank. Present card names
-only. Do not expose internal card IDs.""",
+Reuse known mappings. Ask for banks only if the user does not know their card names.
+For multiple banks, list once and filter internally. Present relevant card names only.""",
     "kiasumiles_configure": """Save or replace the user's KiasuMiles wallet on this device.
 
 Use this after matching the card names the user carries. Include Amaze when mentioned. Confirm

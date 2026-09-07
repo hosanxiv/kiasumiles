@@ -29,11 +29,11 @@ If you cannot add the connection yourself, say so plainly and give me only the d
 
 Once KiasuMiles is available, check whether this installation provides tools to read or configure a saved card stack. If it does, show me any saved cards and ask whether I want to keep or change them. If it does not, explain how this AI agent can supply my selected cards for KiasuMiles lookups and whether my selections will persist between conversations.
 
-Ask which banks I have cards with, show me the matching supported cards, and ask me to confirm my selections.
+Ask which cards I have only if you do not already know. Offer banks if I need help finding their names, then show me the matching supported cards so I can choose. Accept cards I name unambiguously; clarify ambiguous variants only. Reuse my selections in this conversation.
 
 Use only the storage method documented by the available tools. Never claim the hosted KiasuMiles server stores my card stack.
 
-After confirming my cards, ask for a Singapore merchant and recommend my best card.
+After confirming my cards, ask for a Singapore merchant only if I have not already named one. Give a brief recommendation with its rate, essential conditions, uncertainty and fallback. If payment is unclear, compare physical-card and mobile-wallet options in one request. Avoid repeating setup and card confirmation for each purchase.
 ```
 
 This message is both a setup request and a capability check. Some AI agents can add the connection after asking for approval. Others require you or a workspace administrator to add it in settings.
@@ -110,6 +110,14 @@ After the app is available in a chat, send the quick-start message.
 Custom MCP apps are currently web-only in ChatGPT. Do not claim that this setup works in the ChatGPT mobile app.
 
 See [OpenAI’s developer-mode and MCP app guide](https://help.openai.com/en/articles/12584461-developer-mode-apps-and-full-mcp-connectors-in-chatgpt-beta).
+
+### ChatGPT Work through the public API
+
+The public API provides another route when Work has network access. A mobile Work conversation has completed card selection and a merchant lookup through this route; availability depends on account permissions. This does not require installing an MCP connector.
+
+```text
+Use KiasuMiles through https://kiasumiles.space/api/chatgpt/openapi.json. Read its instructions once. Ask which cards I have only if missing, clarify ambiguous names only, and reuse my selections in this conversation. When I name a merchant, use one lookup if payment is known; otherwise compare payment methods in one request. Give a brief answer with the best card, rate, conditions, uncertainty and fallback. Only claim success after a real response. If network access is unavailable, say so.
+```
 
 ### Another AI agent
 

@@ -10,10 +10,11 @@ LANDING = ROOT / "kiasumiles" / "static" / "kiasumiles" / "index.html"
 WEBSITE_SETUP_PROMPT = (
     "Connect KiasuMiles at https://kiasumiles.space/mcp. Ask before changing settings or "
     "installing anything, and don't claim it's connected until you can list its tools and call "
-    "kiasumiles_data_version successfully. Then ask which banks I use, show their supported "
-    "cards, and let me confirm mine. Finally, ask for a Singapore merchant and how I'm paying, "
-    "then recommend the best confirmed card with its conditions, caveats, and fallback if the "
-    "match is uncertain."
+    "kiasumiles_data_version successfully. Ask which cards I have only if you don't already know; "
+    "offer banks if I need help finding their names. Clarify ambiguous cards only, then reuse my "
+    "selections in this conversation. When I name a merchant, give a brief recommendation with "
+    "its rate, conditions, caveats, and fallback if the match is uncertain. If payment is unclear, "
+    "compare physical-card and mobile-wallet options together."
 )
 
 
