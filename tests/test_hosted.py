@@ -89,7 +89,8 @@ def test_landing_page_and_media_routes_are_served():
 
     assert landing.status_code == 200
     assert "The right card, before you tap." in landing.text
-    assert "Connect KiasuMiles at https://kiasumiles.space/mcp" in landing.text
+    assert "https://kiasumiles.space/mcp" in landing.text
+    assert "https://kiasumiles.space/api/chatgpt/openapi.json" in landing.text
     assert "https://kiasumiles.space/mcp" in landing.text
     assert "We never see your card numbers." in landing.text
     assert "KiasuMiles reads the rules, returns an answer, and does not store your card stack." in landing.text

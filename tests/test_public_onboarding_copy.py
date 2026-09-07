@@ -8,13 +8,7 @@ ROOT = Path(__file__).resolve().parents[1]
 README = ROOT / "README.md"
 LANDING = ROOT / "kiasumiles" / "static" / "kiasumiles" / "index.html"
 WEBSITE_SETUP_PROMPT = (
-    "Connect KiasuMiles at https://kiasumiles.space/mcp. Ask before changing settings or "
-    "installing anything, and don't claim it's connected until you can list its tools and call "
-    "kiasumiles_data_version successfully. Ask which cards I have only if you don't already know; "
-    "offer banks if I need help finding their names. Clarify ambiguous cards only, then reuse my "
-    "selections in this conversation. When I name a merchant, give a brief recommendation with "
-    "its rate, conditions, caveats, and fallback if the match is uncertain. If payment is unclear, "
-    "compare physical-card and mobile-wallet options together."
+    "Use KiasuMiles. Reuse its MCP tools if available. Otherwise, if you can add MCP connections, connect https://kiasumiles.space/mcp with my approval. For MCP, don't claim it's connected until you can list its tools and call kiasumiles_data_version successfully. If MCP setup is unavailable, use the public API described at https://kiasumiles.space/api/chatgpt/openapi.json when network access permits; read it once and verify a real response. If neither route works, explain the blocker. Ask which cards I have only if missing; offer banks if I need help. Clarify ambiguous names only and reuse my cards in this conversation. For a merchant, make one lookup if payment is known; otherwise compare payment methods together. Give a brief answer with the best card, rate, conditions, caveats, and fallback if the match is uncertain."
 )
 
 
