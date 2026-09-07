@@ -66,9 +66,9 @@ def test_landing_copy_is_truthful_and_accessible():
     required_copy = (
         "Ask your AI agent which card to tap. KiasuMiles answers from the cards you actually own.",
         "Maximise your miles, without the guesswork.",
-        "Copy this to your AI agent. It will either connect and verify the tools, or tell you plainly that it cannot.",
+        "Copy this prompt:",
         "Use KiasuMiles. Reuse its MCP tools if available.",
-        "Use KiasuMiles with ChatGPT Work, including on mobile when network access is available.",
+        "Use KiasuMiles with compatible AI agents, including ChatGPT Work on mobile where network access is available.",
         "kiasumiles_data_version successfully",
         "Claude and other agents",
         "Read the setup guide on GitHub",
