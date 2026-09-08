@@ -30,12 +30,35 @@ _CHANNEL_ALIASES = {
     "physical_contactless": "contactless",
 }
 
+_CARD_ALIASES = {
+    "amaze (instarem)": "amaze",
+    "uob preferred visa": "uob_ppv",
+    "uob preferred platinum visa": "uob_ppv",
+}
+
 
 def _normalize_channel(channel: str | None) -> str | None:
     if not channel:
         return channel
     normalized = "_".join(channel.strip().lower().replace("-", " ").split())
     return _CHANNEL_ALIASES.get(normalized, normalized)
+
+
+def _resolve_card_inputs(cards: list[str]) -> tuple[list[str], list[str]]:
+    lookup = {"amaze": "amaze", **_CARD_ALIASES}
+    for card in _loader.cards():
+        lookup[card.card_id.casefold()] = card.card_id
+        lookup[card.card_name.casefold()] = card.card_id
+
+    resolved: list[str] = []
+    skipped: list[str] = []
+    for card in cards:
+        card_id = lookup.get(card.strip().casefold())
+        if card_id:
+            resolved.append(card_id)
+        else:
+            skipped.append(card)
+    return resolved, skipped
 
 
 def list_cards(bank: str | None = None) -> dict:
@@ -67,9 +90,8 @@ def _lookup_for_cards(
     amount_sgd: float | None = None,
 ) -> dict:
     channel = _normalize_channel(channel)
+    cards, skipped = _resolve_card_inputs(cards)
     wallet_has_amaze = "amaze" in cards
-    valid_ids = {c.card_id for c in _loader.cards()}
-    skipped = [cid for cid in cards if cid not in valid_ids and cid != "amaze"]
 
     wallet_cards = [c for c in _loader.cards() if c.card_id in cards]
     if wallet_has_amaze and "citi_rewards_mc" in cards and "amaze_citi" not in cards:
@@ -188,6 +210,7 @@ def compare_payment_methods(
     outlet: str | None = None,
     category: str | None = None,
 ) -> dict:
+    cards, skipped = _resolve_card_inputs(cards)
     direct_cards = [card for card in cards if card not in {"amaze", "amaze_citi"}]
     methods = []
     for payment_method in ("mobile_contactless", "contactless", "online"):
@@ -221,13 +244,12 @@ def compare_payment_methods(
             "low_confidence_note": result.get("low_confidence_note"),
         })
 
-    valid_ids = {c.card_id for c in _loader.cards()} | {"amaze"}
     return {
         "merchant": merchant,
         "amount_sgd": amount_sgd,
         "methods": methods,
         "wallet_stored": False,
-        "skipped_cards": [card for card in cards if card not in valid_ids],
+        "skipped_cards": skipped,
         "data_version": data_version()["data_version"],
     }
 
@@ -262,9 +284,7 @@ def changes_since(since: str, limit: int = 20) -> dict:
 
 
 def recommend_stack(cards: list[str], top_n: int = 3) -> dict:
-    wallet_ids = cards
-    valid_ids = {c.card_id for c in _loader.cards()}
-    skipped = [cid for cid in wallet_ids if cid not in valid_ids]
+    wallet_ids, skipped = _resolve_card_inputs(cards)
     wallet_cards = [c for c in _loader.cards() if c.card_id in wallet_ids]
     wallet_has_amaze = "amaze" in wallet_ids
 

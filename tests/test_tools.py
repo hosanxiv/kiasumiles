@@ -48,6 +48,20 @@ def test_lookup_normalizes_agent_friendly_mobile_payment_names(channel):
     assert result["conditional_recommendations"][0]["earn_rate_mpd"] == pytest.approx(4.0)
 
 
+@pytest.mark.parametrize("uob_name", ["UOB Preferred Visa", "UOB Preferred Platinum Visa"])
+def test_lookup_accepts_exact_card_names_from_agents(uob_name):
+    result = lookup_hosted(
+        "NTUC FairPrice",
+        cards=["Citi Rewards Mastercard", uob_name],
+        channel="Apple Pay",
+        amount_sgd=25,
+    )
+
+    assert result["skipped_cards"] == []
+    assert result["conditional_recommendations"][0]["card_id"] == "uob_ppv"
+    assert result["conditional_recommendations"][0]["earn_rate_mpd"] == pytest.approx(4.0)
+
+
 def test_lookup_unknown_merchant_returns_not_matched():
     result = lookup_hosted("xyzzy_nonexistent_9999", cards=["hsbc_revolution"])
 
