@@ -175,6 +175,14 @@ async def robots(_: Request) -> PlainTextResponse:
     return PlainTextResponse("User-agent: *\nDisallow: /mcp\n")
 
 
+@mcp.custom_route("/.well-known/openai-apps-challenge", methods=["GET"])
+async def openai_apps_challenge(_: Request) -> PlainTextResponse:
+    token = os.environ.get("KIASUMILES_OPENAI_APPS_CHALLENGE")
+    if not token:
+        return PlainTextResponse("Not configured", status_code=404)
+    return PlainTextResponse(token, headers={"Cache-Control": "no-store"})
+
+
 class RateLimitMiddleware:
     """Per-IP sliding-window rate limit on the MCP endpoint.
 
