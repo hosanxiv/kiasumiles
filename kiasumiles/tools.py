@@ -22,6 +22,21 @@ _STACK_CATEGORIES: tuple[dict[str, str], ...] = (
     {"category": "petrol", "mcc": "5541", "channel": "contactless", "sample_merchant": "petrol"},
 )
 
+_CHANNEL_ALIASES = {
+    "apple_pay": "mobile_contactless",
+    "google_pay": "mobile_contactless",
+    "mobile_wallet": "mobile_contactless",
+    "paywave": "contactless",
+    "physical_contactless": "contactless",
+}
+
+
+def _normalize_channel(channel: str | None) -> str | None:
+    if not channel:
+        return channel
+    normalized = "_".join(channel.strip().lower().replace("-", " ").split())
+    return _CHANNEL_ALIASES.get(normalized, normalized)
+
 
 def list_cards(bank: str | None = None) -> dict:
     cards = _loader.cards()
@@ -51,6 +66,7 @@ def _lookup_for_cards(
     category: str | None = None,
     amount_sgd: float | None = None,
 ) -> dict:
+    channel = _normalize_channel(channel)
     wallet_has_amaze = "amaze" in cards
     valid_ids = {c.card_id for c in _loader.cards()}
     skipped = [cid for cid in cards if cid not in valid_ids and cid != "amaze"]

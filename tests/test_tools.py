@@ -35,6 +35,19 @@ def test_lookup_dining_merchant_returns_recommendations():
     assert result["conditional_recommendations"][0]["earn_rate_mpd"] >= 4.0
 
 
+@pytest.mark.parametrize("channel", ["Apple Pay", "mobile contactless", "mobile-contactless"])
+def test_lookup_normalizes_agent_friendly_mobile_payment_names(channel):
+    result = lookup_hosted(
+        "NTUC FairPrice",
+        cards=["citi_rewards_mc", "uob_ppv"],
+        channel=channel,
+        amount_sgd=25,
+    )
+
+    assert result["conditional_recommendations"][0]["card_id"] == "uob_ppv"
+    assert result["conditional_recommendations"][0]["earn_rate_mpd"] == pytest.approx(4.0)
+
+
 def test_lookup_unknown_merchant_returns_not_matched():
     result = lookup_hosted("xyzzy_nonexistent_9999", cards=["hsbc_revolution"])
 
