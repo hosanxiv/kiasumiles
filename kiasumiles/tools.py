@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import math
+import re
 from datetime import date
 
 from .agent_contract import CATEGORY_MCC, hosted_agent_guide
@@ -44,16 +45,20 @@ def _normalize_channel(channel: str | None) -> str | None:
     return _CHANNEL_ALIASES.get(normalized, normalized)
 
 
+def _normalize_card_key(card: str) -> str:
+    return " ".join(re.sub(r"[^a-z0-9]+", " ", card.casefold()).split())
+
+
 def _resolve_card_inputs(cards: list[str]) -> tuple[list[str], list[str]]:
-    lookup = {"amaze": "amaze", **_CARD_ALIASES}
+    lookup = {_normalize_card_key(key): value for key, value in {"amaze": "amaze", **_CARD_ALIASES}.items()}
     for card in _loader.cards():
-        lookup[card.card_id.casefold()] = card.card_id
-        lookup[card.card_name.casefold()] = card.card_id
+        lookup[_normalize_card_key(card.card_id)] = card.card_id
+        lookup[_normalize_card_key(card.card_name)] = card.card_id
 
     resolved: list[str] = []
     skipped: list[str] = []
     for card in cards:
-        card_id = lookup.get(card.strip().casefold())
+        card_id = lookup.get(_normalize_card_key(card))
         if card_id:
             resolved.append(card_id)
         else:
