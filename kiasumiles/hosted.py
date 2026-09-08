@@ -85,6 +85,7 @@ for _name, _description in HOSTED_TOOL_DESCRIPTIONS.items():
     _tool = globals()[_name]
     _tool.__doc__ = _description
     globals()[_name] = mcp.tool(
+        title=_name.removeprefix("kiasumiles_").replace("_", " ").title(),
         annotations=ToolAnnotations(
             readOnlyHint=True,
             destructiveHint=False,

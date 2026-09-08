@@ -9,6 +9,7 @@ def test_hosted_tools_declare_read_only_behavior():
         registered = await hosted.mcp.list_tools()
         assert {tool.name for tool in registered} == set(hosted.HOSTED_TOOL_DESCRIPTIONS)
         for tool in registered:
+            assert tool.title == tool.name.removeprefix("kiasumiles_").replace("_", " ").title()
             assert tool.annotations is not None
             assert tool.annotations.readOnlyHint is True
             assert tool.annotations.destructiveHint is False
