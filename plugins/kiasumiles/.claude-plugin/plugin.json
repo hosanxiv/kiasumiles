@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
+  "name": "kiasumiles",
+  "displayName": "KiasuMiles",
+  "version": "1.0.3",
+  "description": "Choose the best Singapore miles card for a merchant.",
+  "author": {
+    "name": "Hosan"
+  },
+  "homepage": "https://kiasumiles.space",
+  "repository": "https://github.com/hosanxiv/kiasumiles",
+  "license": "MIT",
+  "keywords": [
+    "singapore",
+    "credit-cards",
+    "miles"
+  ],
+  "skills": "./skills/",
+  "mcpServers": "./.mcp.json"
+}
