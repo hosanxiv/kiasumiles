@@ -8,7 +8,7 @@
   "skills": "./skills/",
   "interface": {
     "displayName": "KiasuMiles",
-    "shortDescription": "Ask Codex which Singapore miles card to use at a merchant.",
+    "shortDescription": "Choose the best Singapore miles card for a merchant.",
     "longDescription": "KiasuMiles checks the cards you choose against its hosted card rules and merchant data. Your agent supplies those cards for each lookup; the hosted service does not store a wallet.",
     "developerName": "Hosan",
     "category": "Productivity",

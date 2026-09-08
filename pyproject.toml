@@ -45,6 +45,7 @@ exclude = ["kiasumiles/static/"]
 [tool.hatch.build.targets.wheel.force-include]
 "kiasumiles/static/kiasumiles/index.html" = "kiasumiles/static/kiasumiles/index.html"
 "kiasumiles/static/kiasumiles/privacy.html" = "kiasumiles/static/kiasumiles/privacy.html"
+"kiasumiles/static/kiasumiles/terms.html" = "kiasumiles/static/kiasumiles/terms.html"
 "kiasumiles/static/kiasumiles/favicon.svg" = "kiasumiles/static/kiasumiles/favicon.svg"
 "kiasumiles/static/kiasumiles/assets/proof" = "kiasumiles/static/kiasumiles/assets/proof"
 "kiasumiles/static/kiasumiles/assets/logos/fairprice-real-crop.png" = "kiasumiles/static/kiasumiles/assets/logos/fairprice-real-crop.png"
@@ -73,6 +74,7 @@ exclude = [
 [tool.hatch.build.targets.sdist.force-include]
 "kiasumiles/static/kiasumiles/index.html" = "kiasumiles/static/kiasumiles/index.html"
 "kiasumiles/static/kiasumiles/privacy.html" = "kiasumiles/static/kiasumiles/privacy.html"
+"kiasumiles/static/kiasumiles/terms.html" = "kiasumiles/static/kiasumiles/terms.html"
 "kiasumiles/static/kiasumiles/favicon.svg" = "kiasumiles/static/kiasumiles/favicon.svg"
 "kiasumiles/static/kiasumiles/assets/proof" = "kiasumiles/static/kiasumiles/assets/proof"
 "kiasumiles/static/kiasumiles/assets/logos/fairprice-real-crop.png" = "kiasumiles/static/kiasumiles/assets/logos/fairprice-real-crop.png"

@@ -4,6 +4,20 @@ import json
 from kiasumiles import hosted
 
 
+def test_hosted_tools_declare_read_only_behavior():
+    async def exercise():
+        registered = await hosted.mcp.list_tools()
+        assert {tool.name for tool in registered} == set(hosted.HOSTED_TOOL_DESCRIPTIONS)
+        for tool in registered:
+            assert tool.annotations is not None
+            assert tool.annotations.readOnlyHint is True
+            assert tool.annotations.destructiveHint is False
+            assert tool.annotations.openWorldHint is False
+            assert tool.annotations.idempotentHint is True
+
+    asyncio.run(exercise())
+
+
 def test_new_tools_are_callable_through_mcp_with_generated_schemas():
     async def exercise():
         tools = {tool.name: tool for tool in await hosted.mcp.list_tools()}

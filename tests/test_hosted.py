@@ -164,3 +164,14 @@ def test_privacy_page_is_request_scoped_and_requires_revalidation():
     assert "supplies selected card products for each lookup" in response.text
     assert "does not store the stack" in response.text
     assert "card IDs" not in response.text
+
+
+def test_terms_page_is_public_and_requires_revalidation():
+    client = TestClient(hosted.app)
+    response = client.get("/terms")
+
+    assert response.status_code == 200
+    assert response.headers["cache-control"] == "public, max-age=0, must-revalidate"
+    assert 'href="/"' in response.text
+    assert "informational guidance" in response.text
+    assert "hello@theaiburrow.xyz" in response.text

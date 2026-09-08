@@ -30,6 +30,7 @@ def test_plugin_manifest_describes_hosted_stateless_usage():
     ).lower()
     assert "hosted" in public_copy
     assert "does not store a wallet" in public_copy
+    assert "codex" not in payload["interface"]["shortDescription"].lower()
     assert "local wallet" not in public_copy
     assert "saved on this device" not in public_copy
 

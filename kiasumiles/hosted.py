@@ -7,6 +7,7 @@ from collections import defaultdict, deque
 from pathlib import Path
 
 from mcp.server.fastmcp import FastMCP
+from mcp.types import ToolAnnotations
 from starlette.requests import Request
 from starlette.responses import FileResponse, HTMLResponse, JSONResponse, PlainTextResponse
 
@@ -83,7 +84,14 @@ def kiasumiles_agent_guide() -> dict:
 for _name, _description in HOSTED_TOOL_DESCRIPTIONS.items():
     _tool = globals()[_name]
     _tool.__doc__ = _description
-    globals()[_name] = mcp.tool()(_tool)
+    globals()[_name] = mcp.tool(
+        annotations=ToolAnnotations(
+            readOnlyHint=True,
+            destructiveHint=False,
+            openWorldHint=False,
+            idempotentHint=True,
+        )
+    )(_tool)
 
 
 register_chatgpt_action_routes(mcp)
@@ -144,6 +152,14 @@ async def logo_asset(request: Request) -> FileResponse:
 async def privacy(_: Request) -> HTMLResponse:
     return HTMLResponse(
         (STATIC_DIR / "privacy.html").read_text(encoding="utf-8"),
+        headers={"Cache-Control": REVALIDATE_CACHE_CONTROL},
+    )
+
+
+@mcp.custom_route("/terms", methods=["GET"])
+async def terms(_: Request) -> HTMLResponse:
+    return HTMLResponse(
+        (STATIC_DIR / "terms.html").read_text(encoding="utf-8"),
         headers={"Cache-Control": REVALIDATE_CACHE_CONTROL},
     )
 
