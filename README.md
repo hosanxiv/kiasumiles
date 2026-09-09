@@ -12,138 +12,100 @@
 
 > “Which card do I use again?”
 
-KiasuMiles helps you choose from the Singapore miles cards you already hold. Tell a compatible AI agent which cards are in your stack, ask about a merchant, and KiasuMiles ranks those cards using its centrally maintained card and merchant database.
+KiasuMiles helps an AI agent choose the best Singapore miles card from the cards you already hold. It compares your confirmed cards against centrally maintained card rules and merchant-category data, then explains the best card, payment method, conditions, cap and fallback.
 
-The hosted KiasuMiles service does not store your card stack. It never needs your card number, expiry date, CVV, banking login or payment details.
+KiasuMiles is a hosted **MCP** service. MCP is the connection that lets a compatible agent use KiasuMiles as a tool. It is not a standalone chatbot or web app.
 
-## Quick start
+The hosted service does not store your card stack. It never needs your card number, expiry date, CVV, banking login, one-time password or payment credentials.
 
-Send this message to your AI agent:
+## Start here
+
+KiasuMiles ONLY works with AI assistants that can use external tools. Choose the setup for your assistant below.
+
+After the one-time connection, send this message:
 
 ```text
-Connect me to KiasuMiles at https://kiasumiles.space/mcp if its tools are not already available.
-
-Ask before changing settings or running installation commands. Do not say KiasuMiles is connected until you can list its tools and successfully call its data-version tool.
-
-If you cannot add the connection yourself, say so plainly and give me only the documented setup steps for the AI agent I am using. Do not guess. Then wait for me to complete them.
-
-Once KiasuMiles is available, check whether this installation provides tools to read or configure a saved card stack. If it does, show me any saved cards and ask whether I want to keep or change them. If it does not, explain how this AI agent can supply my selected cards for KiasuMiles lookups and whether my selections will persist between conversations.
-
-Ask which cards I have only if you do not already know. Offer banks if I need help finding their names, then show me the matching supported cards so I can choose. Accept cards I name unambiguously; clarify ambiguous variants only. Reuse my selections in this conversation.
-
-Use only the storage method documented by the available tools. Never claim the hosted KiasuMiles server stores my card stack.
-
-After confirming my cards, ask for a Singapore merchant only if I have not already named one. Give a brief recommendation with its rate, essential conditions, uncertainty and fallback. If payment is unclear, compare physical-card and mobile-wallet options in one request. Avoid repeating setup and card confirmation for each purchase.
+Use KiasuMiles. First verify the connection by calling kiasumiles_data_version. Ask which cards I carry only if you don’t already know; show supported cards if I need help choosing. Then ask where I’m paying and how, and recommend my best confirmed card with its earn rate, bonus conditions and fallback. If KiasuMiles tools aren’t available, stop and tell me.
 ```
 
-This message is both a setup request and a capability check. Some AI agents can add the connection after asking for approval. Others require you or a workspace administrator to add it in settings.
+This prompt verifies and uses an existing connection. It cannot give an ordinary chatbot capabilities that the app does not provide.
 
-## Choose your AI agent
+## Where it works
 
-### OpenClaw or Hermes through Telegram
+Status as of 9 September 2026:
 
-Paste the quick-start message into your Telegram chat.
+| Agent | Current route | Plug-and-play status |
+|---|---|---|
+| Claude chat, Cowork, desktop and mobile | Account-level custom connector | Available after one-time setup; the directory submission is still under review |
+| Codex desktop and CLI | Custom remote MCP server | Available now |
+| OpenClaw, Hermes, Zo and similar agents | Agent-managed remote MCP connection | Paste the prompt above when the agent is allowed to update its MCP configuration |
+| ChatGPT Work on web and mobile | Private custom connector created on ChatGPT web | Tested on a Pro account; public directory approval is not required for this route |
 
-If your agent is allowed to update its MCP configuration, it can ask for approval, add KiasuMiles and verify the tools. This depends on the permissions configured by the person who runs your agent, so do not treat a success message as proof unless the agent can actually use the KiasuMiles tools.
+KiasuMiles is not a normal chatbot. It is an MCP tool, so the assistant must support external tools and have KiasuMiles connected before the usage prompt can work.
 
-### Codex on desktop
+## One-time connection options
 
-In the desktop app:
+### Agent-managed setup
 
-1. Open **Settings → MCP servers**.
-2. Select **Add server**.
-3. Name it `KiasuMiles`.
-4. Choose **Streamable HTTP**.
-5. Enter:
+For an agent that can update its own MCP configuration, such as OpenClaw, Hermes or Zo, paste this into its chat:
 
-   ```text
-   https://kiasumiles.space/mcp
-   ```
+```text
+Use KiasuMiles. If its tools are already available, reuse them. Otherwise, connect to https://kiasumiles.space/mcp if you can manage remote MCP connections. Ask before changing settings or installing anything. If you cannot, say that this agent needs a one-time MCP connection and stop. Do not claim KiasuMiles is connected until you can list its tools and call kiasumiles_data_version successfully. Then ask which banks I use, show their supported cards, and let me confirm mine. Finally, ask for a Singapore merchant and payment method and recommend the best confirmed card with its conditions and fallback.
+```
 
-6. Save the server and restart the app.
-7. Use `/mcp` to confirm that the KiasuMiles tools are available.
-8. Send the quick-start message above.
+### Codex desktop or CLI
 
-Codex CLI users can add the same hosted server with:
+In Codex desktop, add a Streamable HTTP MCP server named `KiasuMiles` with:
+
+```text
+https://kiasumiles.space/mcp
+```
+
+For Codex CLI:
 
 ```bash
 codex mcp add kiasumiles --url https://kiasumiles.space/mcp
+codex mcp list
 ```
-
-Then run `codex mcp list` or use `/mcp` to verify it.
 
 ### Claude
 
-Add KiasuMiles as a custom connector using Claude on the web or Claude Desktop:
-
-1. Open **Customize → Connectors**.
-2. Select **+ → Add custom connector**.
-3. Enter `KiasuMiles` and:
-
-   ```text
-   https://kiasumiles.space/mcp
-   ```
-
-4. Add the connector.
-5. Enable it for the conversation, then send the quick-start message.
-
-Claude currently makes custom connectors available on Free, Pro, Max, Team and Enterprise plans; Free accounts are limited to one custom connector. On Team and Enterprise plans, an Owner or Primary Owner must add the connector for the organisation before members can connect it.
-
-Claude supports connectors on iOS and Android. Installing connectors on mobile is currently in beta, so web or desktop remains the more reliable setup path.
-
-See [Claude’s custom connector guide](https://support.claude.com/en/articles/11175166-get-started-with-custom-connectors-using-remote-mcp).
-
-### ChatGPT web and ChatGPT Work
-
-Do not expect the quick-start message to install KiasuMiles by itself.
-
-If your account or workspace provides custom MCP apps in developer mode, add KiasuMiles as a custom app on ChatGPT web using:
+In the Claude app, open **Settings → Customise → Connectors → Add custom connector**, name it `KiasuMiles`, and enter:
 
 ```text
 https://kiasumiles.space/mcp
 ```
 
-Managed workspaces may require an administrator or owner to enable developer mode, create and review the app, and publish it to the workspace before members can use it.
+Start a new Claude chat, enable KiasuMiles from the **+** menu, then send the Start here prompt. Anthropic documents account-level remote connectors across Claude, Cowork, desktop and mobile. Workspace policies may require an administrator to approve the connector. See [Claude's remote MCP connector guide](https://support.claude.com/en/articles/11175166-get-started-with-custom-connectors-using-remote-mcp).
 
-After the app is available in a chat, send the quick-start message.
+### ChatGPT Work
 
-Custom MCP apps are currently web-only in ChatGPT. Do not claim that this setup works in the ChatGPT mobile app.
+Set up once on ChatGPT web, then use KiasuMiles in Work on web or mobile. This route passed native MCP tests on a ChatGPT Pro account. Availability may vary by account and plan; ordinary ChatGPT Chat was not verified by these tests.
 
-See [OpenAI’s developer-mode and MCP app guide](https://help.openai.com/en/articles/12584461-developer-mode-apps-and-full-mcp-connectors-in-chatgpt-beta).
+1. On ChatGPT web, open **Settings → Plugins → Developer mode** and enable it.
+2. Open **Plugins** from the sidebar. Click the **+ beside the search bar** to open **New Plugin**.
+3. Enter **KiasuMiles** as the name. Choose **Server URL**, enter `https://kiasumiles.space/mcp`, and set Authentication to **No Auth**. Leave the optional fields blank.
+4. Read the warning, tick **I understand and want to continue**, then select **Create → Connect**.
+5. Start a **Work** conversation on web or mobile and send the Start here prompt. Approve **Connect** again if prompted, then ask it to continue.
 
-### ChatGPT Work through the public API
+<img src="kiasumiles/static/kiasumiles/assets/proof/chatgpt-custom-connector.png" alt="ChatGPT New Plugin setup with KiasuMiles, its server URL and No Auth selected" width="420">
 
-The public API provides another route when Work has network access. A mobile Work conversation has completed card selection and a merchant lookup through this route; availability depends on account permissions. This does not require installing an MCP connector.
-
-```text
-Use KiasuMiles through https://kiasumiles.space/api/chatgpt/openapi.json. Read its instructions once. Ask which cards I have only if missing, clarify ambiguous names only, and reuse my selections in this conversation. When I name a merchant, use one lookup if payment is known; otherwise compare payment methods in one request. Give a brief answer with the best card, rate, conditions, uncertainty and fallback. Only claim success after a real response. If network access is unavailable, say so.
-```
-
-### Another AI agent
-
-Check whether it supports remote MCP servers over Streamable HTTP and lets you add a custom server URL. If it does, add:
-
-```text
-https://kiasumiles.space/mcp
-```
-
-Then verify that it can list and call the KiasuMiles tools before relying on it.
+The public directory submission is separately awaiting review. This private setup does not make KiasuMiles publicly listed. We have not verified that the ChatGPT connection carries over to Codex; use the separate Codex instructions above.
 
 ## First use
 
 After KiasuMiles is connected:
 
-1. Your agent asks which banks you use.
-2. KiasuMiles shows the supported cards from those banks.
-3. You confirm the cards you hold.
-4. Your agent explains whether it can remember that selection.
-5. You provide a merchant and, where useful, how you are paying.
-6. KiasuMiles ranks only the cards supplied for that lookup.
+1. Tell the agent which cards you carry. If you need help, name your banks and choose from their supported cards.
+2. Provide a merchant and how you are paying. Include the amount if you want a miles estimate.
+3. KiasuMiles compares only the cards supplied for that lookup and returns the recommendation, conditions and fallback.
+
+Reuse your card selection within the conversation. Whether it carries into another conversation depends on your assistant, not KiasuMiles.
 
 Try:
 
 ```text
-What card should I use at NTUC FairPrice?
+What card should I use at NTUC FairPrice with Apple Pay?
 ```
 
 Other useful questions:
@@ -153,108 +115,86 @@ I’m paying for Grab in the app. Which card should I use?
 ```
 
 ```text
-Which card should I use for a Singapore Airlines booking online?
+Compare how I should pay at Uniqlo using the cards I carry.
 ```
 
 ```text
-Which of my cards should I use at this restaurant with Apple Pay?
+Does my card stack have any weak categories?
 ```
-
-The result can include the card name, miles per dollar, spending-cap summary, reason for the ranking and relevant caveats.
 
 ## Your card stack and privacy
 
-The hosted KiasuMiles MCP server has no wallet-save or wallet-read tools. For each hosted recommendation, the AI agent or client supplies the selected cards in that request.
+The hosted MCP server has no wallet-save or wallet-read tools. For each recommendation, the agent supplies the selected card names or identifiers in that request. KiasuMiles returns the result without retaining them as a wallet.
 
-Whether your card stack survives a new conversation depends on the AI agent or client you are using. KiasuMiles cannot guarantee that persistence, so ask the agent to explain its documented storage behaviour.
+Whether the selection survives a new conversation depends on the agent you use. KiasuMiles cannot promise persistence on another product’s behalf.
 
-KiasuMiles needs only the names of your cards. Do not provide:
+Only provide card names. Never provide:
 
 - Card numbers
-- Expiry dates
-- CVVs
+- Expiry dates or CVVs
 - Banking usernames or passwords
 - One-time passwords
 - Transaction or account credentials
-
-If your agent supports remembering your selection, you can ask:
-
-```text
-Show me the card stack you use for KiasuMiles lookups.
-```
-
-```text
-Add OCBC 90°N to the card stack you use for KiasuMiles.
-```
-
-```text
-Remove UOB Preferred Visa from the card stack you use for KiasuMiles.
-```
-
-The agent should tell you whether that change will persist. These are requests to your agent; the hosted KiasuMiles server itself does not save the stack.
 
 ## Troubleshooting
 
 ### The agent says it cannot connect
 
-- Confirm that the agent supports remote MCP servers over Streamable HTTP.
-- Check that the endpoint is exactly `https://kiasumiles.space/mcp`.
-- Check whether your account or workspace allows custom connections.
-- Use the product-specific steps above instead of asking the agent to guess.
+The app does not have permission or capability to add a remote MCP connection. Use its documented plugin or connector setup. Do not ask it to imitate KiasuMiles using general card knowledge.
 
-### The agent says KiasuMiles is connected, but cannot list its tools
+### The agent says KiasuMiles is connected but cannot call its tools
 
-The connection has not been verified. Restart or reload the agent using its documented method, then require it to list the KiasuMiles tools and call `kiasumiles_data_version`.
+The connection is not verified. Reload the agent using its documented method, then require it to list the KiasuMiles tools and call `kiasumiles_data_version`.
 
-### My card stack disappeared in a new conversation
+### Claude says `kiasumiles_data_version` does not exist
 
-The agent or client did not persist it. Run the quick-start message again and ask the agent to explain its storage behaviour. The hosted KiasuMiles server is not a wallet store.
+Claude has loaded an older local KiasuMiles server instead of the hosted connector. Disable the old local server, start a new Claude chat, enable the remote KiasuMiles connector, and retry. The current hosted connector exposes seven tools, including `kiasumiles_data_version`; do not let Claude replace that check with a different tool.
 
-### The recommendation is too broad
+### My card stack disappeared
 
-Include the exact merchant and payment method:
+The agent did not retain it. Confirm the cards again and ask the agent whether its own storage persists across conversations. The hosted KiasuMiles service is not a wallet store.
 
-```text
-Which of my cards should I use at NTUC FairPrice with Apple Pay?
-```
+### The recommendation is broad or uncertain
 
-### The service returns a rate-limit error
+Include the exact merchant, outlet when relevant, payment method and transaction amount. Merchant classifications and bank terms can change, so review the returned conditions and fallback before a large or unusual purchase.
 
-The hosted MCP endpoint defaults to 30 requests per 60 seconds for each IP address handled by a running service instance. If you receive HTTP 429, wait and retry.
+### The service returns HTTP 429
+
+The hosted MCP endpoint defaults to 30 requests per 60 seconds per IP address for each running service instance. Wait and retry.
 
 ## Supported cards and data
 
-Ask your agent:
+Ask the connected agent:
 
 ```text
 Show me all cards currently supported by KiasuMiles.
 ```
 
-The production service reports its current number of card rules, merchant records, data version and backend at:
+The production service reports its data version, record counts and active backend at:
 
 ```text
 https://kiasumiles.space/health
 ```
 
-Records may include a confidence level and last-verified date, but those fields do not guarantee that every merchant classification or bank rule is current.
+Confidence and last-verified fields are useful signals, not guarantees that every merchant classification or bank rule is current. Recommendations are informational; check the bank’s current terms when the stakes are high.
 
-Recommendations are informational. Check the relevant bank’s current terms before making a large or unusual purchase.
-
-For supported Amaze pairings, include both Amaze and the paired card in your selected stack so KiasuMiles can apply its configured adjustment.
+For supported Amaze pairings, include both Amaze and the paired card in the confirmed stack.
 
 ## Hosted MCP reference
 
-KiasuMiles currently exposes five hosted MCP tools:
+KiasuMiles exposes seven read-only MCP tools:
 
 | Tool | Purpose |
 |---|---|
 | `kiasumiles_list_cards` | Lists supported cards, optionally filtered by bank |
-| `kiasumiles_lookup` | Ranks supplied cards for a merchant |
+| `kiasumiles_lookup` | Ranks supplied cards for a merchant and payment method |
+| `kiasumiles_compare_payment_methods` | Compares supported payment methods in one request |
+| `kiasumiles_changes_since` | Summarises source-neutral data changes since a date |
 | `kiasumiles_recommend_stack` | Reviews category coverage among supplied cards |
 | `kiasumiles_data_version` | Returns the data version, record counts and backend |
-| `kiasumiles_agent_guide` | Returns integration and display guidance |
+| `kiasumiles_agent_guide` | Returns conversation and display guidance |
 
-Hosted lookups are stateless. The `cards` parameter is required, and the server does not retain it as a wallet.
+Hosted lookups are stateless. The caller supplies the selected cards for each lookup, and the server does not retain them as a wallet.
 
 ### Test the MCP connection
 
@@ -265,35 +205,9 @@ curl -i -X POST https://kiasumiles.space/mcp \
   -d '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-06-18","capabilities":{},"clientInfo":{"name":"curl-smoke","version":"1.0"}}}'
 ```
 
-### Public REST adapter
-
-The hosted service also exposes a stateless REST adapter:
-
-| Route | Purpose |
-|---|---|
-| `GET /api/chatgpt/openapi.json` | OpenAPI schema |
-| `GET /api/chatgpt/cards?bank=UOB` | Lists supported card names by bank |
-| `POST /api/chatgpt/lookup` | Looks up a merchant using card names supplied in the request |
-| `POST /api/chatgpt/recommend-stack` | Reviews the supplied card stack |
-
-The public adapter accepts card names and removes internal card IDs, merchant-category codes and internal reason codes from its JSON responses.
-
-Example:
-
-```json
-{
-  "merchant": "NTUC FairPrice",
-  "cards": [
-    "UOB Preferred Visa",
-    "Citi Rewards Mastercard"
-  ],
-  "channel": "mobile_contactless"
-}
-```
-
 ## For maintainers
 
-Production can load card rules and merchant mappings from Supabase. The repository includes a smaller bundled dataset for development and tests.
+Production loads card rules and merchant mappings from Supabase. The repository includes a smaller bundled dataset for development and tests. Lookup and ranking remain deterministic and do not perform live web searches.
 
 Environment variables:
 
@@ -305,46 +219,17 @@ Environment variables:
 - `KIASUMILES_RATE_LIMIT_REQUESTS` — optional; defaults to `30`; `0` disables the MCP rate limit
 - `KIASUMILES_RATE_LIMIT_WINDOW_SECONDS` — optional; defaults to `60`
 
-Backend selection:
-
-- `auto`: use Supabase when its credentials are present; otherwise use the bundled dataset
-- `supabase`: require Supabase and fail if it is unavailable
-
-The database schema is at [supabase/schema.sql](supabase/schema.sql). Both `/health` and `kiasumiles_data_version` report the selected backend.
+The schema is at [supabase/schema.sql](supabase/schema.sql). Both `/health` and `kiasumiles_data_version` report the selected backend.
 
 ### Supabase keep-awake
 
-The `Supabase keep-awake` GitHub Actions workflow performs one direct, read-only
-`card_rules` query at 08:17, 16:17, and 00:17 Singapore time each day. It does
-not use the hosted `/health` route, because a warm hosted process can serve
-cached data without touching Supabase. The query selects one identifier and
-never inserts, updates, or deletes data.
+The `Supabase keep-awake` GitHub Actions workflow performs one direct, read-only `card_rules` query at 08:17, 16:17 and 00:17 Singapore time each day. It never inserts, updates or deletes data.
 
-Configure the encrypted repository secrets:
-
-1. In the GitHub repository, open **Settings → Secrets and variables → Actions**.
-2. Choose **New repository secret** and create
-   `KIASUMILES_SUPABASE_URL` with the production project API URL.
-3. Choose **New repository secret** again and create
-   `KIASUMILES_SUPABASE_SERVICE_ROLE_KEY` with the production service-role key
-   used by the hosted backend.
-
-Never put either value in the workflow file, source code, logs, or a pull
-request. The script prints only a generic success message or a sanitized error;
-a failed query exits non-zero so the workflow is visibly red in GitHub Actions.
-
-The scheduled trigger starts only after the workflow is on the repository's
-default branch. After merging, open **Actions → Supabase keep-awake → Run
-workflow** once and confirm the run succeeds. Keep GitHub Actions failure
-notifications enabled so a failed scheduled run is noticed.
+Store `KIASUMILES_SUPABASE_URL` and `KIASUMILES_SUPABASE_SERVICE_ROLE_KEY` only as encrypted GitHub Actions secrets. Never place either value in source code, logs or a pull request.
 
 ## Feedback
 
-If a recommendation appears wrong or a merchant is missing, message [@kiasumilesbot](https://t.me/kiasumilesbot) on Telegram with the merchant name and the recommendation you received.
-
-## Changelog
-
-See [CHANGELOG.md](CHANGELOG.md).
+If a recommendation appears wrong or a merchant is missing, message [@kiasumilesbot](https://t.me/kiasumilesbot) on Telegram with the merchant, outlet and payment method. Leave out card numbers and personal payment details.
 
 ## About
 

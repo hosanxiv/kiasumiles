@@ -7,24 +7,13 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 README = ROOT / "README.md"
 LANDING = ROOT / "kiasumiles" / "static" / "kiasumiles" / "index.html"
-WEBSITE_SETUP_PROMPT = (
-    "Use KiasuMiles. Reuse its MCP tools if available. Otherwise, if you can add MCP connections, connect https://kiasumiles.space/mcp with my approval. For MCP, don't claim it's connected until you can list its tools and call kiasumiles_data_version successfully. If MCP setup is unavailable, use the public API described at https://kiasumiles.space/api/chatgpt/openapi.json when network access permits; read it once and verify a real response. If neither route works, explain the blocker. Ask which cards I have only if missing; offer banks if I need help. Clarify ambiguous names only and reuse my cards in this conversation. For a merchant, make one lookup if payment is known; otherwise compare payment methods together. Give a brief answer with the best card, rate, conditions, caveats, and fallback if the match is uncertain."
-)
-
-
 def test_public_setup_prompts_are_present_on_github_and_website():
     readme = README.read_text(encoding="utf-8")
     landing = unescape(LANDING.read_text(encoding="utf-8"))
 
-    normalized_readme = " ".join(readme.split())
-    assert "Connect me to KiasuMiles at https://kiasumiles.space/mcp" in normalized_readme
-    assert "Ask before changing settings or running installation commands." in normalized_readme
-    assert "Do not say KiasuMiles is connected until" in normalized_readme
-    assert "show me the matching supported cards" in normalized_readme
-    assert "whether my selections will persist" in normalized_readme
-    assert "After confirming my cards, ask for a Singapore merchant" in normalized_readme
-
-    assert f'data-copy="{WEBSITE_SETUP_PROMPT}"' in landing
+    assert "First verify the connection by calling kiasumiles_data_version." in readme
+    assert "Use KiasuMiles. If its tools are already available, reuse them." in landing
+    assert "connect to https://kiasumiles.space/mcp if you can manage remote MCP connections" in landing
 
 
 def test_public_setup_is_client_neutral_and_nontechnical():
@@ -33,19 +22,21 @@ def test_public_setup_is_client_neutral_and_nontechnical():
     assert "uvx kiasumiles-mcp" not in public_copy
     assert "The Codex plugin" not in public_copy
     assert "### Codex plugin" not in public_copy
+    assert "/api/chatgpt" not in public_copy
 
 
 def test_public_setup_is_honest_about_connection_and_storage():
     readme = " ".join(README.read_text(encoding="utf-8").split())
     landing = " ".join(unescape(LANDING.read_text(encoding="utf-8")).split())
 
-    assert "Do not say KiasuMiles is connected until" in readme
-    assert "whether my selections will persist" in readme
-    assert "hosted KiasuMiles server stores my card stack" in readme
+    assert "Do not claim KiasuMiles is connected until" in readme
+    assert "the assistant must support external tools" in readme
+    assert "does not retain them as a wallet" in readme
 
-    assert "don't claim it's connected until you can list its tools" in landing
+    assert "Do not claim KiasuMiles is connected until you can list its tools" in landing
     assert "kiasumiles_data_version successfully" in landing
-    assert "fallback if the match is uncertain" in landing
+    assert "If KiasuMiles tools aren’t available, stop and tell me." in landing
+    assert "with its conditions and fallback" in landing
     assert "does not store your card stack" in landing
 
     assert "Install KiasuMiles MCP for me" not in readme
@@ -53,15 +44,43 @@ def test_public_setup_is_honest_about_connection_and_storage():
     assert "It remembers your cards" not in landing
 
 
-def test_landing_routes_detailed_agent_setup_to_github():
+def test_landing_keeps_setup_on_page_and_github_in_footer():
     readme = README.read_text(encoding="utf-8")
     landing = unescape(LANDING.read_text(encoding="utf-8"))
 
-    assert "### OpenClaw or Hermes through Telegram" in readme
-    assert "### Codex on desktop" in readme
+    assert "OpenClaw, Hermes, Zo and similar agents" in readme
+    assert "### Codex desktop or CLI" in readme
     assert "### Claude" in readme
     assert "custom connector" in readme
-    assert "Do not claim that this setup works in the ChatGPT mobile app." in readme
+    assert "ChatGPT Work on web and mobile" in readme
+    assert "New Plugin" in readme
+    assert "No Auth" in readme
+    assert "ordinary ChatGPT Chat was not verified" in readme
 
-    assert "Claude and other agents" in landing
-    assert "github.com/hosanxiv/kiasumiles#readme" in landing
+    assert "setup-tab-claude" in landing
+    assert "setup-tab-work" in landing
+    assert "setup-tab-agents" in landing
+    assert "Read the setup guide on GitHub" not in landing
+    assert "github.com/hosanxiv/kiasumiles" in landing
+
+
+def test_public_copy_is_mcp_only_and_lists_every_hosted_tool():
+    readme = README.read_text(encoding="utf-8")
+    landing = unescape(LANDING.read_text(encoding="utf-8"))
+
+    assert "seven read-only MCP tools" in readme
+    for tool in (
+        "kiasumiles_list_cards",
+        "kiasumiles_lookup",
+        "kiasumiles_compare_payment_methods",
+        "kiasumiles_changes_since",
+        "kiasumiles_recommend_stack",
+        "kiasumiles_data_version",
+        "kiasumiles_agent_guide",
+    ):
+        assert tool in readme
+
+    assert "public API" not in landing
+    assert "We tested ChatGPT Work on mobile" in landing
+    assert "using the same Pro account" in landing
+    assert "KiasuMiles ONLY works with AI assistants that can use external tools." in landing

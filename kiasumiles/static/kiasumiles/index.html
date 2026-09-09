@@ -75,12 +75,21 @@
     .route-card { padding: clamp(24px,4vw,42px); border-radius: 16px; background: #fff; color: var(--ink); box-shadow: 0 26px 64px rgba(0,0,0,.25); }
     .route-card h3 { font-size: 24px; letter-spacing: -.03em; }
     .route-card > p { margin-top: 12px; color: var(--ink-soft); line-height: 1.55; }
+    .setup-tabs { display: flex; gap: 8px; margin-top: 20px; padding: 4px; overflow-x: auto; border-radius: 999px; background: var(--wash); }
+    .setup-tab { flex: 1 0 auto; min-height: 42px; padding: 9px 14px; border: 0; border-radius: 999px; background: transparent; color: var(--ink-soft); font: inherit; font-size: 14px; font-weight: 800; cursor: pointer; }
+    .setup-tab[aria-selected="true"] { background: var(--deep-green); color: #fff; }
+    .setup-panel { margin-top: 18px; }
+    .setup-panel[hidden] { display: none; }
+    .setup-panel p { color: var(--ink-soft); line-height: 1.55; }
+    .setup-panel strong { color: var(--ink); }
+    .setup-panel ol { margin-top: 12px; padding-left: 22px; color: var(--ink-soft); line-height: 1.55; }
+    .setup-panel li + li { margin-top: 8px; }
+    .setup-shot { display: block; width: auto; height: auto; max-width: 100%; max-height: 280px; margin-top: 16px; border: 1px solid var(--line); border-radius: 12px; }
+    .setup-shot-link { display: inline-block; font-size: 12px; }
     .route-label { margin-bottom: 10px; color: var(--deep-green) !important; font-family: var(--mono); font-size: 12px; font-weight: 750; letter-spacing: .04em; text-transform: uppercase; }
     .setup-prompt { width: 100%; min-height: 190px; margin-top: 16px; resize: vertical; padding: 17px; border: 0; border-radius: 12px; background: var(--ink); color: #fff; font-family: var(--mono); font-size: 13px; line-height: 1.65; }
     .copy-row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-top: 14px; }
     .copy-status { min-height: 22px; color: var(--muted); font-size: 14px; font-weight: 650; }
-    .guide-link { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px; margin-top: 24px !important; padding-top: 22px; border-top: 1px solid var(--line); }
-    .guide-link strong { color: var(--ink); }
 
     .answer-section { padding: 96px 24px; background: var(--mint-wash); }
     .answer-inner, .flow-inner { display: grid; grid-template-columns: .72fr 1.28fr; align-items: center; gap: clamp(48px,7vw,90px); width: min(var(--content),100%); margin: 0 auto; }
@@ -151,6 +160,8 @@
       .start-copy h2, .answer-copy h2, .flow-copy h2, .privacy-copy h2 { font-size: clamp(42px,12vw,58px); }
       .start-copy > p { font-size: 18px; }
       .route-card { padding: 22px; }
+      .setup-tabs { display: grid; grid-template-columns: 1fr 1.45fr 1fr; overflow: visible; }
+      .setup-tab { min-width: 0; padding: 8px 5px; font-size: 12px; line-height: 1.15; white-space: normal; }
       .ticket-top { grid-template-columns: 1fr; }
       .ticket-card-art { width: min(210px,82%); }
       .ticket-rate { align-items: flex-start; flex-direction: column; }
@@ -159,7 +170,7 @@
       .footer-inner { align-items: flex-start; flex-direction: column; }
       .footer-links { justify-content: flex-start; }
     }
-    @media (max-width: 430px) { .brand { font-size: 18px; } .setup-prompt { min-height: 210px; } .guide-link .button { width: 100%; } }
+    @media (max-width: 430px) { .brand { font-size: 18px; } .setup-prompt { min-height: 230px; } }
     @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } *, *::before, *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; } }
   </style>
 </head>
@@ -198,11 +209,37 @@
         </div>
         <section class="route-card" aria-labelledby="setup-card-title">
           <h3 id="setup-card-title">Connect KiasuMiles</h3>
-          <p>Use KiasuMiles with compatible AI agents, including ChatGPT Work on mobile where network access is available.</p>
-          <p>Copy this prompt:</p>
-          <textarea class="setup-prompt" id="setup-prompt" readonly>Use KiasuMiles. Reuse its MCP tools if available. Otherwise, if you can add MCP connections, connect https://kiasumiles.space/mcp with my approval. For MCP, don't claim it's connected until you can list its tools and call kiasumiles_data_version successfully. If MCP setup is unavailable, use the public API described at https://kiasumiles.space/api/chatgpt/openapi.json when network access permits; read it once and verify a real response. If neither route works, explain the blocker. Ask which cards I have only if missing; offer banks if I need help. Clarify ambiguous names only and reuse my cards in this conversation. For a merchant, make one lookup if payment is known; otherwise compare payment methods together. Give a brief answer with the best card, rate, conditions, caveats, and fallback if the match is uncertain.</textarea>
-          <div class="copy-row"><button class="button accent" id="copy-prompt" type="button" aria-label="Copy KiasuMiles setup message" data-copy="Use KiasuMiles. Reuse its MCP tools if available. Otherwise, if you can add MCP connections, connect https://kiasumiles.space/mcp with my approval. For MCP, don't claim it's connected until you can list its tools and call kiasumiles_data_version successfully. If MCP setup is unavailable, use the public API described at https://kiasumiles.space/api/chatgpt/openapi.json when network access permits; read it once and verify a real response. If neither route works, explain the blocker. Ask which cards I have only if missing; offer banks if I need help. Clarify ambiguous names only and reuse my cards in this conversation. For a merchant, make one lookup if payment is known; otherwise compare payment methods together. Give a brief answer with the best card, rate, conditions, caveats, and fallback if the match is uncertain.">Copy setup message</button><p class="copy-status" id="copy-status" aria-live="polite"></p></div>
-          <p class="guide-link"><strong>Claude and other agents</strong><a class="button" href="https://github.com/hosanxiv/kiasumiles#readme" target="_blank" rel="noreferrer">Read the setup guide on GitHub</a></p>
+          <p>KiasuMiles ONLY works with AI assistants that can use external tools. Choose yours for the right setup.</p>
+          <div class="setup-tabs" role="tablist" aria-label="Choose your AI assistant">
+            <button class="setup-tab" id="setup-tab-agents" type="button" role="tab" aria-selected="true" aria-controls="setup-panel-agents" data-setup="agents">AI agents</button>
+            <button class="setup-tab" id="setup-tab-work" type="button" role="tab" aria-selected="false" aria-controls="setup-panel-work" data-setup="work" tabindex="-1">ChatGPT Work</button>
+            <button class="setup-tab" id="setup-tab-claude" type="button" role="tab" aria-selected="false" aria-controls="setup-panel-claude" data-setup="claude" tabindex="-1">Claude</button>
+          </div>
+          <div class="setup-panel" id="setup-panel-agents" role="tabpanel" aria-labelledby="setup-tab-agents"><p>Paste this into an AI agent that can add remote MCP connections.</p></div>
+          <div class="setup-panel" id="setup-panel-work" role="tabpanel" aria-labelledby="setup-tab-work" hidden>
+            <p>Set up once on ChatGPT web, then use KiasuMiles in Work on web or mobile. Tested on a ChatGPT Pro account; availability may vary.</p>
+            <ol>
+              <li>On ChatGPT web, go to <strong>Settings → Plugins → Developer mode</strong> and enable it.</li>
+              <li>Open <strong>Plugins</strong> from the sidebar. Click the <strong>+ beside the search bar</strong> to open <strong>New Plugin</strong>.</li>
+              <li>Enter <strong>KiasuMiles</strong> as the name, choose <strong>Server URL</strong>, and enter <code>https://kiasumiles.space/mcp</code>. Set Authentication to <strong>No Auth</strong>. Leave the optional fields blank.</li>
+              <li>Read the warning, tick <strong>I understand and want to continue</strong>, then select <strong>Create → Connect</strong>.</li>
+              <li>Start a <strong>Work</strong> conversation on web or mobile and paste the prompt below. Approve <strong>Connect</strong> again if asked.</li>
+            </ol>
+            <a class="setup-shot-link" href="assets/proof/chatgpt-custom-connector.png" target="_blank" rel="noreferrer"><img class="setup-shot" src="assets/proof/chatgpt-custom-connector.png" width="1000" height="1544" loading="lazy" decoding="async" alt="ChatGPT New Plugin form filled with KiasuMiles, https://kiasumiles.space/mcp, No Auth and the acknowledgement checkbox selected">View setup screenshot (opens in a new tab)</a>
+          </div>
+          <div class="setup-panel" id="setup-panel-claude" role="tabpanel" aria-labelledby="setup-tab-claude" hidden>
+            <p>Set up once in the Claude app, then use KiasuMiles in a conversation with the connector enabled. Tested in Claude chat and Cowork on desktop; mobile availability may vary.</p>
+            <ol>
+              <li>In the Claude app, go to <strong>Settings → Customise → Connectors → Add custom connector</strong>.</li>
+              <li>Enter <strong>KiasuMiles</strong> as the name and <code>https://kiasumiles.space/mcp</code> as the server URL.</li>
+              <li>Select <strong>Continue</strong> and complete the connection prompts.</li>
+              <li>Start a new conversation, enable <strong>KiasuMiles</strong> from the <strong>+</strong> menu, and paste the prompt below.</li>
+            </ol>
+            <a class="setup-shot-link" href="assets/proof/claude-custom-connector.png" target="_blank" rel="noreferrer"><img class="setup-shot" src="assets/proof/claude-custom-connector.png" width="950" height="784" loading="lazy" decoding="async" alt="Claude Add custom connector screen filled with the KiasuMiles name and MCP address">View setup screenshot (opens in a new tab)</a>
+          </div>
+          <p class="route-label">Copy this prompt</p>
+          <textarea class="setup-prompt" id="setup-prompt" readonly>Use KiasuMiles. If its tools are already available, reuse them. Otherwise, connect to https://kiasumiles.space/mcp if you can manage remote MCP connections. Ask before changing settings or installing anything. If you cannot, say that this agent needs a one-time MCP connection and stop. Do not claim KiasuMiles is connected until you can list its tools and call kiasumiles_data_version successfully. Then ask which banks I use, show their supported cards, and let me confirm mine. Finally, ask for a Singapore merchant and payment method and recommend the best confirmed card with its conditions and fallback.</textarea>
+          <div class="copy-row"><button class="button accent" id="copy-prompt" type="button" aria-label="Copy KiasuMiles setup message">Copy setup message</button><p class="copy-status" id="copy-status" aria-live="polite"></p></div>
         </section>
       </div>
     </section>
@@ -234,7 +271,9 @@
         <h2 id="faq-title">Questions I get about KiasuMiles.</h2>
         <div class="faq-list">
           <details class="faq-item"><summary>What is KiasuMiles?</summary><p>I built KiasuMiles so your AI agent can pick the best card from the ones you own. It matches the merchant and payment method against Singapore credit-card miles rules, then returns the conditions and a fallback.</p></details>
-          <details class="faq-item"><summary>Will it work with my AI agent?</summary><p>Paste the setup message into your AI agent. Agents that can connect to external tools will add KiasuMiles or ask you to approve the connection. Some apps may need you to add it through their settings.</p></details>
+          <details class="faq-item"><summary>Will it work with my AI assistant?</summary><p>KiasuMiles ONLY works with AI assistants that can use external tools. Use the setup tab for AI agents, ChatGPT Work or Claude above. Some agents can handle the connection with your approval; ChatGPT Work and Claude need a one-time setup in their settings.</p></details>
+          <details class="faq-item"><summary>Can I use it on my phone?</summary><p>We tested ChatGPT Work on mobile after setting up KiasuMiles once on ChatGPT web, using the same Pro account. You can then ask Work which card to use. Availability may vary by account and plan; this test does not cover ordinary ChatGPT Chat.</p></details>
+          <details class="faq-item"><summary>Do I need to wait for a public plugin?</summary><p>No. The custom connection described above worked in ChatGPT Work without public directory approval. Complete that one-time setup first, then use the prompt. If the assistant cannot access KiasuMiles, it should tell you rather than guess.</p></details>
           <details class="faq-item"><summary>Does KiasuMiles store my cards?</summary><p>For each lookup, your agent sends the card names you confirmed. The hosted service returns an answer without keeping a wallet. We never receive your card number, expiry date, or CVV.</p></details>
           <details class="faq-item"><summary>How accurate are the recommendations?</summary><p>I keep the card rules and merchant matches updated, but banks change their terms and merchants sometimes process payments under an unexpected category. Check the conditions and fallback before you tap.</p></details>
           <details class="faq-item"><summary>What if a merchant or card rule looks wrong?</summary><p>Send me feedback through Telegram with the merchant name, outlet, and how you paid. Leave out your card number and any personal payment details.</p></details>
@@ -243,17 +282,26 @@
     </section>
   </main>
 
-  <footer class="site-footer"><div class="footer-inner"><p class="footer-brand">KiasuMiles · Singapore credit-card miles guidance</p><nav class="footer-links" aria-label="Footer navigation"><a href="/privacy">Privacy</a><a href="/terms">Terms</a><a href="https://t.me/kiasumilesbot" target="_blank" rel="noreferrer">Send feedback</a></nav></div></footer>
+  <footer class="site-footer"><div class="footer-inner"><p class="footer-brand">KiasuMiles · Singapore credit-card miles guidance</p><nav class="footer-links" aria-label="Footer navigation"><a href="/privacy">Privacy</a><a href="/terms">Terms</a><a href="https://github.com/hosanxiv/kiasumiles" target="_blank" rel="noreferrer">GitHub</a><a href="https://t.me/kiasumilesbot" target="_blank" rel="noreferrer">Send feedback</a></nav></div></footer>
 
   <script>
     (function () {
       var button = document.getElementById("copy-prompt");
       var prompt = document.getElementById("setup-prompt");
       var status = document.getElementById("copy-status");
+      var tabs = Array.prototype.slice.call(document.querySelectorAll(".setup-tab"));
+      var panels = Array.prototype.slice.call(document.querySelectorAll(".setup-panel"));
+      var prompts = {
+        agents: "Use KiasuMiles. If its tools are already available, reuse them. Otherwise, connect to https://kiasumiles.space/mcp if you can manage remote MCP connections. Ask before changing settings or installing anything. If you cannot, say that this agent needs a one-time MCP connection and stop. Do not claim KiasuMiles is connected until you can list its tools and call kiasumiles_data_version successfully. Then ask which banks I use, show their supported cards, and let me confirm mine. Finally, ask for a Singapore merchant and payment method and recommend the best confirmed card with its conditions and fallback.",
+        work: "Use KiasuMiles. First verify the connection by calling kiasumiles_data_version. Ask which cards I carry only if you don’t already know; show supported cards if I need help choosing. Then ask where I’m paying and how, and recommend my best confirmed card with its earn rate, bonus conditions and fallback. If KiasuMiles tools aren’t available, stop and tell me.",
+        claude: "Use KiasuMiles. First verify the connection by calling kiasumiles_data_version. Ask which cards I carry only if you don’t already know; show supported cards if I need help choosing. Then ask where I’m paying and how, and recommend my best confirmed card with its earn rate, bonus conditions and fallback. If KiasuMiles tools aren’t available, stop and tell me."
+      };
       var resetTimer;
       function scheduleReset(delay) { if (resetTimer) window.clearTimeout(resetTimer); resetTimer = window.setTimeout(function () { button.textContent = "Copy setup message"; status.textContent = ""; }, delay); }
       function showManualFallback() { prompt.focus(); prompt.select(); prompt.setSelectionRange(0, prompt.value.length); button.textContent = "Copy manually"; status.textContent = "Copy didn't work. Select the message and copy it manually."; scheduleReset(6000); }
-      button.addEventListener("click", async function () { try { if (!navigator.clipboard || !navigator.clipboard.writeText) throw new Error("Clipboard unavailable"); await navigator.clipboard.writeText(button.getAttribute("data-copy") || prompt.value); button.textContent = "Copied"; status.textContent = "Setup message copied."; scheduleReset(2500); } catch (error) { showManualFallback(); } });
+      function selectSetup(name) { tabs.forEach(function (tab) { var selected = tab.dataset.setup === name; tab.setAttribute("aria-selected", String(selected)); tab.tabIndex = selected ? 0 : -1; }); panels.forEach(function (panel) { panel.hidden = panel.id !== "setup-panel-" + name; }); prompt.value = prompts[name]; status.textContent = ""; }
+      tabs.forEach(function (tab, index) { tab.addEventListener("click", function () { selectSetup(tab.dataset.setup); }); tab.addEventListener("keydown", function (event) { if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return; event.preventDefault(); var next = (index + (event.key === "ArrowRight" ? 1 : tabs.length - 1)) % tabs.length; tabs[next].focus(); selectSetup(tabs[next].dataset.setup); }); });
+      button.addEventListener("click", async function () { try { if (!navigator.clipboard || !navigator.clipboard.writeText) throw new Error("Clipboard unavailable"); await navigator.clipboard.writeText(prompt.value); button.textContent = "Copied"; status.textContent = "Setup message copied."; scheduleReset(2500); } catch (error) { showManualFallback(); } });
     }());
   </script>
 </body>
