@@ -18,6 +18,8 @@ from . import tools
 
 STATIC_DIR = Path(__file__).resolve().parent / "static" / "kiasumiles"
 PROOF_ASSETS = {
+    "chatgpt-custom-connector.png": "image/png",
+    "claude-custom-connector.png": "image/png",
     "kiasumiles-real-life-720.webp": "image/webp",
     "kiasumiles-real-life-1460.webp": "image/webp",
     "kiasumiles-real-life-1460.jpg": "image/jpeg",
@@ -125,6 +127,7 @@ async def product_demo(_: Request) -> FileResponse:
     return FileResponse(STATIC_DIR / "product-demo-60s.mp4", media_type="video/mp4")
 
 
+@mcp.custom_route("/assets/proof/{filename}", methods=["GET"])
 @mcp.custom_route("/kiasumiles/assets/proof/{filename}", methods=["GET"])
 async def proof_asset(request: Request) -> FileResponse | PlainTextResponse:
     filename = request.path_params["filename"]

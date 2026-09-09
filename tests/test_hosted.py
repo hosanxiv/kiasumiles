@@ -5,6 +5,8 @@ from starlette.testclient import TestClient
 
 
 PROOF_ASSETS = (
+    ("chatgpt-custom-connector.png", "image/png"),
+    ("claude-custom-connector.png", "image/png"),
     ("kiasumiles-real-life-720.webp", "image/webp"),
     ("kiasumiles-real-life-1460.webp", "image/webp"),
     ("kiasumiles-real-life-1460.jpg", "image/jpeg"),
