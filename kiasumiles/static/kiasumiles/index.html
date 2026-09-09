@@ -84,8 +84,7 @@
     .setup-panel strong { color: var(--ink); }
     .setup-panel ol { margin-top: 12px; padding-left: 22px; color: var(--ink-soft); line-height: 1.55; }
     .setup-panel li + li { margin-top: 8px; }
-    .setup-shot { display: block; width: auto; height: auto; max-width: 100%; max-height: 280px; margin-top: 16px; border: 1px solid var(--line); border-radius: 12px; }
-    .setup-shot-link { display: inline-block; font-size: 12px; }
+    .setup-shot { display: block; width: min(100%, 520px); height: 260px; margin-top: 16px; padding: 12px; object-fit: contain; object-position: left center; background: var(--wash); border: 1px solid var(--line); border-radius: 12px; }
     .route-label { margin-bottom: 10px; color: var(--deep-green) !important; font-family: var(--mono); font-size: 12px; font-weight: 750; letter-spacing: .04em; text-transform: uppercase; }
     .setup-prompt { width: 100%; min-height: 190px; margin-top: 16px; resize: vertical; padding: 17px; border: 0; border-radius: 12px; background: var(--ink); color: #fff; font-family: var(--mono); font-size: 13px; line-height: 1.65; }
     .copy-row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-top: 14px; }
@@ -225,7 +224,7 @@
               <li>Read the warning, tick <strong>I understand and want to continue</strong>, then select <strong>Create → Connect</strong>.</li>
               <li>Start a <strong>Work</strong> conversation on web or mobile and paste the prompt below. Approve <strong>Connect</strong> again if asked.</li>
             </ol>
-            <a class="setup-shot-link" href="assets/proof/chatgpt-custom-connector.png" target="_blank" rel="noreferrer"><img class="setup-shot" src="assets/proof/chatgpt-custom-connector.png" width="1000" height="1544" loading="lazy" decoding="async" alt="ChatGPT New Plugin form filled with KiasuMiles, https://kiasumiles.space/mcp, No Auth and the acknowledgement checkbox selected">View setup screenshot (opens in a new tab)</a>
+            <img class="setup-shot" src="assets/proof/chatgpt-custom-connector.png" width="1000" height="1544" loading="lazy" decoding="async" alt="ChatGPT New Plugin form filled with KiasuMiles, https://kiasumiles.space/mcp, No Auth and the acknowledgement checkbox selected">
           </div>
           <div class="setup-panel" id="setup-panel-claude" role="tabpanel" aria-labelledby="setup-tab-claude" hidden>
             <p>Set up once in the Claude app, then use KiasuMiles in a conversation with the connector enabled. Tested in Claude chat and Cowork on desktop; mobile availability may vary.</p>
@@ -235,7 +234,7 @@
               <li>Select <strong>Continue</strong> and complete the connection prompts.</li>
               <li>Start a new conversation, enable <strong>KiasuMiles</strong> from the <strong>+</strong> menu, and paste the prompt below.</li>
             </ol>
-            <a class="setup-shot-link" href="assets/proof/claude-custom-connector.png" target="_blank" rel="noreferrer"><img class="setup-shot" src="assets/proof/claude-custom-connector.png" width="950" height="784" loading="lazy" decoding="async" alt="Claude Add custom connector screen filled with the KiasuMiles name and MCP address">View setup screenshot (opens in a new tab)</a>
+            <img class="setup-shot" src="assets/proof/claude-custom-connector.png" width="950" height="784" loading="lazy" decoding="async" alt="Claude Add custom connector screen filled with the KiasuMiles name and MCP address">
           </div>
           <p class="route-label">Copy this prompt</p>
           <textarea class="setup-prompt" id="setup-prompt" readonly>Use KiasuMiles. If its tools are already available, reuse them. Otherwise, connect to https://kiasumiles.space/mcp if you can manage remote MCP connections. Ask before changing settings or installing anything. If you cannot, say that this agent needs a one-time MCP connection and stop. Do not claim KiasuMiles is connected until you can list its tools and call kiasumiles_data_version successfully. Then ask which banks I use, show their supported cards, and let me confirm mine. Finally, ask for a Singapore merchant and payment method and recommend the best confirmed card with its conditions and fallback.</textarea>
