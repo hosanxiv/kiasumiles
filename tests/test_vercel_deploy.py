@@ -28,6 +28,11 @@ def test_vercelignore_excludes_private_and_local_artifacts() -> None:
     }
 
     required = {
+        ".local-private/",
+        "private-data/",
+        ".tmp-*/",
+        ".Codex/",
+        "**/settings.local.json",
         ".impeccable/",
         ".playwright-cli/",
         ".superpowers/",

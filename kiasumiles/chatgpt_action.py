@@ -70,12 +70,22 @@ def _openapi_spec() -> dict:
             "merchant": {"type": "string"},
             "cards": card_array_schema,
             "outlet": {"type": "string"},
-            "channel": {"type": "string", "enum": ["online", "contactless", "mobile_contactless"]},
+            "channel": {"type": "string", "enum": ["online", "app", "contactless", "mobile_contactless", "fcy"]},
             "category": {
                 "type": "string",
                 "enum": ["dining", "grocery", "transport", "petrol", "pharmacy", "hotel", "airlines", "shopping"],
             },
             "amount_sgd": {"type": "number", "exclusiveMinimum": 0},
+            "transaction_currency": {"type": ["string", "null"], "pattern": "^[A-Z]{3}$", "description": "Confirmed charged currency, e.g. SGD or MYR. Used for PRVI and BOC Elite overseas eligibility. Omit if unknown."},
+            "payment_gateway_country": {"type": ["string", "null"], "pattern": "^[A-Z]{2}$", "description": "Confirmed payment processing country, e.g. SG or MY, not inferred from merchant location. Used for PRVI and BOC Elite overseas eligibility. Omit if unknown."},
+            "chocolate_eligible": {"type": ["boolean", "null"], "description": "True when the Chocolate Visa card is linked and verified on HeyMax and both accounts use the same email; from October 2026 also confirm at least S$5,000 prior-month average daily SGD balance. September 2026 has no balance check. False if ineligible; omit when unknown."},
+            "is_recurring": {"type": ["boolean", "null"], "description": "Whether this is an automatic payment under a one-time authorisation at fixed intervals. Omit if unknown."},
+            "revolution_prior_eligible_spend_sgd": {"type": ["number", "null"], "minimum": 0, "description": "Revolution bonus-eligible spending already posted in the same calendar month before this purchase, combined across primary and supplementary cards. Exclude this purchase and non-eligible spending. Omit if unknown; zero means confirmed no prior eligible spending."},
+            "revolution_ega_eligible": {"type": ["boolean", "null"], "description": "True only when the user confirms at least S$50,000 average daily SGD deposits in their sole HSBC Everyday Global Account for the posting month; joint accounts do not qualify. Omit if unknown."},
+            "vantage_miles_selected": {"type": ["boolean", "null"], "description": "True only when DBS Vantage Miles choice is confirmed in digibank; false for Cashback; omit when unknown."},
+            "smart_statement_spend_sgd": {"type": ["number", "null"], "minimum": 0, "description": "User-confirmed total eligible Smart spending for this statement month, including this purchase and supplementary cards. Omit if unknown; not a forecast or the purchase amount alone."},
+            "pps_prior_spend_sgd": {"type": ["object", "null"], "additionalProperties": {"type": "number", "minimum": 0}, "description": "Lookup only: map PPS card names to confirmed prior eligible calendar-month SGD-equivalent spending, excluding this purchase, in the same currency bucket; use the separate SIA Group bucket only if pps_sia_group_eligible is true. Never combine currencies or cards. Omit unknown totals."},
+            "pps_sia_group_eligible": {"type": ["boolean", "null"], "description": "Lookup only: true only for confirmed qualifying direct SGD SIA Group purchases, including Singapore departure for flights and no digital wallet for Pelago; false if not qualifying, otherwise omit."},
         },
     }
     stack_body = {
@@ -131,7 +141,10 @@ def _openapi_spec() -> dict:
                     "summary": "Compare payment methods in one request when payment is unspecified or the user asks to compare.",
                     "requestBody": {
                         "required": True,
-                        "content": {"application/json": {"schema": lookup_body}},
+                        "content": {"application/json": {"schema": {
+                            **lookup_body, "properties": {key: value for key, value in lookup_body["properties"].items()
+                                                          if not key.startswith("pps_")}
+                        }}},
                     },
                     "responses": {"200": {"description": "Payment-method comparison"}},
                 }
@@ -196,6 +209,16 @@ def register_chatgpt_action_routes(mcp) -> None:
                 body.get("channel"),
                 body.get("category"),
                 body.get("amount_sgd"),
+                body.get("chocolate_eligible"),
+                body.get("smart_statement_spend_sgd"),
+                body.get("pps_prior_spend_sgd"),
+                body.get("pps_sia_group_eligible"),
+                body.get("vantage_miles_selected"),
+                body.get("transaction_currency"),
+                body.get("payment_gateway_country"),
+                body.get("is_recurring"),
+                body.get("revolution_ega_eligible"),
+                body.get("revolution_prior_eligible_spend_sgd"),
             )
         except ValueError as exc:
             return JSONResponse({"error": str(exc)}, status_code=400)
@@ -214,6 +237,14 @@ def register_chatgpt_action_routes(mcp) -> None:
                 body.get("amount_sgd"),
                 body.get("outlet"),
                 body.get("category"),
+                body.get("chocolate_eligible"),
+                body.get("smart_statement_spend_sgd"),
+                vantage_miles_selected=body.get("vantage_miles_selected"),
+                transaction_currency=body.get("transaction_currency"),
+                payment_gateway_country=body.get("payment_gateway_country"),
+                is_recurring=body.get("is_recurring"),
+                revolution_ega_eligible=body.get("revolution_ega_eligible"),
+                revolution_prior_eligible_spend_sgd=body.get("revolution_prior_eligible_spend_sgd"),
             )
         except ValueError as exc:
             return JSONResponse({"error": str(exc)}, status_code=400)

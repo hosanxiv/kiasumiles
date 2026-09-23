@@ -75,6 +75,23 @@ def test_lookup_unknown_merchant_returns_not_matched():
     assert result["merchant_matched"] is False
 
 
+def test_approximate_merchant_requires_confirmation_before_ranking():
+    result = lookup_hosted("NTUC Fair Price", cards=["uob_ppv"])
+    assert result["requires_clarification"] is True
+    assert "NTUC FairPrice" in result["message"]
+    assert result["recommendations"] == []
+    assert result["conditional_recommendations"] == []
+    comparison = tools.compare_payment_methods("NTUC Fair Price", ["uob_ppv"])
+    assert all(method["best_guaranteed"] is None for method in comparison["methods"])
+    assert lookup_hosted("NTUC FairPrice", cards=["uob_ppv"])["recommendations"]
+
+
+def test_unknown_merchant_conflicting_category_requires_clarification():
+    result = lookup_hosted("zzznew9999 cafe", ["uob_ppv"], category="grocery")
+    assert result["requires_clarification"]
+    assert result["recommendations"] == []
+
+
 @pytest.mark.parametrize("category", [None, "shopping"])
 def test_comparison_preserves_unknown_merchant_context(category):
     result = tools.compare_payment_methods(
@@ -111,7 +128,7 @@ def test_lookup_result_has_required_fields():
 
 
 def test_unknown_merchant_with_keyword_gets_recommendations():
-    result = lookup_hosted("zzznewramen9999", cards=["uob_ppv", "citi_rewards_mc"])
+    result = lookup_hosted("zzznew9999 ramen", cards=["uob_ppv", "citi_rewards_mc"])
 
     assert result["merchant_matched"] is False
     assert "routing_note" in result
@@ -119,7 +136,7 @@ def test_unknown_merchant_with_keyword_gets_recommendations():
 
 
 def test_unknown_merchant_keyword_infers_dining_mcc():
-    result = lookup_hosted("zzznewramen9999", cards=["uob_ppv", "citi_rewards_mc"])
+    result = lookup_hosted("zzznew9999 ramen", cards=["uob_ppv", "citi_rewards_mc"])
 
     assert result["mcc"] == "5812"
 
@@ -133,7 +150,7 @@ def test_unknown_merchant_with_category_param_gets_recommendations():
 
 
 def test_dbs_yuu_earns_base_rate_on_unknown_ramen_fallback():
-    result = lookup_hosted("zzznewramen9999", cards=["dbs_yuu_visa", "uob_ppv"])
+    result = lookup_hosted("zzznew9999 ramen", cards=["dbs_yuu_visa", "uob_ppv"])
 
     yuu = next((r for r in result["recommendations"] if r["card_id"] == "dbs_yuu_visa"), None)
     if yuu:
@@ -188,6 +205,20 @@ def test_recommend_stack_empty_cards_returns_no_recommendations():
     assert "No cards were supplied" in result["message"]
 
 
+def test_stack_preserves_unrecognised_names_for_recovery():
+    result = recommend_stack(cards=["unknown card", "another unknown card"])
+    assert result["wallet_configured"] is False
+    assert result["skipped_cards"] == ["unknown card", "another unknown card"]
+    assert result["coverage"] == []
+    assert "recognised" in result["message"]
+    assert "kiasumiles_list_cards" in result["message"]
+
+    partial = recommend_stack(cards=["uob_ppv", "unknown card"])
+    assert partial["wallet_configured"] is True
+    assert partial["skipped_cards"] == ["unknown card"]
+    assert partial["coverage"]
+
+
 def test_demo_loader_still_has_sample_data():
     loader = DataLoader()
 
@@ -212,6 +243,17 @@ def test_lookup_returns_guaranteed_and_conditional_results_with_amount():
 def test_lookup_rejects_invalid_amounts(amount):
     with pytest.raises(ValueError, match="finite number greater than 0"):
         lookup_hosted("NTUC FairPrice", cards=["uob_ppv"], amount_sgd=amount)
+
+
+@pytest.mark.parametrize("handler", [lookup_hosted, tools.compare_payment_methods])
+@pytest.mark.parametrize("field,value", [
+    ("transaction_currency", "sgd"), ("transaction_currency", True),
+    ("transaction_currency", "SG"), ("payment_gateway_country", "Singapore"),
+    ("payment_gateway_country", 1), ("payment_gateway_country", "sg"),
+])
+def test_currency_inputs_validated_without_wallet(handler, field, value):
+    with pytest.raises(ValueError, match=field):
+        handler("Unknown merchant", cards=[], **{field: value})
 
 
 def test_payment_method_comparison_includes_amaze_only_when_supplied():
@@ -245,3 +287,21 @@ def test_changes_since_returns_source_neutral_history():
     assert result["changes"]
     assert all(change["changed_on"] >= "2026-08-01" for change in result["changes"])
     assert all("source" not in key for change in result["changes"] for key in change)
+
+
+@pytest.mark.parametrize("merchant", ["Marutama Ramen", "brand-new ramen kiosk"])
+def test_revolution_deposit_tier_reaches_lookup_and_comparison(merchant):
+    result = lookup_hosted(merchant, ["hsbc_revolution"], channel="online", amount_sgd=10,
+                           revolution_ega_eligible=True)
+    assert result["conditional_recommendations"][0]["estimated_miles"] == 80
+    assert result["recommendations"][0]["estimated_miles"] == 4
+    comparison = tools.compare_payment_methods(merchant, ["hsbc_revolution"], amount_sgd=10,
+                                                revolution_ega_eligible=True)
+    assert all(row["best_if_conditions_met"]["estimated_miles"] == 80
+               for row in comparison["methods"])
+
+
+@pytest.mark.parametrize("handler", [lookup_hosted, tools.compare_payment_methods])
+def test_revolution_eligibility_validated_without_wallet(handler):
+    with pytest.raises(ValueError, match="revolution_ega_eligible"):
+        handler("Unknown merchant", [], revolution_ega_eligible="true")

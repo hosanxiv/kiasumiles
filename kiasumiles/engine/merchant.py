@@ -1,4 +1,5 @@
 from __future__ import annotations
+import re
 from rapidfuzz import fuzz, process
 from ..data.loader import MerchantRecord
 
@@ -19,11 +20,15 @@ def infer_mcc_from_name(merchant: str) -> str | None:
     """Infer MCC from merchant name keywords. Returns None if no match."""
     lower = merchant.lower()
     for keywords, mcc in _KEYWORD_MCC:
-        if any(kw in lower for kw in keywords):
+        if any(re.search(r"(?<!\w)" + re.escape(kw) + r"(?!\w)", lower) for kw in keywords):
             return mcc
     return None
 
 _FUZZY_THRESHOLD = 80
+
+
+class AmbiguousMerchantError(ValueError):
+    """Available records cannot establish the requested outlet/category."""
 
 
 def find_merchant(
@@ -42,7 +47,7 @@ def find_merchant(
     # exact match (case-insensitive)
     candidates = [r for r in records if r.merchant_name.lower() == needle]
     if candidates:
-        best = _prefer_channel(candidates, channel)
+        best = _prefer_channel(candidates, channel, outlet)
         return best, True
 
     # fuzzy match
@@ -50,8 +55,9 @@ def find_merchant(
     results = process.extract(
         merchant,
         names,
-        scorer=fuzz.WRatio,
-        limit=5,
+        scorer=fuzz.ratio,
+        limit=None,
+        score_cutoff=_FUZZY_THRESHOLD,
     )
     above_threshold = [
         records[idx]
@@ -59,7 +65,7 @@ def find_merchant(
         if score >= _FUZZY_THRESHOLD
     ]
     if above_threshold:
-        best = _prefer_channel(above_threshold, channel)
+        best = _prefer_channel(above_threshold, channel, outlet)
         return best, False
 
     return None, False
@@ -68,13 +74,22 @@ def find_merchant(
 def _prefer_channel(
     candidates: list[MerchantRecord],
     channel: str | None,
+    outlet: str | None = None,
 ) -> MerchantRecord:
-    if not channel:
-        return candidates[0]
-    exact_channel = [r for r in candidates if r.channel == channel]
-    if exact_channel:
-        return exact_channel[0]
-    any_channel = [r for r in candidates if r.channel == "any"]
-    if any_channel:
-        return any_channel[0]
+    if outlet:
+        exact_outlet = [r for r in candidates if (r.outlet or "").strip().casefold() == outlet.strip().casefold()]
+        candidates = exact_outlet or [r for r in candidates if not r.outlet]
+        if not candidates:
+            raise AmbiguousMerchantError("No record confirms this outlet.")
+    if channel:
+        exact_channel = [r for r in candidates if r.channel == channel]
+        compatible_channel = [r for r in candidates if
+                              (channel == "mobile_contactless" and r.channel == "contactless") or
+                              (channel == "app" and r.channel == "online")]
+        any_channel = [r for r in candidates if r.channel == "any"]
+        candidates = exact_channel or compatible_channel or any_channel
+        if not candidates:
+            raise AmbiguousMerchantError("No record confirms this payment method.")
+    if len({r.mcc for r in candidates}) > 1:
+        raise AmbiguousMerchantError("Multiple merchant categories remain possible.")
     return candidates[0]

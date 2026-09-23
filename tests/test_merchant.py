@@ -1,6 +1,6 @@
 import pytest
 from kiasumiles.data.loader import DataLoader, MerchantRecord
-from kiasumiles.engine.merchant import find_merchant, infer_mcc_from_name
+from kiasumiles.engine.merchant import AmbiguousMerchantError, find_merchant, infer_mcc_from_name
 
 
 @pytest.fixture
@@ -25,6 +25,33 @@ def test_fuzzy_match_typo(records):
     match, is_exact = find_merchant("NTUC Fair Price", None, None, records)
     assert match is not None
     assert is_exact is False
+
+
+@pytest.mark.parametrize("query,stored", [
+    ("Art Friend", "Art Di Daniele Sperindio"),
+    ("Cake Defi", "The Mandarin Cake Shop"),
+    ("Jurong Community Hospital", "Ta Community"),
+    ("Emicakes", "Em"),
+    ("Shopee SPay Later", "Shopee"),
+])
+def test_partial_brand_overlap_is_not_a_typo(query, stored):
+    records = [MerchantRecord(stored, None, "any", "5812", "", "medium", 1, "")]
+    assert find_merchant(query, None, None, records) == (None, False)
+
+
+def test_fuzzy_match_checks_categories_beyond_first_five_records():
+    records = [MerchantRecord("Example Cafe", None, "any", code, "", "medium", 1, "")
+               for code in ["5812"] * 5 + ["5814"]]
+    with pytest.raises(AmbiguousMerchantError):
+        find_merchant("Example Caf", None, "contactless", records)
+
+
+def test_fuzzy_match_finds_outlet_beyond_first_five_records():
+    records = [MerchantRecord("Example Cafe", str(i), "any", "5812", "", "medium", 1, "")
+               for i in range(6)]
+    match, exact = find_merchant("Example Caf", "5", "contactless", records)
+    assert match.outlet == "5"
+    assert not exact
 
 
 def test_no_match_returns_none(records):
@@ -67,6 +94,17 @@ def test_infer_mcc_pharmacy_keywords():
 
 def test_infer_mcc_no_match_returns_none():
     assert infer_mcc_from_name("xyzzy unknown place 99") is None
+
+
+@pytest.mark.parametrize("name", ["Business Services", "Dinner Club", "Shellfish Supplies", "Grabber Tools"])
+def test_category_inference_does_not_match_partial_words(name):
+    assert infer_mcc_from_name(name) is None
+
+
+@pytest.mark.parametrize("name,expected", [("BUS/MRT", "4121"), ("FairPrice Finest", "5411"),
+    ("Sheng Siong Supermarket", "5411"), ("Cafe: Sample", "5812")])
+def test_category_inference_preserves_word_boundaries(name, expected):
+    assert infer_mcc_from_name(name) == expected
 
 
 def test_infer_mcc_case_insensitive():

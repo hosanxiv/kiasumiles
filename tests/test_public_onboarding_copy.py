@@ -52,10 +52,10 @@ def test_landing_keeps_setup_on_page_and_github_in_footer():
     assert "### Codex desktop or CLI" in readme
     assert "### Claude" in readme
     assert "custom connector" in readme
-    assert "ChatGPT Work on web and mobile" in readme
-    assert "New Plugin" in readme
-    assert "No Auth" in readme
-    assert "ordinary ChatGPT Chat was not verified" in readme
+    assert "ChatGPT app, including iPhone" in readme
+    assert "Install plugin" in readme
+    assert "@KiasuMiles Run through the setup with me" in readme
+    assert "does not require Developer mode" in readme
 
     assert "setup-tab-claude" in landing
     assert "setup-tab-work" in landing
@@ -81,6 +81,7 @@ def test_public_copy_is_mcp_only_and_lists_every_hosted_tool():
         assert tool in readme
 
     assert "public API" not in landing
-    assert "We tested ChatGPT Work on mobile" in landing
-    assert "using the same Pro account" in landing
+    assert "Open <strong>Plugins</strong> in the ChatGPT app" in landing
+    assert "Install plugin" in landing
+    assert "Select <strong>@KiasuMiles</strong>" in landing
     assert "KiasuMiles ONLY works with AI assistants that can use external tools." in landing

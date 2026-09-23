@@ -60,8 +60,48 @@ already supplied cards, ask which cards the user carries first. Use kiasumiles_l
 to map the user's card names to stable card IDs, then call kiasumiles_lookup with those IDs.
 
 Pass the user's exact merchant name. Extract outlet and channel from natural language if present.
+Use channel="app" only for an order placed in the merchant's own app. For CHAGEE,
+this distinction is required for the yuu bonus; website or tap payments are not equivalent.
 If the merchant is not found, pass category when context makes it obvious.
 Accepted values: dining, grocery, transport, petrol, pharmacy, hotel, airlines, shopping.
+
+Pass is_recurring=true for confirmed automatic payments authorised once and charged
+at fixed intervals; false for a confirmed one-off purchase. Omit when unknown.
+Pass revolution_ega_eligible=true only after confirming at least
+S$50,000 average daily SGD deposits in the user's sole HSBC Everyday Global Account
+for the posting month; joint accounts do not qualify. Otherwise omit this flag.
+For Revolution, supply revolution_prior_eligible_spend_sgd only when the user confirms
+the bonus-eligible amount already posted in that calendar month across primary and
+supplementary cards, excluding this purchase. Omit if unknown; never assume zero.
+Standard Chartered recurring payments do not earn rewards. Do not infer recurring
+status merely because the user shops with the same merchant regularly.
+
+For DBS Vantage, pass vantage_miles_selected=true only when the user confirms Miles
+is selected in digibank; false for Cashback, or omit when unknown. Do not assume the
+default is still selected. Cashback automatically consumes points next month.
+
+For PRVI Miles and BOC Elite Miles, supply transaction_currency and payment_gateway_country only when
+confirmed (uppercase currency and country codes, e.g. MYR and MY). The processing
+country is not necessarily the merchant's location. Omit unknown details; never
+promise the overseas or regional rate based on foreign currency alone.
+
+For Chocolate Visa, pass chocolate_eligible=true only when the user confirms the card
+is linked and verified on HeyMax and both accounts use the same email. From October 2026, also require confirmation of at least S$5,000
+prior-month average daily SGD balance; September 2026 has no balance check. Pass false
+when ineligible; omit when unknown. Never infer eligibility from owning the card.
+When requires_clarification is returned, ask for the outlet/payment details instead of guessing.
+For Smart, pass smart_statement_spend_sgd only for user-confirmed total eligible spending
+in this statement month, including this purchase and supplementary cards. Do not use
+a forecast, calendar-month total, or the purchase amount alone. Omit when unknown.
+For PPS cards, pps_prior_spend_sgd maps each card ID to its confirmed prior eligible
+calendar-month SGD-equivalent spending, excluding this purchase. Use only the same
+currency bucket (SGD or foreign currency); never combine cards or currency totals.
+If pps_sia_group_eligible=true, use the separate qualifying SIA Group spending bucket
+instead. Confirm direct SGD purchase and Singapore departure for flights; Pelago
+digital-wallet purchases do not qualify. Omit the flag if uncertain. Omit unknown totals.
+PPS estimates with unknown spending are lower/upper bounds, not exact awards.
+The monthly calculation may complete an earlier partial S$10 block. Explain this
+when the incremental miles appear large relative to a small purchase.
 
 Present card name, earn_rate_mpd, cap_summary, and reason_summary. Use gotchas to warn about
 wrong payment channel, merchant-only bonus rules, minimum spend, and cap constraints. Never show
@@ -72,6 +112,23 @@ raw card IDs, MCC codes, or technical fields unless the user asks for diagnostic
 
 Use this when payment method is unspecified or the user asks whether to pay by mobile wallet, physical contactless card, online, or
 through Amaze. Pass amount_sgd when known. Amaze is compared only when the user supplied it.
+For Chocolate, chocolate_eligible requires the card linked and verified on HeyMax
+with matching account emails; from October 2026 it also requires prior-month SGD balance eligibility. Omit it when unknown,
+or pass false when ineligible.
+For Smart, smart_statement_spend_sgd is the user-confirmed eligible statement-month
+total including this purchase and supplementary cards; omit if unknown, never forecast it.
+PPS comparisons use unknown-spending bounds. Once payment is chosen, use lookup
+with the confirmed spending in that payment's applicable monthly bucket.
+For DBS Vantage, pass vantage_miles_selected only for the user's confirmed digibank
+reward choice (true for Miles, false for Cashback); omit when unknown.
+Pass is_recurring for confirmed automatic fixed-interval payments (true), or confirmed
+one-off purchases (false). Pass revolution_ega_eligible=true only with confirmed
+S$50,000 average daily SGD deposits in a sole HSBC Everyday Global Account for the
+posting month; otherwise omit it. Omit recurring-payment status when unknown.
+For Revolution, pass revolution_prior_eligible_spend_sgd only for confirmed eligible
+spending already posted that calendar month across primary and supplementary cards,
+excluding this purchase. Omit if unknown; zero must be confirmed.
+Repeated shopping alone is not recurring.
 Present the best guaranteed and conditional result for each method with conditions and caveats.
 Show a returned message when no recommendation is available; never invent a merchant match.""",
     "kiasumiles_changes_since": """Summarize source-neutral card and merchant rule changes since an ISO date.
@@ -86,7 +143,10 @@ cards supplied in the current request; it does not suggest cards outside that re
 If the client has not already supplied cards, ask which cards the user carries first.
 
 Present covered and weak categories. Never show raw card IDs to the user.""",
-    "kiasumiles_data_version": """Return the current KiasuMiles data version and row counts for diagnostics and freshness checks.""",
+    "kiasumiles_data_version": """Return record verification dates and row counts. data_version is the newest individual
+record verification date, not the last database edit or a full-database review date.
+For recent updates, call kiasumiles_changes_since. Never describe all rules as verified
+on data_version; individual records may be older.""",
     "kiasumiles_agent_guide": """Return concise hosted integration guidance for agents. Use this for diagnostics, installation checks, or when an agent needs presentation rules.""",
 }
 

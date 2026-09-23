@@ -53,8 +53,19 @@ def kiasumiles_lookup(
     channel: str | None = None,
     category: str | None = None,
     amount_sgd: float | None = None,
+    chocolate_eligible: bool | None = None,
+    smart_statement_spend_sgd: float | None = None,
+    pps_prior_spend_sgd: dict[str, float] | None = None,
+    pps_sia_group_eligible: bool | None = None,
+    vantage_miles_selected: bool | None = None,
+    transaction_currency: str | None = None,
+    payment_gateway_country: str | None = None,
+    is_recurring: bool | None = None,
+    revolution_ega_eligible: bool | None = None,
+    revolution_prior_eligible_spend_sgd: float | None = None,
 ) -> dict:
-    return tools.lookup_hosted(merchant, cards, outlet, channel, category, amount_sgd)
+    return tools.lookup_hosted(merchant, cards, outlet, channel, category, amount_sgd, chocolate_eligible, smart_statement_spend_sgd,
+                               pps_prior_spend_sgd, pps_sia_group_eligible, vantage_miles_selected, transaction_currency, payment_gateway_country, is_recurring, revolution_ega_eligible, revolution_prior_eligible_spend_sgd)
 
 
 def kiasumiles_compare_payment_methods(
@@ -63,8 +74,16 @@ def kiasumiles_compare_payment_methods(
     amount_sgd: float | None = None,
     outlet: str | None = None,
     category: str | None = None,
+    chocolate_eligible: bool | None = None,
+    smart_statement_spend_sgd: float | None = None,
+    vantage_miles_selected: bool | None = None,
+    transaction_currency: str | None = None,
+    payment_gateway_country: str | None = None,
+    is_recurring: bool | None = None,
+    revolution_ega_eligible: bool | None = None,
+    revolution_prior_eligible_spend_sgd: float | None = None,
 ) -> dict:
-    return tools.compare_payment_methods(merchant, cards, amount_sgd, outlet, category)
+    return tools.compare_payment_methods(merchant, cards, amount_sgd, outlet, category, chocolate_eligible, smart_statement_spend_sgd, vantage_miles_selected, transaction_currency, payment_gateway_country, is_recurring, revolution_ega_eligible, revolution_prior_eligible_spend_sgd)
 
 
 def kiasumiles_changes_since(since: str, limit: int = 20) -> dict:

@@ -6,8 +6,8 @@ from datetime import date
 
 from .agent_contract import CATEGORY_MCC, hosted_agent_guide
 from .data.loader import DataLoader
-from .engine.merchant import find_merchant, infer_mcc_from_name
-from .engine.router import rank_cards
+from .engine.merchant import AmbiguousMerchantError, find_merchant, infer_mcc_from_name
+from .engine.router import rank_cards, validate_payment_codes
 
 _loader = DataLoader()
 
@@ -24,6 +24,7 @@ _STACK_CATEGORIES: tuple[dict[str, str], ...] = (
 )
 
 _CHANNEL_ALIASES = {
+    "in_app": "app",
     "apple_pay": "mobile_contactless",
     "google_pay": "mobile_contactless",
     "mobile_wallet": "mobile_contactless",
@@ -93,6 +94,16 @@ def _lookup_for_cards(
     channel: str | None = None,
     category: str | None = None,
     amount_sgd: float | None = None,
+    chocolate_eligible: bool | None = None,
+    smart_statement_spend_sgd: float | None = None,
+    pps_prior_spend_sgd: dict[str, float] | None = None,
+    pps_sia_group_eligible: bool | None = None,
+    vantage_miles_selected: bool | None = None,
+    transaction_currency: str | None = None,
+    payment_gateway_country: str | None = None,
+    is_recurring: bool | None = None,
+    revolution_ega_eligible: bool | None = None,
+    revolution_prior_eligible_spend_sgd: float | None = None,
 ) -> dict:
     channel = _normalize_channel(channel)
     cards, skipped = _resolve_card_inputs(cards)
@@ -105,9 +116,29 @@ def _lookup_for_cards(
             wallet_cards.append(pairing)
     top_n = 5
 
-    record, is_exact = find_merchant(
-        merchant, outlet, channel, _loader.merchants()
-    )
+    try:
+        record, is_exact = find_merchant(
+            merchant, outlet, channel, _loader.merchants()
+        )
+        if record is not None and not is_exact:
+            raise AmbiguousMerchantError(
+                f"Possible match: {record.merchant_name}. Confirm the merchant name first."
+            )
+        inferred_category = infer_mcc_from_name(merchant)
+        supplied_category = CATEGORY_MCC.get((category or "").lower())
+        if record is None and inferred_category and supplied_category and inferred_category != supplied_category:
+            raise AmbiguousMerchantError("The merchant name and supplied category conflict. Confirm the purchase category.")
+    except AmbiguousMerchantError as exc:
+        return {
+            "merchant": merchant,
+            "merchant_matched": False,
+            "requires_clarification": True,
+            "message": f"{exc} Confirm the outlet and payment method before recommending a card.",
+            "recommendations": [],
+            "conditional_recommendations": [],
+            "wallet_configured": bool(cards),
+            "skipped_cards": skipped,
+        }
 
     if record is None:
         fallback_mcc = infer_mcc_from_name(merchant) or CATEGORY_MCC.get((category or "").lower())
@@ -115,11 +146,21 @@ def _lookup_for_cards(
             recommendations = rank_cards(
                 fallback_mcc, wallet_cards, wallet_has_amaze, top_n,
                 merchant_name=merchant, channel=channel,
-                rate_mode="guaranteed", amount_sgd=amount_sgd,
+                rate_mode="guaranteed", amount_sgd=amount_sgd, chocolate_eligible=chocolate_eligible,
+                smart_statement_spend_sgd=smart_statement_spend_sgd,
+                pps_prior_spend_sgd=pps_prior_spend_sgd, pps_sia_group_eligible=pps_sia_group_eligible, vantage_miles_selected=vantage_miles_selected,
+                transaction_currency=transaction_currency, payment_gateway_country=payment_gateway_country, is_recurring=is_recurring,
+                revolution_ega_eligible=revolution_ega_eligible,
+                revolution_prior_eligible_spend_sgd=revolution_prior_eligible_spend_sgd,
             )
             conditional_recommendations = rank_cards(
                 fallback_mcc, wallet_cards, wallet_has_amaze, top_n,
-                merchant_name=merchant, channel=channel, amount_sgd=amount_sgd,
+                merchant_name=merchant, channel=channel, amount_sgd=amount_sgd, chocolate_eligible=chocolate_eligible,
+                smart_statement_spend_sgd=smart_statement_spend_sgd,
+                pps_prior_spend_sgd=pps_prior_spend_sgd, pps_sia_group_eligible=pps_sia_group_eligible, vantage_miles_selected=vantage_miles_selected,
+                transaction_currency=transaction_currency, payment_gateway_country=payment_gateway_country, is_recurring=is_recurring,
+                revolution_ega_eligible=revolution_ega_eligible,
+                revolution_prior_eligible_spend_sgd=revolution_prior_eligible_spend_sgd,
             )
             return {
                 "merchant": merchant,
@@ -147,13 +188,25 @@ def _lookup_for_cards(
     )
 
     ranking_channel = channel or record.channel
+    # Keep user-supplied outlet restrictions even when a generic record supplies the category.
+    ranking_merchant = " ".join(part for part in (merchant, outlet) if part)
     recommendations = rank_cards(
-        record.mcc, wallet_cards, wallet_has_amaze, top_n, record.merchant_name,
-        ranking_channel, rate_mode="guaranteed", amount_sgd=amount_sgd,
+        record.mcc, wallet_cards, wallet_has_amaze, top_n, ranking_merchant,
+        ranking_channel, rate_mode="guaranteed", amount_sgd=amount_sgd, chocolate_eligible=chocolate_eligible,
+        smart_statement_spend_sgd=smart_statement_spend_sgd,
+        pps_prior_spend_sgd=pps_prior_spend_sgd, pps_sia_group_eligible=pps_sia_group_eligible, vantage_miles_selected=vantage_miles_selected,
+                transaction_currency=transaction_currency, payment_gateway_country=payment_gateway_country, is_recurring=is_recurring,
+                revolution_ega_eligible=revolution_ega_eligible,
+                revolution_prior_eligible_spend_sgd=revolution_prior_eligible_spend_sgd,
     )
     conditional_recommendations = rank_cards(
-        record.mcc, wallet_cards, wallet_has_amaze, top_n, record.merchant_name,
-        ranking_channel, amount_sgd=amount_sgd,
+        record.mcc, wallet_cards, wallet_has_amaze, top_n, ranking_merchant,
+        ranking_channel, amount_sgd=amount_sgd, chocolate_eligible=chocolate_eligible,
+        smart_statement_spend_sgd=smart_statement_spend_sgd,
+        pps_prior_spend_sgd=pps_prior_spend_sgd, pps_sia_group_eligible=pps_sia_group_eligible, vantage_miles_selected=vantage_miles_selected,
+                transaction_currency=transaction_currency, payment_gateway_country=payment_gateway_country, is_recurring=is_recurring,
+                revolution_ega_eligible=revolution_ega_eligible,
+                revolution_prior_eligible_spend_sgd=revolution_prior_eligible_spend_sgd,
     )
 
     return {
@@ -182,7 +235,45 @@ def lookup_hosted(
     channel: str | None = None,
     category: str | None = None,
     amount_sgd: float | None = None,
+    chocolate_eligible: bool | None = None,
+    smart_statement_spend_sgd: float | None = None,
+    pps_prior_spend_sgd: dict[str, float] | None = None,
+    pps_sia_group_eligible: bool | None = None,
+    vantage_miles_selected: bool | None = None,
+    transaction_currency: str | None = None,
+    payment_gateway_country: str | None = None,
+    is_recurring: bool | None = None,
+    revolution_ega_eligible: bool | None = None,
+    revolution_prior_eligible_spend_sgd: float | None = None,
 ) -> dict:
+    if revolution_prior_eligible_spend_sgd is not None and (
+        type(revolution_prior_eligible_spend_sgd) not in (int, float)
+        or not math.isfinite(revolution_prior_eligible_spend_sgd)
+        or revolution_prior_eligible_spend_sgd < 0
+    ):
+        raise ValueError("revolution_prior_eligible_spend_sgd must be a finite non-negative number.")
+    if revolution_ega_eligible is not None and type(revolution_ega_eligible) is not bool:
+        raise ValueError("revolution_ega_eligible must be true, false or null.")
+    if vantage_miles_selected is not None and type(vantage_miles_selected) is not bool:
+        raise ValueError("vantage_miles_selected must be true, false or null.")
+    validate_payment_codes(transaction_currency, payment_gateway_country)
+    if is_recurring is not None and type(is_recurring) is not bool:
+        raise ValueError("is_recurring must be true, false or null.")
+    if pps_prior_spend_sgd is not None and isinstance(pps_prior_spend_sgd, dict):
+        resolved_spending = {}
+        for name, spending in pps_prior_spend_sgd.items():
+            resolved, skipped = _resolve_card_inputs([name])
+            if skipped or len(resolved) != 1 or resolved[0] in resolved_spending:
+                raise ValueError("Use one unambiguous PPS card name or ID per spending total.")
+            resolved_spending[resolved[0]] = spending
+        pps_prior_spend_sgd = resolved_spending
+    if smart_statement_spend_sgd is not None and (
+        type(smart_statement_spend_sgd) not in (int, float)
+        or not math.isfinite(smart_statement_spend_sgd) or smart_statement_spend_sgd < 0
+    ):
+        raise ValueError("smart_statement_spend_sgd must be a finite non-negative number.")
+    if chocolate_eligible is not None and type(chocolate_eligible) is not bool:
+        raise ValueError("chocolate_eligible must be true, false or null.")
     if amount_sgd is not None and (
         not isinstance(amount_sgd, (int, float))
         or isinstance(amount_sgd, bool)
@@ -202,7 +293,12 @@ def lookup_hosted(
             "data_version": data_version()["data_version"],
         }
 
-    result = _lookup_for_cards(merchant, cards, outlet, channel, category, amount_sgd)
+    result = _lookup_for_cards(merchant, cards, outlet, channel, category, amount_sgd, chocolate_eligible, smart_statement_spend_sgd,
+                               pps_prior_spend_sgd, pps_sia_group_eligible, vantage_miles_selected, transaction_currency, payment_gateway_country, is_recurring, revolution_ega_eligible, revolution_prior_eligible_spend_sgd)
+    if smart_statement_spend_sgd is not None:
+        result["recommendation_basis"] = "user_supplied_smart_statement_spend_other_conditions_unconfirmed"
+    if pps_prior_spend_sgd:
+        result["recommendation_basis"] = "user_supplied_pps_monthly_spending_other_conditions_unconfirmed"
     result["wallet_stored"] = False
     result["data_version"] = data_version()["data_version"]
     return result
@@ -214,13 +310,28 @@ def compare_payment_methods(
     amount_sgd: float | None = None,
     outlet: str | None = None,
     category: str | None = None,
+    chocolate_eligible: bool | None = None,
+    smart_statement_spend_sgd: float | None = None,
+    vantage_miles_selected: bool | None = None,
+    transaction_currency: str | None = None,
+    payment_gateway_country: str | None = None,
+    is_recurring: bool | None = None,
+    revolution_ega_eligible: bool | None = None,
+    revolution_prior_eligible_spend_sgd: float | None = None,
 ) -> dict:
     cards, skipped = _resolve_card_inputs(cards)
     direct_cards = [card for card in cards if card not in {"amaze", "amaze_citi"}]
     methods = []
-    for payment_method in ("mobile_contactless", "contactless", "online"):
+    payment_methods = ["mobile_contactless", "contactless", "online"]
+    if re.search(r"\bchagee\b", merchant, re.I):
+        payment_methods.append("app")
+    for payment_method in payment_methods:
         result = lookup_hosted(
-            merchant, direct_cards, outlet, payment_method, category, amount_sgd
+            merchant, direct_cards, outlet, payment_method, category, amount_sgd, chocolate_eligible, smart_statement_spend_sgd,
+            vantage_miles_selected=vantage_miles_selected,
+            transaction_currency=transaction_currency, payment_gateway_country=payment_gateway_country, is_recurring=is_recurring,
+            revolution_ega_eligible=revolution_ega_eligible,
+            revolution_prior_eligible_spend_sgd=revolution_prior_eligible_spend_sgd,
         )
         methods.append({
             "payment_method": payment_method,
@@ -297,11 +408,16 @@ def recommend_stack(cards: list[str], top_n: int = 3) -> dict:
         return {
             "wallet_configured": False,
             "wallet_cards": [],
-            "skipped_cards": [],
+            "skipped_cards": skipped,
             "coverage": [],
             "recommended_additions": [],
             "recommendation_scope": "supplied_cards_only",
-            "message": "No cards were supplied. Ask which cards the user carries, then call this tool with those cards.",
+            "message": (
+                "None of the supplied card names were recognised. Show the unmatched names and use "
+                "kiasumiles_list_cards to help the user choose the correct cards. Do not guess variants."
+                if skipped else
+                "No cards were supplied. Ask which cards the user carries, then call this tool with those cards."
+            ),
         }
 
     coverage = []
@@ -359,6 +475,8 @@ def data_version() -> dict:
     all_dates = card_dates + merchant_dates
     return {
         "data_version": max(all_dates) if all_dates else "unknown",
+        "oldest_record_verification": min(all_dates) if all_dates else "unknown",
+        "verification_scope": "individual_records_not_full_database",
         "cards": len(_loader.cards()),
         "merchants": len(_loader.merchants()),
         "data_backend": _loader.backend_name(),

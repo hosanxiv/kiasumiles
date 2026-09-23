@@ -20,26 +20,26 @@ The hosted service does not store your card stack. It never needs your card numb
 
 ## Start here
 
-KiasuMiles ONLY works with AI assistants that can use external tools. Choose the setup for your assistant below.
+KiasuMiles ONLY works with AI assistants that can use external tools. Choose the setup for your assistant below. For ChatGPT, install the public KiasuMiles plugin; the other routes use an MCP connection.
 
 After the one-time connection, send this message:
 
 ```text
-Use KiasuMiles. First verify the connection by calling kiasumiles_data_version. Ask which cards I carry only if you don’t already know; show supported cards if I need help choosing. Then ask where I’m paying and how, and recommend my best confirmed card with its earn rate, bonus conditions and fallback. If KiasuMiles tools aren’t available, stop and tell me.
+Use KiasuMiles. First verify the connection by calling kiasumiles_data_version. If KiasuMiles tools aren’t available, stop and tell me. Reuse the cards and purchase details I supply; ask only for missing cards or ambiguous names. If I omit the payment method, compare methods. Recommend my best confirmed card with its conditions and fallback.
 ```
 
 This prompt verifies and uses an existing connection. It cannot give an ordinary chatbot capabilities that the app does not provide.
 
 ## Where it works
 
-Status as of 9 September 2026:
+Setup guidance checked on 23 September 2026; verification scope is noted below:
 
 | Agent | Current route | Plug-and-play status |
 |---|---|---|
-| Claude chat, Cowork, desktop and mobile | Account-level custom connector | Available after one-time setup; the directory submission is still under review |
+| ChatGPT app, including iPhone | Public KiasuMiles plugin | Install from Plugins, then select `@KiasuMiles` in a conversation; verified on iPhone |
+| Claude chat, Cowork, desktop and mobile | Account-level custom connector | Available after one-time setup; mobile availability may vary |
 | Codex desktop and CLI | Custom remote MCP server | Available now |
 | OpenClaw, Hermes, Zo and similar agents | Agent-managed remote MCP connection | Paste the prompt above when the agent is allowed to update its MCP configuration |
-| ChatGPT Work on web and mobile | Private custom connector created on ChatGPT web | Tested on a Pro account; public directory approval is not required for this route |
 
 KiasuMiles is not a normal chatbot. It is an MCP tool, so the assistant must support external tools and have KiasuMiles connected before the usage prompt can work.
 
@@ -50,7 +50,7 @@ KiasuMiles is not a normal chatbot. It is an MCP tool, so the assistant must sup
 For an agent that can update its own MCP configuration, such as OpenClaw, Hermes or Zo, paste this into its chat:
 
 ```text
-Use KiasuMiles. If its tools are already available, reuse them. Otherwise, connect to https://kiasumiles.space/mcp if you can manage remote MCP connections. Ask before changing settings or installing anything. If you cannot, say that this agent needs a one-time MCP connection and stop. Do not claim KiasuMiles is connected until you can list its tools and call kiasumiles_data_version successfully. Then ask which banks I use, show their supported cards, and let me confirm mine. Finally, ask for a Singapore merchant and payment method and recommend the best confirmed card with its conditions and fallback.
+Use KiasuMiles. If its tools are already available, reuse them. Otherwise, connect to https://kiasumiles.space/mcp if you can manage remote MCP connections. Ask before changing settings or installing anything. If you cannot, say that this agent needs a one-time MCP connection and stop. Do not claim KiasuMiles is connected until you can list its tools and call kiasumiles_data_version successfully. Reuse the cards and purchase details I supply; ask only for missing cards or ambiguous names. If I omit the payment method, compare methods. Recommend my best confirmed card with its conditions and fallback.
 ```
 
 ### Codex desktop or CLI
@@ -76,31 +76,29 @@ In the Claude app, open **Settings → Customise → Connectors → Add custom c
 https://kiasumiles.space/mcp
 ```
 
-Start a new Claude chat, enable KiasuMiles from the **+** menu, then send the Start here prompt. Anthropic documents account-level remote connectors across Claude, Cowork, desktop and mobile. Workspace policies may require an administrator to approve the connector. See [Claude's remote MCP connector guide](https://support.claude.com/en/articles/11175166-get-started-with-custom-connectors-using-remote-mcp).
+Select **Continue** to check the server. If Claude says the URL already exists, cancel and use the existing connector. Otherwise, review the next screen before adding it; the final creation step was not retested here. Start a new Claude chat, enable KiasuMiles from **+ → Connectors**, then send the Start here prompt. The entry screen and server check were tested on Claude Pro on 12 September 2026. This account shows **Continue**, while the official guide says **Add**; a fresh installation was not tested. Anthropic documents account-level remote connectors across Claude, Cowork, desktop and mobile. Workspace policies may require an administrator to approve the connector. See [Claude's remote MCP connector guide](https://support.claude.com/en/articles/11175166-get-started-with-custom-connectors-using-remote-mcp).
 
-### ChatGPT Work
+### ChatGPT
 
-Set up once on ChatGPT web, then use KiasuMiles in Work on web or mobile. This route passed native MCP tests on a ChatGPT Pro account. Availability may vary by account and plan; ordinary ChatGPT Chat was not verified by these tests.
+In the ChatGPT app, open **Plugins**, search for **KiasuMiles**, and select **Install plugin**. Complete any connection prompts. Then start a conversation, type `@`, select **KiasuMiles**, and send:
 
-1. On ChatGPT web, open **Settings → Plugins → Developer mode** and enable it.
-2. Open **Plugins** from the sidebar. Click the **+ beside the search bar** to open **New Plugin**.
-3. Enter **KiasuMiles** as the name. Choose **Server URL**, enter `https://kiasumiles.space/mcp`, and set Authentication to **No Auth**. Leave the optional fields blank.
-4. Read the warning, tick **I understand and want to continue**, then select **Create → Connect**.
-5. Start a **Work** conversation on web or mobile and send the Start here prompt. Approve **Connect** again if prompted, then ask it to continue.
+```text
+@KiasuMiles Run through the setup with me. Help me choose my cards, then ask about my purchase.
+```
 
-<img src="kiasumiles/static/kiasumiles/assets/proof/chatgpt-custom-connector.png" alt="ChatGPT New Plugin setup with KiasuMiles, its server URL and No Auth selected" width="420">
-
-The public directory submission is separately awaiting review. This private setup does not make KiasuMiles publicly listed. We have not verified that the ChatGPT connection carries over to Codex; use the separate Codex instructions above.
+This public-plugin route was verified in the ChatGPT iPhone app. It does not require Developer mode or a manually entered server URL. Availability may vary by account, plan and region. Codex uses the separate connection instructions above.
 
 ## First use
 
 After KiasuMiles is connected:
 
+Include your cards and purchase in the same message to skip unnecessary questions. If you omit the payment method, the agent can compare methods.
+
 1. Tell the agent which cards you carry. If you need help, name your banks and choose from their supported cards.
 2. Provide a merchant and how you are paying. Include the amount if you want a miles estimate.
 3. KiasuMiles compares only the cards supplied for that lookup and returns the recommendation, conditions and fallback.
 
-Reuse your card selection within the conversation. Whether it carries into another conversation depends on your assistant, not KiasuMiles.
+Save a copy of your card names to paste into a new conversation when needed. A saved connection does not guarantee saved cards. Reuse your card selection within the conversation. Whether it carries into another conversation depends on your assistant, not KiasuMiles.
 
 Try:
 

@@ -95,10 +95,10 @@ def test_cap_summary_with_cap_no_blocks(cards):
     assert results[0]["cap_summary"] == "S$1,000 cap / statement month"
 
 
-def test_cap_summary_no_cap_with_blocks(cards):
+def test_cap_summary_no_cap_with_point_rounding(cards):
     altitude = next(c for c in cards if c.card_id == "dbs_altitude_visa")
     results = rank_cards("9999", [altitude], wallet_has_amaze=False, top_n=1)
-    assert results[0]["cap_summary"] == "No cap · earns in S$5 blocks"
+    assert results[0]["cap_summary"] == "No cap · DBS Points rounded down per transaction"
 
 
 def test_cap_summary_no_cap_no_blocks(cards):
@@ -156,14 +156,14 @@ def test_amount_estimate_respects_five_dollar_earn_blocks(cards):
     assert result["estimated_miles"] == 40.0
 
 
-def test_dbs_amount_estimate_respects_declared_five_dollar_block(cards):
+def test_altitude_amount_estimate_rounds_awarded_points(cards):
     altitude = next(c for c in cards if c.card_id == "dbs_altitude_visa")
 
     result = rank_cards(
         "9999", [altitude], wallet_has_amaze=False, top_n=1, amount_sgd=9.0,
     )[0]
 
-    assert result["estimated_miles"] == 6.0
+    assert result["estimated_miles"] == 10.0
 
 
 def test_amaze_fee_does_not_reduce_miles_credited(cards):

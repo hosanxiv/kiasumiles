@@ -1,6 +1,11 @@
 .agents/
 .claude/
 .codex/
+.Codex/
+.tmp-*/
+.local-private/
+private-data/
+**/settings.local.json
 .impeccable/
 .playwright-cli/
 .superpowers/

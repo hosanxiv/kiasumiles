@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import pytest
 from starlette.testclient import TestClient
 
 from kiasumiles import hosted
@@ -114,3 +115,49 @@ def test_chatgpt_changes_route_is_source_neutral():
     payload = response.json()
     assert payload["changes"]
     assert all("source" not in key for change in payload["changes"] for key in change)
+
+
+@pytest.mark.parametrize("path", ["lookup", "compare-payment-methods"])
+@pytest.mark.parametrize("eligible,expected", [(True, 80), (False, 40), (None, 40)])
+def test_revolution_tier_public_api(path, eligible, expected):
+    client = TestClient(hosted.app)
+    response = client.post(f"/api/chatgpt/{path}", json={
+        "merchant": "Marutama Ramen", "cards": ["HSBC Revolution"],
+        "channel": "online", "amount_sgd": 10, "revolution_ega_eligible": eligible,
+    })
+    assert response.status_code == 200
+    payload = response.json()
+    rows = (payload["conditional_recommendations"] if path == "lookup" else
+            [method["best_if_conditions_met"] for method in payload["methods"]])
+    assert all(row["estimated_miles"] == expected for row in rows)
+    assert all(row["rate_status"] == "conditional" for row in rows)
+    assert_no_public_technical_keys(payload)
+
+
+@pytest.mark.parametrize("path", ["lookup", "compare-payment-methods"])
+def test_revolution_public_schema_and_validation(path):
+    client = TestClient(hosted.app)
+    spec = client.get("/api/chatgpt/openapi.json").json()
+    schema = spec["paths"][f"/api/chatgpt/{path}"]["post"]["requestBody"]["content"]["application/json"]["schema"]
+    assert schema["properties"]["revolution_ega_eligible"]["type"] == ["boolean", "null"]
+    response = client.post(f"/api/chatgpt/{path}", json={
+        "merchant": "Unknown", "cards": [], "revolution_ega_eligible": "true",
+    })
+    assert response.status_code == 400
+
+
+@pytest.mark.parametrize("path", ["lookup", "compare-payment-methods"])
+def test_revolution_monthly_cap_public_api(path):
+    client = TestClient(hosted.app)
+    arguments = {"merchant": "Marutama Ramen", "cards": ["HSBC Revolution"],
+                 "channel": "online", "amount_sgd": 2, "revolution_ega_eligible": True,
+                 "revolution_prior_eligible_spend_sgd": 1199}
+    response = client.post(f"/api/chatgpt/{path}", json=arguments)
+    assert response.status_code == 200
+    payload = response.json()
+    rows = (payload["recommendations"] if path == "lookup" else
+            [method["best_guaranteed"] for method in payload["methods"]])
+    assert all(row["estimated_miles"] == 8.4 for row in rows)
+    assert_no_public_technical_keys(payload)
+    arguments.update(cards=[], revolution_prior_eligible_spend_sgd=True)
+    assert client.post(f"/api/chatgpt/{path}", json=arguments).status_code == 400

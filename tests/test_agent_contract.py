@@ -30,6 +30,12 @@ def test_lookup_description_requires_card_stack_first():
     assert any("Before the first lookup" in rule for rule in guide["display_rules"])
 
 
+def test_chocolate_september_has_no_balance_check_in_agent_guidance():
+    lookup_description = HOSTED_TOOL_DESCRIPTIONS["kiasumiles_lookup"]
+    assert "September 2026 has no balance check" in lookup_description
+    assert "From October 2026" in lookup_description
+
+
 def test_tool_handlers_are_callable_without_fastmcp():
     result = tools.lookup_hosted("NTUC FairPrice", cards=["uob_ppv"])
 
