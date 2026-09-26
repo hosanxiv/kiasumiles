@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.0.3 - 2026-09-26
+
+- Database refresh
+- Added public ChatGPT plugin setup, including iPhone support
+- Improved card-name matching and merchant matching
+- Updated spending caps, bonus eligibility, exclusions and miles rounding
+- Improved fallback recommendations when bonus conditions are unconfirmed
+- Updated the website and setup instructions for ChatGPT, Claude, Codex and other agents
+- Added regression checks for card rules and recommendations
+
 ## 1.0.2 - 2026-07-10
 
 - Restored one-time card setup for local MCP clients
