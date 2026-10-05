@@ -2,6 +2,7 @@ from kiasumiles import hosted
 from kiasumiles.agent_contract import HOSTED_TOOL_DESCRIPTIONS
 from kiasumiles.tools import lookup_hosted, data_version
 from starlette.testclient import TestClient
+from mcp.server.fastmcp import FastMCP
 
 
 PROOF_ASSETS = (
@@ -64,7 +65,7 @@ def test_mcp_endpoint_is_rate_limited_per_ip():
     # No `with` block: the dummy app has no lifespan handler, and the
     # middleware needs no startup.
     client = TestClient(limited)
-    statuses = [client.get("/mcp").status_code for _ in range(5)]
+    statuses = [client.post("/mcp").status_code for _ in range(5)]
     landing_status = client.get("/").status_code
 
     assert statuses[:3] == [200, 200, 200]
@@ -75,6 +76,48 @@ def test_mcp_endpoint_is_rate_limited_per_ip():
 
 def test_hosted_app_is_wrapped_in_rate_limiter():
     assert isinstance(hosted.app, hosted.RateLimitMiddleware)
+
+
+def test_mcp_standalone_streams_are_rejected_without_consuming_post_budget():
+    async def ok_app(scope, receive, send):
+        await send({"type": "http.response.start", "status": 200, "headers": []})
+        await send({"type": "http.response.body", "body": b"ok"})
+
+    client = TestClient(hosted.RateLimitMiddleware(ok_app, max_requests=1))
+    for path in ("/mcp", "/mcp/"):
+        response = client.get(path, headers={"Accept": "text/event-stream"})
+        assert response.status_code == 405
+        assert response.headers["allow"] == "POST"
+        assert response.headers["cache-control"] == "no-store"
+    assert client.post("/mcp").status_code == 200
+    assert client.post("/mcp").status_code == 429
+
+
+def test_mcp_post_initialization_and_tool_call_use_json():
+    # MCP session managers cannot restart after a TestClient lifespan exits.
+    # Exercise the configured transport with its own manager.
+    assert hosted.mcp.settings.stateless_http is True
+    assert hosted.mcp.settings.json_response is True
+    server = FastMCP("KiasuMiles Hosted", stateless_http=True, json_response=True)
+    server.tool()(hosted.kiasumiles_list_cards)
+    headers = {"Accept": "application/json, text/event-stream"}
+    with TestClient(hosted.RateLimitMiddleware(server.streamable_http_app()), base_url="http://localhost:8000") as client:
+        response = client.post("/mcp", headers=headers, json={
+            "jsonrpc": "2.0", "id": 1, "method": "initialize",
+            "params": {"protocolVersion": "2025-03-26", "capabilities": {},
+                       "clientInfo": {"name": "transport-test", "version": "1.0"}},
+        })
+        assert response.status_code == 200
+        assert response.headers["content-type"].startswith("application/json")
+        assert response.json()["result"]["serverInfo"]["name"] == "KiasuMiles Hosted"
+        result = client.post("/mcp", headers=headers, json={
+            "jsonrpc": "2.0", "id": 2, "method": "tools/call",
+            "params": {"name": "kiasumiles_list_cards", "arguments": {"bank": "UOB"}},
+        })
+        assert result.status_code == 200
+        assert result.headers["content-type"].startswith("application/json")
+        assert not result.json()["result"].get("isError", False)
+        assert result.json()["result"]["content"]
 
 
 def test_landing_page_and_media_routes_are_served():

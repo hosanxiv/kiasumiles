@@ -39,6 +39,7 @@ mcp = FastMCP(
     port=_port(),
     streamable_http_path=os.environ.get("KIASUMILES_MCP_PATH", "/mcp"),
     stateless_http=True,
+    json_response=True,
 )
 
 
@@ -245,6 +246,16 @@ class RateLimitMiddleware:
 
     async def __call__(self, scope, receive, send):
         is_mcp = scope.get("type") == "http" and scope.get("path", "").startswith("/mcp")
+        # This stateless service has no server-initiated notifications. An idle
+        # GET stream otherwise holds a serverless function open until timeout.
+        if is_mcp and scope.get("path", "").rstrip("/") == "/mcp" and scope.get("method") == "GET":
+            response = JSONResponse(
+                {"error": "method_not_allowed", "detail": "Use POST for MCP requests; standalone event streams are not supported."},
+                status_code=405,
+                headers={"Allow": "POST", "Cache-Control": "no-store"},
+            )
+            await response(scope, receive, send)
+            return
         if is_mcp and self.max_requests > 0 and self._is_limited(self._client_ip(scope)):
             body = json.dumps({
                 "error": "rate_limited",
