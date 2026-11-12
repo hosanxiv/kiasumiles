@@ -3,6 +3,10 @@
   "version": 2,
   "rewrites": [
     {
+      "source": "/",
+      "destination": "/api/index.py?__kiasumiles_path=%2F"
+    },
+    {
       "source": "/:path*",
       "destination": "/api/index.py?__kiasumiles_path=:path*"
     }

@@ -54,6 +54,10 @@ def test_vercel_rewrite_forwards_the_original_public_path() -> None:
 
     assert config["rewrites"] == [
         {
+            "source": "/",
+            "destination": "/api/index.py?__kiasumiles_path=%2F",
+        },
+        {
             "source": "/:path*",
             "destination": "/api/index.py?__kiasumiles_path=:path*",
         }
@@ -62,7 +66,7 @@ def test_vercel_rewrite_forwards_the_original_public_path() -> None:
 
 def test_vercel_entrypoint_restores_landing_and_health_paths() -> None:
     client = TestClient(vercel_app)
-    landing = client.get("/api/index.py?__kiasumiles_path=")
+    landing = client.get("/api/index.py?__kiasumiles_path=%2F")
     health = client.get("/api/index.py?__kiasumiles_path=health")
 
     assert landing.status_code == 200
