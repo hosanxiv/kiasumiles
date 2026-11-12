@@ -1607,3 +1607,16 @@ def test_vantage_november_rate_effective_date(ocbc_rewards, as_of, local_rate, l
     row = rank_cards("5411", [card], False, 1, channel="online", amount_sgd=2.80,
                      as_of=as_of, transaction_currency="SGD", vantage_miles_selected=True)[0]
     assert row["estimated_miles"] == (4 if as_of < date(2026, 11, 2) else 2)
+
+
+@pytest.mark.parametrize("amount,expected_rate", [(0.49, 0), (0.50, 1)])
+def test_chocolate_minimum_transaction(ocbc_rewards, amount, expected_rate):
+    card = replace(ocbc_rewards, card_id="chocolate_visa", eligible_mccs=[],
+                   eligible_merchants=[], cap_sgd=2000, earn_rate_mpd=1,
+                   base_rate_mpd=.4, min_spend=0, earn_block_sgd=1)
+    row = rank_cards("5411", [card], False, 1, amount_sgd=amount,
+                     chocolate_eligible=True)[0]
+    assert row["earn_rate_mpd"] == expected_rate
+    if amount < .5:
+        assert row["estimated_miles"] == 0
+        assert "below_minimum_transaction" in row["reason_codes"]

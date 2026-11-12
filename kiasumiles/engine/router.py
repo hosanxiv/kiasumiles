@@ -961,6 +961,11 @@ def rank_cards(
             if rate_mode == "guaranteed":
                 mpd = 0.0
                 reasons = []
+        if rule.card_id == "chocolate_visa" and amount_sgd is not None and amount_sgd < 0.50:
+            mpd = 0.0
+            reasons = []
+            reason_codes.append("below_minimum_transaction")
+            gotchas.append("Chocolate transactions below S$0.50 earn no Max Miles.")
         scored.append({
             "card_id": rule.card_id,
             "card_name": rule.card_name,
