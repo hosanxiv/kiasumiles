@@ -544,7 +544,7 @@ def test_dbs_rewards_exclusions(ocbc_rewards, card_id):
     for merchant, mcc in [("Utility", "4900"), ("Hospital", "8062"), ("SAM - BILL", "5411"), ("AMAZE*SHOP", "5411")]:
         row = rank_cards(mcc, [card], False, 1, merchant, "online", "guaranteed", 30)[0]
         assert row["estimated_miles"] == 0
-    assert effective_mpd(card, "5411", False, "Supermarket", "contactless") == {"dbs_insignia": 1.6, "dbs_vantage": 1.5}.get(card_id, 1.3)
+    assert effective_mpd(card, "5411", False, "Supermarket", "contactless") == {"dbs_insignia": 1.6, "dbs_vantage": 1.4}.get(card_id, 1.3)
 
 
 @pytest.mark.parametrize("amount,miles", [(4.99, 6), (5, 6), (9.99, 12), (30, 38)])
@@ -859,7 +859,7 @@ def test_altitude_rounds_points_not_spend(ocbc_rewards, channel, amount, expecte
                       amount_sgd=amount)[0]["estimated_miles"] == expected
 
 
-@pytest.mark.parametrize("card_id,local,fcy", [("dbs_insignia", 1.6, 2), ("dbs_vantage", 1.5, 2.2)])
+@pytest.mark.parametrize("card_id,local,fcy", [("dbs_insignia", 1.6, 2), ("dbs_vantage", 1.4, 2.2)])
 def test_dbs_general_cards_currency_and_rounding(ocbc_rewards, card_id, local, fcy):
     card = replace(ocbc_rewards, card_id=card_id, bank="DBS", eligible_mccs=[],
                    eligible_merchants=[], cap_sgd=None, earn_rate_mpd=local,
@@ -879,13 +879,13 @@ def test_dbs_general_rounding_label(ocbc_rewards, card_id):
     assert row["cap_summary"] == "No cap · DBS Points rounded down per transaction"
 
 
-@pytest.mark.parametrize("selected,mode,expected", [(True, "guaranteed", 150),
+@pytest.mark.parametrize("selected,mode,expected", [(True, "guaranteed", 140),
     (None, "guaranteed", 0), (False, "guaranteed", 0),
-    (None, "conditional", 150), (False, "conditional", 150)])
+    (None, "conditional", 140), (False, "conditional", 140)])
 def test_vantage_reward_choice(ocbc_rewards, selected, mode, expected):
     card = replace(ocbc_rewards, card_id="dbs_vantage", bank="DBS", eligible_mccs=[],
                    eligible_merchants=[], cap_sgd=None, min_spend=0,
-                   earn_rate_mpd=1.5, base_rate_mpd=1.5, earn_block_sgd=5)
+                   earn_rate_mpd=1.4, base_rate_mpd=1.4, earn_block_sgd=5)
     row = rank_cards("5411", [card], False, 1, channel="online", amount_sgd=100,
                      rate_mode=mode, vantage_miles_selected=selected)[0]
     assert row["estimated_miles"] == expected
@@ -904,13 +904,13 @@ def test_vantage_choice_api_is_request_scoped(monkeypatch, ocbc_rewards, endpoin
 
     card = replace(ocbc_rewards, card_id="dbs_vantage", card_name="DBS Vantage", bank="DBS",
                    eligible_mccs=[], eligible_merchants=[], cap_sgd=None, min_spend=0,
-                   earn_rate_mpd=1.5, base_rate_mpd=1.5, earn_block_sgd=5)
+                   earn_rate_mpd=1.4, base_rate_mpd=1.4, earn_block_sgd=5)
     monkeypatch.setattr(tools._loader, "_cards", [card])
     monkeypatch.setattr(tools._loader, "_merchants", [
         MerchantRecord("Sample Grocer", None, "any", "5411", "Grocery", "medium", 1, "")])
     client = TestClient(hosted.app)
     body = {"merchant": "Sample Grocer", "cards": ["DBS Vantage"], "amount_sgd": 100}
-    for selected, expected in [(True, 150), (False, 0), (None, 0)]:
+    for selected, expected in [(True, 140), (False, 0), (None, 0)]:
         response = client.post(f"/api/chatgpt/{endpoint}", json={**body, "vantage_miles_selected": selected})
         assert response.status_code == 200
         payload = response.json()
@@ -1587,3 +1587,23 @@ def test_pps_explicit_currency_overrides_channel(ocbc_rewards, card_id, foreign_
                      pps_sia_group_eligible=True, transaction_currency="SGD",
                      pps_prior_spend_sgd={card_id: 0})[0]
     assert row["estimated_miles"] == 20
+
+
+@pytest.mark.parametrize("as_of,local_rate,local_miles", [
+    (date(2026, 11, 1), 1.5, 150),
+    (date(2026, 11, 2), 1.4, 140),
+    (date(2026, 11, 13), 1.4, 140),
+])
+def test_vantage_november_rate_effective_date(ocbc_rewards, as_of, local_rate, local_miles):
+    card = replace(ocbc_rewards, card_id="dbs_vantage", bank="DBS",
+                   eligible_mccs=[], eligible_merchants=[], cap_sgd=None, min_spend=0,
+                   earn_rate_mpd=1.4, base_rate_mpd=1.4, earn_block_sgd=5)
+    for currency, rate, miles in [("SGD", local_rate, local_miles), ("USD", 2.2, 220)]:
+        row = rank_cards("5411", [card], False, 1, channel="online", amount_sgd=100,
+                         as_of=as_of, transaction_currency=currency,
+                         vantage_miles_selected=True)[0]
+        assert row["earn_rate_mpd"] == rate
+        assert row["estimated_miles"] == miles
+    row = rank_cards("5411", [card], False, 1, channel="online", amount_sgd=2.80,
+                     as_of=as_of, transaction_currency="SGD", vantage_miles_selected=True)[0]
+    assert row["estimated_miles"] == (4 if as_of < date(2026, 11, 2) else 2)

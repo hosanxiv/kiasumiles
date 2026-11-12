@@ -503,7 +503,12 @@ def _rule_diagnostics(
             return 0.0, ["transaction_excluded"], [], ["This transaction is excluded from this card's DBS rewards programme."]
     if rule.card_id in _DBS_GENERAL_RATES:
         foreign = transaction_currency != "SGD" if transaction_currency else channel == "fcy"
-        return _DBS_GENERAL_RATES[rule.card_id][foreign], [], [], []
+        rate = _DBS_GENERAL_RATES[rule.card_id][foreign]
+        if rule.card_id == "dbs_vantage" and not foreign:
+            # DBS revised eligible SGD earning from 2 November 2026.
+            posting_day = as_of or datetime.now(ZoneInfo("Asia/Singapore")).date()
+            rate = 1.4 if posting_day >= date(2026, 11, 2) else 1.5
+        return rate, [], [], []
     if rule.card_id == "dbs_wwmc" and channel == "fcy":
         return 1.2, [], [], []
     if rule.card_id == "dbs_wwmc" and (mcc in {
